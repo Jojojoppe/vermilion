@@ -14,6 +14,12 @@ const int VmWindowSupportedPlatforms[] = {
 #ifdef VMWINDOW_UNIX_GLFW
 	VMWINDOW_PLATFORM_UNIX_GLFW,
 #endif
+#ifdef VMWINDOW_WIN32_GLFW
+	VMWINDOW_PLATFORM_WINDOWS_GLFW,
+#endif
+#ifdef VMWINDOW_WIN32
+	VMWINDOW_PLATFORM_WINDOWS,
+#endif
 	0
 };
 
