@@ -10,6 +10,6 @@ target_include_directories(sandbox PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/../libvermilion/include	
 )
 target_link_libraries(sandbox
-	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libvermilion_core.so
-	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libvermilion_window.so
+	vermilion_core
+	vermilion_window
 )
