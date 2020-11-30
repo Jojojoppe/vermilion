@@ -1,6 +1,6 @@
 .SILENT:
 
-TARGET				:= sandbox
+TARGET				:= libvermilion_core.so
 BUILDDIR			:= build
 SRCDIRS				:= src
 
@@ -12,15 +12,15 @@ FILESTOCLEAN		:= $(OBJFILES) $(DEPFILES) $(BUILDDIR)/$(TARGET)
 
 CC					:= g++
 AR					:= ar
-LD					:= g++
+LD					:= ld
 AS					:= as
 
 CC_WARNING			:= -Wall -Wextra
-CC_LIBS				:= -L ../libvermilion/build -lvermilion_core -lvermilion_window
-CC_FLAGS			:=
-CC_INCLUDES			:= -I src -I ../libvermilion/include
+CC_LIBS				:=
+CC_FLAGS			:= -fPIC
+CC_INCLUDES			:= -I src -I ../../libvermilion/include
 
-LD_FLAGS 			:=
+LD_FLAGS 			:= -shared
 
 # Add DEPFILE dependencies
 -include $(DEPFILES)

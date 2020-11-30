@@ -15,7 +15,7 @@ flags = [
 'c++',
 '-std=c++11',
 
-'-I', 'src',
+'-I', 'src', '-I', 'include'
 ]
 
 compilation_database_folder = ''
