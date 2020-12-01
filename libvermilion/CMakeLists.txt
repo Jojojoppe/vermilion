@@ -62,4 +62,4 @@ add_library(vermilion_window SHARED
 target_include_directories(vermilion_window PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include	
 )
-target_link_libraries(vermilion_window ${VERMILION_WINDOW_LIBS})
+target_link_libraries(vermilion_window ${VERMILION_WINDOW_LIBS} vermilion_core)
