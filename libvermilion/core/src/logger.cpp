@@ -8,15 +8,6 @@ const char * VmCoreLoggerLevelNames[] = {
 	"ERROR", 
 	"FATAL"
 };
-#ifdef WIN32
-const char * VmCoreLoggerLevelColors[] = {
-	"^<ESC^>[37m [37m",
-	"^<ESC^>[33m [33m",
-	"^<ESC^>[93m [93m",
-	"^<ESC^>[31m [31m",
-	"^<ESC^>[91m [91m"
-};
-#else
 const char * VmCoreLoggerLevelColors[] = {
 	"\033[00;37m",
 	"\033[00;33m",
@@ -24,7 +15,6 @@ const char * VmCoreLoggerLevelColors[] = {
 	"\033[00;31m",
 	"\033[01;31m"
 };
-#endif
 
 Vermilion::Core::Logger::Logger(){
 //	this->log(VMCORE_LOGLEVEL_DEBUG, "Vermilion logger initialized");

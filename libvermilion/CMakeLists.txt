@@ -19,13 +19,9 @@ target_include_directories(vermilion_core PUBLIC
 if(WIN32)
 	add_compile_definitions(VMWINDOW_WIN32)
 
-	find_package(glfw3)
-
-	if(glfw3_FOUND)
-		message("-- GLFW system found, add to source tree")
-		add_compile_definitions(VMWINDOW_UNIX_GLFW)
-		set(VERMILION_WINDOW_LIBS ${VERMILION_WINDOW_LIBS} glfw)
-	endif()
+	message("-- GLFW system being build, add to source tree")
+	add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/glfw3 ${PROJECT_BINARY_DIR}/third_party/glfw3)
+	add_compile_definitions(VMWINDOW_WIN32_GLFW3)
 
 endif()
 if(UNIX AND NOT APPLE)
@@ -43,6 +39,11 @@ if(UNIX AND NOT APPLE)
 		message("-- GLFW system found, add to source tree")
 		add_compile_definitions(VMWINDOW_UNIX_GLFW)
 		set(VERMILION_WINDOW_LIBS ${VERMILION_WINDOW_LIBS} glfw)
+	endif()
+	if(not glfw3_FOUND)
+		message("-- GLFW system being build, add to source tree")
+		add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/glfw3 ${PROJECT_BINARY_DIR}/third_party/glfw3)
+		add_compile_definitions(VMWINDOW_UNIX_GLFW3)
 	endif()
 	
 endif()

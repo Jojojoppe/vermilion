@@ -12,6 +12,7 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
 endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS True)
+set(CMAKE_BUILD_TYPE Release)
 link_directories("${PROJECT_BINARY_DIR}/out")
 
 add_subdirectory(libvermilion)
