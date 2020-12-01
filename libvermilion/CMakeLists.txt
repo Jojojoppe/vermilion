@@ -16,10 +16,6 @@ target_include_directories(vermilion_core PUBLIC
 # LIBVERMILION_WINDOW
 # -------------------
 
-set(VERMILION_WINDOW_LIBS
-	m	
-)
-
 if(WIN32)
 	add_compile_definitions(VMWINDOW_WIN32)
 
