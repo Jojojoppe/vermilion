@@ -1,22 +1,20 @@
-#ifdef VMWINDOW_UNIX_GLFW
+#ifdef VMWINDOW_WIN32_GLFW
 
 #include "window.hpp"
 #include <vermilion/window/window.hpp>
 #include <vermilion/core/logger.hpp>
 
-#include <GLFW/glfw3.h>
-
-Vermilion::Window::UNIX_GLFW_WindowInstance::UNIX_GLFW_WindowInstance(Window * window){
+Vermilion::Window::WINDOWS_GLFW_WindowInstance::WINDOWS_GLFW_WindowInstance(Vermilion::Window::Window * window){
 	this->vmWindowWindow = window;
 
-	this->vmWindowWindow->vmCoreInstance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Starting GLFW window on UNIX");
+	vmWindowWindow->vmCoreInstance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Starting GLFW window on WINDOWS");
 }
 
-Vermilion::Window::UNIX_GLFW_WindowInstance::~UNIX_GLFW_WindowInstance(){
+Vermilion::Window::WINDOWS_GLFW_WindowInstance::~WINDOWS_GLFW_WindowInstance(){
 
 }
 
-void Vermilion::Window::UNIX_GLFW_WindowInstance::open(Vermilion::Core::ContextProperties * contextProperties){
+void Vermilion::Window::WINDOWS_GLFW_WindowInstance::open(Vermilion::Core::ContextProperties * contextProperties){
 	this->vmWindowWindow->vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "Initialize GLFW");
 
 	glfwInit();

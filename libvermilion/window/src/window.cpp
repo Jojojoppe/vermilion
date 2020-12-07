@@ -4,12 +4,11 @@
 #include <iostream>
 
 #include "platform/unix_glfw/window.hpp"
-#include "platform/unix_X11/window.hpp"
+#include "platform/windows_glfw/window.hpp"
 
 const int VmWindowSupportedPlatforms[] = {
-	VMWINDOW_PLATFORM_NONE,
 #ifdef VMWINDOW_UNIX_X11
-	VMWINDOW_PLATFORM_UNIX_X11,
+//	VMWINDOW_PLATFORM_UNIX_X11,
 #endif
 #ifdef VMWINDOW_UNIX_GLFW
 	VMWINDOW_PLATFORM_UNIX_GLFW,
@@ -18,13 +17,12 @@ const int VmWindowSupportedPlatforms[] = {
 	VMWINDOW_PLATFORM_WINDOWS_GLFW,
 #endif
 #ifdef VMWINDOW_WIN32
-	VMWINDOW_PLATFORM_WINDOWS,
+//	VMWINDOW_PLATFORM_WINDOWS,
 #endif
 	0
 };
 
 const char * VmWindowSupportedPlatformName[] = {
-	"None",
 	"None",
 	"Unix with X11",
 	"Unix with GLFW",
@@ -33,8 +31,12 @@ const char * VmWindowSupportedPlatformName[] = {
 };
 
 
-Vermilion::Window::Window::Window(std::shared_ptr<Vermilion::Core::Instance> instance){
+Vermilion::Window::Window::Window(std::shared_ptr<Vermilion::Core::Instance> instance, WindowProperties& properties){
 	this->vmCoreInstance = instance;
+
+	this->properties.width = properties.width;
+	this->properties.height = properties.height;
+	this->properties.title = properties.title;
 
 	const int * supported = VmWindowSupportedPlatforms;
 	while(*supported){
@@ -42,10 +44,47 @@ Vermilion::Window::Window::Window(std::shared_ptr<Vermilion::Core::Instance> ins
 		supported++;
 	}
 
-	// TODO select a supported WindowInstance
-//	windowInstance.reset(new Vermilion::Window::UNIX_X11_WindowInstance(this->vmCoreInstance));
+	vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "Trying to create window with title \"%s\"", this->properties.title);
+	vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "                             width %d", properties.width);
+	vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "                             height %d", properties.height);
+
+	switch(VmWindowSupportedPlatforms[0]){
+
+#ifdef VMWINDOW_UNIX_GLFW
+		case VMWINDOW_PLATFORM_UNIX_GLFW:
+			windowInstance.reset(new Vermilion::Window::UNIX_GLFW_WindowInstance(this));
+			break;
+#endif
+#ifdef VMWINDOW_WIN32_GLFW
+		case VMWINDOW_PLATFORM_WINDOWS_GLFW:
+			windowInstance.reset(new Vermilion::Window::WINDOWS_GLFW_WindowInstance(this));
+			break;
+#endif
+
+		default:
+			vmCoreInstance->logger.log(VMCORE_LOGLEVEL_FATAL, "Platform not supported to run Vermilion");
+			break;
+	}
 }
 
 Vermilion::Window::Window::~Window(){
 
+}
+
+Vermilion::Core::ContextProperties* Vermilion::Window::Window::getContextProperties(){
+	Vermilion::Core::ContextProperties* contextProperties = new Vermilion::Core::ContextProperties();;
+	contextProperties->width = 400;
+	contextProperties->height = 400;
+	
+	return contextProperties;
+}
+
+void Vermilion::Window::Window::open(Vermilion::Core::ContextProperties * contextProperties){
+	this->windowInstance->open(contextProperties);	
+}
+
+Vermilion::Window::WindowProperties::WindowProperties(int width, int height, const std::string& title){
+	this->title = title;
+	this->width = width;
+	this->height = height;
 }

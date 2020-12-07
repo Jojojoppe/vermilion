@@ -1,4 +1,4 @@
-#ifdef VMWINDOW_UNIX_GLFW
+#ifdef VMWINDOW_WIN32_GLFW
 #pragma once
 
 #include <vermilion/window/window.hpp>
@@ -8,13 +8,13 @@
 namespace Vermilion{
 namespace Window{
 
-class UNIX_GLFW_WindowInstance : public WindowInstance{
+class WINDOWS_GLFW_WindowInstance : public WindowInstance{
 	private:
 		GLFWwindow * window;
 
 	public:
-		UNIX_GLFW_WindowInstance(Window * window);
-		~UNIX_GLFW_WindowInstance();
+		WINDOWS_GLFW_WindowInstance(Window * window);
+		~WINDOWS_GLFW_WindowInstance();
 
 		virtual void open(Vermilion::Core::ContextProperties * contextProperties) override;
 };
