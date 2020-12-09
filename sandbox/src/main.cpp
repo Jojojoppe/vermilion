@@ -6,6 +6,9 @@
 
 int main(int argc, char ** argv){
 
+	/* ---
+	 * Vermilion initialisation with Vermilion::Window
+	 * -- */
 	// Create Vermilion renderer instance
 	auto vmInstance = std::make_shared<Vermilion::Core::Instance>();
 	// Create Vermilion window
@@ -19,13 +22,36 @@ int main(int argc, char ** argv){
 	vmInstance->createContext(contextProperties);
 	// Post the renderer context settings to the window and open window
 	vmWindow.open(contextProperties);
-	// Call vmInstance->initContext(contextProperties) if not using Vermilion::Window
-	//contextProperties.procAddress = ....
-	//vmInstance->initContext(contextProperties);
 
+	/* ---
+	 * Vermilion initialisation with own windowing interface
+	 * --- */
+	/*
+	// Create Vermilion renderer instance
+	auto vmInstance = std::make_shared<Vermilion::Core::Instance>();
+	// Initialize windowing
+	glfwInit();
+	// Get the window context hints
+	Vermilion::Core::ContextProperties contextProperties;
+	// Set contextProperties with window info
+	contextProperties.hintAPI = VMCORE_API_OPENGL;
+	contextProperties.width = ...;
+	contextProperties.height = ...;
+	// Create the renderer context
+	vmInstance->createContext(&contextProperties);
+	// Create window itself with contextProperties.API context
+	// Check for VMCORE_API_OPENGL in contextProperties.API
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+	window = glfwCreateWindow(....);
+	glfwMakeContextCurrent(window);
+	contextProperties.opengl_procAddress = (void*)glfwGetProcAddress;
+	// Set needed fields in contextProperties
+	vmInstance->initContext(&contextProperties);
+	*/
 
 	while(true){
 	}
+	
 
 	return 0;
 }

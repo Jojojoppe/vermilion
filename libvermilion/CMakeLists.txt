@@ -13,6 +13,10 @@ if(OPENGL_FOUND)
 	message("-- OpenGL found, add to source tree")
 	add_compile_definitions(VMCORE_OPENGL)
 	set(VERMILION_CORE_LIBS ${VERMILION_CORE_LIBS} OpenGL::GL)
+	# Add glad
+	aux_source_directory(${CMAKE_SOURCE_DIR}/third_party/glad/src GLAD_SOURCES)
+	set(VERMILION_CORE_INCLUDE_DIRS ${VERMILION_CORE_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/third_party/glad/include)
+	set(VERMILION_CORE_EXTRA_SRC ${VERMILION_CORE_EXTRA_SRC} ${GLAD_SOURCES})
 endif()
 
 find_package(Vulkan)
@@ -28,6 +32,8 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/logger.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/context.cpp
+
+	${GLAD_SOURCES}
 )
 target_include_directories(vermilion_core PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include	

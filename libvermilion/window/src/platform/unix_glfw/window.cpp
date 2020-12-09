@@ -37,6 +37,19 @@ void Vermilion::Window::UNIX_GLFW_WindowInstance::open(Vermilion::Core::ContextP
 	this->window = glfwCreateWindow(this->vmWindowWindow->properties.width, this->vmWindowWindow->properties.height,
 			"floatme", nullptr, nullptr);
 
+	switch(contextProperties->API){
+		case VMCORE_API_OPENGL:
+			glfwMakeContextCurrent(this->window);
+#ifdef VMCORE_OPENGL
+			contextProperties->opengl_procAddress = (void*)glfwGetProcAddress;
+#endif
+			break;
+		case VMCORE_API_VULKAN:
+			break;
+		default:
+			this->vmWindowWindow->vmCoreInstance->logger.log(VMCORE_LOGLEVEL_FATAL, "API %d not supported", contextProperties->API);
+	}
+
 	// Finalize context initialization
 	this->vmWindowWindow->vmCoreInstance->initContext(contextProperties);
 }

@@ -44,9 +44,9 @@ Vermilion::Window::Window::Window(std::shared_ptr<Vermilion::Core::Instance> ins
 		supported++;
 	}
 
-	vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "Trying to create window with title \"%s\"", this->properties.title);
-	vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "                             width %d", properties.width);
-	vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "                             height %d", properties.height);
+	//vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "Trying to create window with title \"%s\"", this->properties.title);
+	//vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "                             width %d", properties.width);
+	//vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "                             height %d", properties.height);
 
 	switch(VmWindowSupportedPlatforms[0]){
 
