@@ -1,44 +1,77 @@
-#include <vermilion/core/instance.hpp>
-#include <vermilion/vermilion.hpp>
+#include <vermilion/instance.hpp>
 
-#include "platform/opengl/context.hpp"
-#include "platform/vulkan/context.hpp"
-
-Vermilion::Core::Instance::Instance(){
-	this->logger.log(VMCORE_LOGLEVEL_INFO, "Vermilion core version %d.%d", VERMILION_VERSION_MAJOR, VERMILION_VERSION_MINOR);
-	this->logger.log(VMCORE_LOGLEVEL_INFO, "%s - %s [%s]", VERMILION_AUTHOR_NAME, VERMILION_AUTHOR_EMAIL, VERMILION_LICENCE);
-	this->logger.log(VMCORE_LOGLEVEL_INFO, "----");
+Vermilion::Core::Instance::Instance(int * hintType, int * hintValue){
+	// Parse hints
+	int platform_render = parseHintType_RENDER_PLATFORM(hintType, hintValue);
+	this->logger.log(VMCORE_LOGLEVEL_INFO, "RENDER_PLATFORM: %s", Vermilion::Core::RenderPlatformString[platform_render].c_str());
+	int platform_window = parseHintType_WINDOW_PLATFORM(hintType, hintValue);
+	this->logger.log(VMCORE_LOGLEVEL_INFO, "WINDOW_PLATFORM: %s", Vermilion::Core::WindowPlatformString[platform_window].c_str());
+	
 }
 
 Vermilion::Core::Instance::~Instance(){
 
 }
 
-void Vermilion::Core::Instance::createContext(Vermilion::Core::ContextProperties * properties){
-	// TODO final API choosing
-//	properties->API = VMCORE_API_OPENGL;
-	properties->API = properties->hintAPI;
+int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue){
+	int API = Vermilion::Core::renderPlatform[0];
 
-	switch(properties->API){
-
-#ifdef VMCORE_OPENGL
-		case VMCORE_API_OPENGL:
-			this->context.reset(new Vermilion::Core::OPENGL_Context(this));
-			break;
-#endif
-
-#ifdef VMCORE_VULKAN
-		case VMCORE_API_VULKAN:
-			this->context.reset(new Vermilion::Core::VULKAN_Context(this));
-			break;
-#endif
-
-		default:
-			this->logger.log(VMCORE_LOGLEVEL_FATAL, "API not supported");
-			break;
+	if(!hintType){
+		return API;
 	}
+
+	while(*hintType){
+	
+		if((*hintType)==Vermilion::Core::HintType::HINT_TYPE_RENDER_PLATFORM){
+			// Check if hint can be applied
+			const int * rp = Vermilion::Core::renderPlatform;
+			while(*rp){
+				if(*rp == *hintType){
+					// hint can be applied
+					API = *rp;
+					return API;
+				}
+				rp++;
+			}
+			// hint cannot be applied, choose first in possible values
+			API = rp[0];
+			return API;
+		}
+
+		hintType++;
+		hintValue++;
+	}
+	return API;
 }
 
-void Vermilion::Core::Instance::initContext(Vermilion::Core::ContextProperties * properties){
-	this->context->init(properties);
+int Vermilion::Core::Instance::parseHintType_WINDOW_PLATFORM(int * hintType, int * hintValue){
+	int WINDOW = Vermilion::Core::windowPlatform[0];
+
+	if(!hintType){
+		return WINDOW;
+	}
+
+	while(*hintType){
+	
+		if((*hintType)==Vermilion::Core::HintType::HINT_TYPE_WINDOW_PLATFORM){
+			// Check if hint can be applied
+			const int * wp = Vermilion::Core::windowPlatform;
+			while(*wp){
+				if(*wp == *hintType){
+					// hint can be applied
+					WINDOW = *wp;
+					return WINDOW;
+				}
+				wp++;
+			}
+			// hint cannot be applied, choose first in possible values
+			WINDOW = wp[0];
+			return WINDOW;
+		}
+
+		hintType++;
+		hintValue++;
+	}
+	return WINDOW;
 }
+

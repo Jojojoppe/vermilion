@@ -1,4 +1,4 @@
-#include <vermilion/core/logger.hpp>
+#include <vermilion/logger.hpp>
 #include <cstdio>
 
 const char * VmCoreLoggerLevelNames[] = {

@@ -11,5 +11,4 @@ target_include_directories(sandbox PUBLIC
 )
 target_link_libraries(sandbox
 	vermilion_core
-	vermilion_window
 )
