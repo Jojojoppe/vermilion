@@ -32,6 +32,8 @@ class API{
 		static API * create(int platform, Instance * instance);
 		virtual ~API() = default;
 
+		virtual void init(){};
+
 	private:
 };
 

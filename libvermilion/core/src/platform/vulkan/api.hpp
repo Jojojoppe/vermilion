@@ -17,6 +17,8 @@ class API : public Vermilion::Core::API{
 		API(Vermilion::Core::Instance * instance);
 		virtual ~API() override;
 
+		virtual void init() override;
+
 	private:
 
 };

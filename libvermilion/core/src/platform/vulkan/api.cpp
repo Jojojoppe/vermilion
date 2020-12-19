@@ -13,4 +13,8 @@ Vermilion::Core::Vulkan::API::~API(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Destroying Vulkan context");
 }
 
+void Vermilion::Core::Vulkan::API::init(){
+	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Initializing Vulkan context");
+}
+
 #endif

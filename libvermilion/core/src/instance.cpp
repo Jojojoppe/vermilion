@@ -8,11 +8,15 @@ Vermilion::Core::Instance::Instance(int * hintType, int * hintValue){
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "RENDER_PLATFORM: %s", Vermilion::Core::RenderPlatformString[platform_render].c_str());
 	int platform_window = parseHintType_WINDOW_PLATFORM(hintType, hintValue);
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "WINDOW_PLATFORM: %s", Vermilion::Core::WindowPlatformString[platform_window].c_str());
+	int window_height = parseHintType_WINDOW_HEIGHT(hintType, hintValue);
+	int window_width = parseHintType_WINDOW_WIDTH(hintType, hintValue);
 
 	// Create API
 	this->api.reset(API::create(platform_render, this));
 	// Create Window
-	this->window.reset(Window::create(platform_window, this));
+	this->window.reset(Window::create(platform_window, platform_render, this));
+
+	this->window->createWindow(window_width, window_height);
 }
 
 Vermilion::Core::Instance::~Instance(){
@@ -37,7 +41,7 @@ int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int
 			// Check if hint can be applied
 			const int * rp = Vermilion::Core::renderPlatform;
 			while(*rp){
-				if(*rp == *hintType){
+				if(*rp == *hintValue){
 					// hint can be applied
 					API = *rp;
 					return API;
@@ -68,7 +72,7 @@ int Vermilion::Core::Instance::parseHintType_WINDOW_PLATFORM(int * hintType, int
 			// Check if hint can be applied
 			const int * wp = Vermilion::Core::windowPlatform;
 			while(*wp){
-				if(*wp == *hintType){
+				if(*wp == *hintValue){
 					// hint can be applied
 					WINDOW = *wp;
 					return WINDOW;
@@ -84,5 +88,45 @@ int Vermilion::Core::Instance::parseHintType_WINDOW_PLATFORM(int * hintType, int
 		hintValue++;
 	}
 	return WINDOW;
+}
+
+int Vermilion::Core::Instance::parseHintType_WINDOW_HEIGHT(int * hintType, int * hintValue){
+	int HEIGHT = 800;
+
+	if(!hintType){
+		return HEIGHT;
+	}
+
+	while(*hintType){
+	
+		if((*hintType)==Vermilion::Core::HintType::HINT_TYPE_WINDOW_HEIGHT){
+			HEIGHT = *hintValue;
+			return HEIGHT;
+		}
+
+		hintType++;
+		hintValue++;
+	}
+	return HEIGHT;
+}
+
+int Vermilion::Core::Instance::parseHintType_WINDOW_WIDTH(int * hintType, int * hintValue){
+	int WIDTH = 800;
+
+	if(!hintType){
+		return WIDTH;
+	}
+
+	while(*hintType){
+	
+		if((*hintType)==Vermilion::Core::HintType::HINT_TYPE_WINDOW_WIDTH){
+			WIDTH = *hintValue;
+			return WIDTH;
+		}
+
+		hintType++;
+		hintValue++;
+	}
+	return WIDTH;
 }
 

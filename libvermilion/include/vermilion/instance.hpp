@@ -16,6 +16,8 @@ enum HintType{
 	HINT_TYPE_NONE = 0,
 	HINT_TYPE_WINDOW_PLATFORM,
 	HINT_TYPE_RENDER_PLATFORM,
+	HINT_TYPE_WINDOW_HEIGHT,
+	HINT_TYPE_WINDOW_WIDTH
 };
 
 /**
@@ -24,10 +26,10 @@ enum HintType{
 class Instance{
 	public:
 		Logger logger;
-
-	private:
 		std::unique_ptr<API> api;
 		std::unique_ptr<Window> window;
+
+	private:
 
 	public:
 
@@ -44,6 +46,8 @@ class Instance{
 	private:
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);
 		int parseHintType_WINDOW_PLATFORM(int * hintType, int * hintValue);
+		int parseHintType_WINDOW_HEIGHT(int * hintType, int * hintValue);
+		int parseHintType_WINDOW_WIDTH(int * hintType, int * hintValue);
 };
 
 }}
