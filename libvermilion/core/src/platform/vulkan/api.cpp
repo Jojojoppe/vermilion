@@ -3,6 +3,7 @@
 #include "api.hpp"
 #include <vermilion/instance.hpp>
 #include "validationlayers.hpp"
+#include "physicaldevice.hpp"
 
 const bool enableValidationLayers = true;
 
@@ -22,15 +23,7 @@ void Vermilion::Core::Vulkan::API::init(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Initializing Vulkan context");
 
 	this->createInstance();
-
-	// Pick GPU
-	uint32_t deviceCount = 0;
-	vkEnumeratePhysicalDevices(this->vk_instance, &deviceCount, nullptr);
-	if(deviceCount==0){
-		this->instance->logger.log(VMCORE_LOGLEVEL_ERROR, "No GPU's found with Vulkan support");
-	}
-	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(this->vk_instance, &deviceCount, devices.data());
+	this->pickPhysicalDevice();
 
 }
 
@@ -65,6 +58,26 @@ void Vermilion::Core::Vulkan::API::createInstance(){
 	}
 	if(vkCreateInstance(&createInfo, nullptr, &this->vk_instance) != VK_SUCCESS){
 		this->instance->logger.log(VMCORE_LOGLEVEL_ERROR, "Failed to create Vulkan instance");
+	}
+}
+
+void Vermilion::Core::Vulkan::API::pickPhysicalDevice(){
+	// Pick GPU
+	uint32_t deviceCount = 0;
+	vkEnumeratePhysicalDevices(this->vk_instance, &deviceCount, nullptr);
+	if(deviceCount==0){
+		this->instance->logger.log(VMCORE_LOGLEVEL_ERROR, "No GPU's found with Vulkan support");
+	}
+	std::vector<VkPhysicalDevice> devices(deviceCount);
+	vkEnumeratePhysicalDevices(this->vk_instance, &deviceCount, devices.data());
+	for(const auto& device : devices){
+		if(isDeviceSuitable(device)){
+			this->vk_physicalDevice = device;
+			break;
+		}
+	}
+	if(this->vk_physicalDevice==VK_NULL_HANDLE){
+		this->instance->logger.log(VMCORE_LOGLEVEL_ERROR, "No suitable GPU's found");
 	}
 }
 

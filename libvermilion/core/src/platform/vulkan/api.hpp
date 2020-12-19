@@ -31,6 +31,7 @@ class API : public Vermilion::Core::API{
 	private:
 
 		void createInstance();
+		void pickPhysicalDevice();
 
 };
 

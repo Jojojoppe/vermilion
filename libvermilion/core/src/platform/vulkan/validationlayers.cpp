@@ -1,3 +1,4 @@
+#ifdef VMCORE_VULKAN
 #include "validationlayers.hpp"
 
 #include <vector>
@@ -36,3 +37,4 @@ bool checkValidationLayerSupport(){
 }
 
 }}}
+#endif
