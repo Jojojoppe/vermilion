@@ -17,11 +17,24 @@ int main(int argc, char ** argv){
 	Vermilion::Window::Window vmWindow(vmInstance, windowProperties);
 	// Get the window context hints
 	Vermilion::Core::ContextProperties * contextProperties = vmWindow.getContextProperties();
+//	contextProperties->hintAPI = VMCORE_API_VULKAN;
 	contextProperties->hintAPI = VMCORE_API_OPENGL;
 	// Create the renderer context
 	vmInstance->createContext(contextProperties);
 	// Post the renderer context settings to the window and open window
 	vmWindow.open(contextProperties);
+
+	// DO SETUP STUFF
+	// CREATE BUFFERS
+	// SET SETTINGS
+
+	while(vmWindow.shouldClose()){
+		// SET RENDERABLE
+		// SEND RENDER COMMANDS
+		// (SET RENDERABLE AND SEND MORE COMMANDS)
+		// PRESENT FINAL RENDERABLE
+		vmWindow.present();
+	}
 
 	/* ---
 	 * Vermilion initialisation with own windowing interface
@@ -47,10 +60,14 @@ int main(int argc, char ** argv){
 	contextProperties.opengl_procAddress = (void*)glfwGetProcAddress;
 	// Set needed fields in contextProperties
 	vmInstance->initContext(&contextProperties);
-	*/
 
-	while(true){
+	while(!glfwWindowShouldClose(window)){
+		glfwPollEvents();
+		glfwSwapBuffers(window); // IF OPENGL
 	}
+	glfwDestroyWindow(window);
+	glfwTerminate();
+	*/
 	
 
 	return 0;

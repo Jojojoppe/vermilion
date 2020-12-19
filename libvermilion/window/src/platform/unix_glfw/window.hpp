@@ -17,6 +17,9 @@ class UNIX_GLFW_WindowInstance : public WindowInstance{
 		~UNIX_GLFW_WindowInstance();
 
 		virtual void open(Vermilion::Core::ContextProperties * contextProperties) override;
+		virtual void present() override;
+
+		virtual bool shouldClose() override;
 };
 
 }}

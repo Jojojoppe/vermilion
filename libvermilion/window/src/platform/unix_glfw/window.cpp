@@ -13,7 +13,8 @@ Vermilion::Window::UNIX_GLFW_WindowInstance::UNIX_GLFW_WindowInstance(Window * w
 }
 
 Vermilion::Window::UNIX_GLFW_WindowInstance::~UNIX_GLFW_WindowInstance(){
-
+	glfwDestroyWindow(this->window);
+	glfwTerminate();
 }
 
 void Vermilion::Window::UNIX_GLFW_WindowInstance::open(Vermilion::Core::ContextProperties * contextProperties){
@@ -51,7 +52,29 @@ void Vermilion::Window::UNIX_GLFW_WindowInstance::open(Vermilion::Core::ContextP
 	}
 
 	// Finalize context initialization
+	this->api = contextProperties->API;
 	this->vmWindowWindow->vmCoreInstance->initContext(contextProperties);
+}
+
+bool Vermilion::Window::UNIX_GLFW_WindowInstance::shouldClose(){
+	glfwPollEvents();
+	return !glfwWindowShouldClose(this->window);
+}
+
+void Vermilion::Window::UNIX_GLFW_WindowInstance::present(){
+	switch(this->api){
+#ifdef VMCORE_OPENGL
+		case VMCORE_API_OPENGL:
+			glfwSwapBuffers(this->window);
+			break;
+#endif
+#ifdef VMCORE_VULKAN
+		case VMCORE_API_VULKAN:
+			break;
+#endif
+		default:
+			this->vmWindowWindow->vmCoreInstance->logger.log(VMCORE_LOGLEVEL_FATAL, "API %d not supported", this->api);
+	}
 }
 
 #endif

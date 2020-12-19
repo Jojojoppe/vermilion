@@ -1,24 +1,24 @@
-#ifdef VMCORE_OPENGL
+#ifdef VMCORE_VULKAN
 #pragma once
 
 #include <vermilion/core/context.hpp>
+
+#include <vulkan/vulkan.hpp>
 
 namespace Vermilion{
 namespace Core{
 
 class Instance;
 
-class OPENGL_Context : public Context{
+class VULKAN_Context : public Context{
 	public:
 		Instance * vmCoreInstance;
 
 	private:
-		int glVersionMajor;
-		int glVersionMinor;
 
 	public:
-		OPENGL_Context(Instance * instance);
-		~OPENGL_Context();
+		VULKAN_Context(Instance * instance);
+		~VULKAN_Context();
 
 		virtual void init(ContextProperties * properties) override;
 };

@@ -2,6 +2,7 @@
 #include <vermilion/vermilion.hpp>
 
 #include "platform/opengl/context.hpp"
+#include "platform/vulkan/context.hpp"
 
 Vermilion::Core::Instance::Instance(){
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "Vermilion core version %d.%d", VERMILION_VERSION_MAJOR, VERMILION_VERSION_MINOR);
@@ -15,13 +16,20 @@ Vermilion::Core::Instance::~Instance(){
 
 void Vermilion::Core::Instance::createContext(Vermilion::Core::ContextProperties * properties){
 	// TODO final API choosing
-	properties->API = VMCORE_API_OPENGL;
+//	properties->API = VMCORE_API_OPENGL;
+	properties->API = properties->hintAPI;
 
 	switch(properties->API){
 
 #ifdef VMCORE_OPENGL
 		case VMCORE_API_OPENGL:
 			this->context.reset(new Vermilion::Core::OPENGL_Context(this));
+			break;
+#endif
+
+#ifdef VMCORE_VULKAN
+		case VMCORE_API_VULKAN:
+			this->context.reset(new Vermilion::Core::VULKAN_Context(this));
 			break;
 #endif
 

@@ -25,11 +25,15 @@ class WindowProperties{
 class WindowInstance{
 	public:
 		Window * vmWindowWindow;
+		int api;
 
 	public:
 		~WindowInstance() = default;
 
 		virtual void open(Vermilion::Core::ContextProperties * contextProperties){};
+		virtual void present(){};
+		
+		virtual bool shouldClose(){return true;};
 };
 
 class Window{
@@ -45,6 +49,9 @@ class Window{
 
 		Vermilion::Core::ContextProperties* getContextProperties();
 		void open(Vermilion::Core::ContextProperties * contextProperties);
+		void present();
+
+		bool shouldClose();
 };
 
 }}

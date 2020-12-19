@@ -9,6 +9,7 @@
 
 Vermilion::Core::OPENGL_Context::OPENGL_Context(Vermilion::Core::Instance * instance){
 	this->vmCoreInstance = instance;
+	this->vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "Creating OpenGL context");
 }
 
 Vermilion::Core::OPENGL_Context::~OPENGL_Context(){
@@ -23,6 +24,11 @@ void Vermilion::Core::OPENGL_Context::init(Vermilion::Core::ContextProperties * 
 	this->vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "  vendor: %s", glGetString(GL_VENDOR));
 	this->vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "  Renderer: %s", glGetString(GL_RENDERER));
 	this->vmCoreInstance->logger.log(VMCORE_LOGLEVEL_INFO, "  Version: %s", glGetString(GL_VERSION));
+
+	glGetIntegerv(GL_MAJOR_VERSION, &this->glVersionMajor);
+	glGetIntegerv(GL_MINOR_VERSION, &this->glVersionMinor);
+
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 #endif

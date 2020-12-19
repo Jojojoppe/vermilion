@@ -88,3 +88,11 @@ Vermilion::Window::WindowProperties::WindowProperties(int width, int height, con
 	this->width = width;
 	this->height = height;
 }
+
+bool Vermilion::Window::Window::shouldClose(){
+	return this->windowInstance->shouldClose();
+}
+
+void Vermilion::Window::Window::present(){
+	this->windowInstance->present();
+}

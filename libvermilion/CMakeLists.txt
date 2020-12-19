@@ -33,6 +33,8 @@ add_library(vermilion_core SHARED
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/context.cpp
 
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/context.cpp
+
 	${GLAD_SOURCES}
 )
 target_include_directories(vermilion_core PUBLIC
