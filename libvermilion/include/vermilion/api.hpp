@@ -33,6 +33,8 @@ class API{
 		virtual ~API() = default;
 
 		virtual void init(){};
+		virtual void startRender(){};
+		virtual void endRender(){};
 
 	private:
 };

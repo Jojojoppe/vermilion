@@ -17,4 +17,10 @@ void Vermilion::Core::Vulkan::API::init(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Initializing Vulkan context");
 }
 
+void Vermilion::Core::Vulkan::API::startRender(){
+}
+
+void Vermilion::Core::Vulkan::API::endRender(){
+}
+
 #endif

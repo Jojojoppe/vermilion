@@ -23,6 +23,10 @@ class Window : public Vermilion::Core::Window{
 		virtual ~Window() override;
 
 		virtual void createWindow(int width, int height) override;
+		virtual void startRender() override;
+		virtual void endRender() override;
+
+		virtual bool shouldClose() override;
 
 #ifdef VMCORE_OPENGL
 		// OpenGL specific functions

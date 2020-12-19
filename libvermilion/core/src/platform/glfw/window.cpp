@@ -19,6 +19,7 @@ void Vermilion::Core::GLFW::Window::createWindow(int width, int height){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Creating window of %dx%d", this->width, this->height);
 
 	// Set glfw settings accordingly to render API
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);	
 	switch(this->renderPlatform){
 		case Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL:
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
@@ -43,6 +44,22 @@ Vermilion::Core::GLFW::Window::~Window(){
 
 void Vermilion::Core::GLFW::glfwErrorCallback(int err, const char * msg){
 	glfwErrorCallbackLogger->log(VMCORE_LOGLEVEL_ERROR, "GLFW ERROR: %s", msg);
+}
+
+void Vermilion::Core::GLFW::Window::startRender(){
+	glfwPollEvents();
+	this->instance->api->startRender();
+}
+
+void Vermilion::Core::GLFW::Window::endRender(){
+	this->instance->api->endRender();
+	if(this->renderPlatform==Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL){
+		glfwSwapBuffers(this->window);
+	}
+}
+
+bool Vermilion::Core::GLFW::Window::shouldClose(){
+	return !glfwWindowShouldClose(this->window);
 }
 
 #ifdef VMCORE_OPENGL

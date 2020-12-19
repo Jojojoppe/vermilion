@@ -33,6 +33,10 @@ class Window{
 		virtual ~Window() = default;
 
 		virtual void createWindow(int width, int height){};
+		virtual void startRender(){};
+		virtual void endRender(){};
+
+		virtual bool shouldClose(){return true;};
 
 #ifdef VMCORE_OPENGL
 		// OpenGL specific functions

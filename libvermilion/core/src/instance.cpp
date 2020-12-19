@@ -10,6 +10,8 @@ Vermilion::Core::Instance::Instance(int * hintType, int * hintValue){
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "WINDOW_PLATFORM: %s", Vermilion::Core::WindowPlatformString[platform_window].c_str());
 	int window_height = parseHintType_WINDOW_HEIGHT(hintType, hintValue);
 	int window_width = parseHintType_WINDOW_WIDTH(hintType, hintValue);
+	int loglevel = parseHintType_LOGLEVEL(hintType, hintValue);
+	this->logger.setLevel(loglevel);
 
 	// Create API
 	this->api.reset(API::create(platform_render, this));
@@ -26,6 +28,14 @@ Vermilion::Core::Instance::~Instance(){
 	this->window.reset();
 
 	this->logger.log(VMCORE_LOGLEVEL_DEBUG, "Deinitialized Vermilion");
+}
+
+void Vermilion::Core::Instance::startRender(){
+	this->window->startRender();
+}
+
+void Vermilion::Core::Instance::endRender(){
+	this->window->endRender();
 }
 
 int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue){
@@ -128,5 +138,25 @@ int Vermilion::Core::Instance::parseHintType_WINDOW_WIDTH(int * hintType, int * 
 		hintValue++;
 	}
 	return WIDTH;
+}
+
+int Vermilion::Core::Instance::parseHintType_LOGLEVEL(int * hintType, int * hintValue){
+	int LEVEL = VMCORE_LOGLEVEL_INFO;
+
+	if(!hintType){
+		return LEVEL;
+	}
+
+	while(*hintType){
+	
+		if((*hintType)==Vermilion::Core::HintType::HINT_TYPE_LOGLEVEL){
+			LEVEL = *hintValue;
+			return LEVEL;
+		}
+
+		hintType++;
+		hintValue++;
+	}
+	return LEVEL;
 }
 

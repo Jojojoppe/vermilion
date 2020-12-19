@@ -15,7 +15,7 @@ flags = [
 'c++',
 '-std=c++11',
 
-'-I', 'src', '-I', 'include'
+'-I', 'src', '-I', 'include', '-I', '../third_party/glad/include'
 ]
 
 compilation_database_folder = ''

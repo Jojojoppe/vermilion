@@ -18,6 +18,8 @@ class API : public Vermilion::Core::API{
 		virtual ~API() override;
 
 		virtual void init() override;
+		virtual void startRender() override;
+		virtual void endRender() override;
 
 	private:
 

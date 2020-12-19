@@ -17,7 +17,8 @@ enum HintType{
 	HINT_TYPE_WINDOW_PLATFORM,
 	HINT_TYPE_RENDER_PLATFORM,
 	HINT_TYPE_WINDOW_HEIGHT,
-	HINT_TYPE_WINDOW_WIDTH
+	HINT_TYPE_WINDOW_WIDTH,
+	HINT_TYPE_LOGLEVEL,
 };
 
 /**
@@ -43,11 +44,15 @@ class Instance{
 
 		~Instance();
 
+		void startRender();
+		void endRender();
+
 	private:
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);
 		int parseHintType_WINDOW_PLATFORM(int * hintType, int * hintValue);
 		int parseHintType_WINDOW_HEIGHT(int * hintType, int * hintValue);
 		int parseHintType_WINDOW_WIDTH(int * hintType, int * hintValue);
+		int parseHintType_LOGLEVEL(int * hintType, int * hintValue);
 };
 
 }}

@@ -10,16 +10,21 @@ int main(int argc, char ** argv){
 		Vermilion::Core::HintType::HINT_TYPE_RENDER_PLATFORM, 
 		Vermilion::Core::HintType::HINT_TYPE_WINDOW_WIDTH,
 		Vermilion::Core::HintType::HINT_TYPE_WINDOW_HEIGHT,
+		Vermilion::Core::HintType::HINT_TYPE_LOGLEVEL,
 	0};
 	int hintValue[] = {
 		Vermilion::Core::WindowPlatform::WINDOW_PLATFORM_GLFW, 
-		Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
+		Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL,
 		400,
 		400,
+		VMCORE_LOGLEVEL_DEBUG,
 	0};
 	Vermilion::Core::Instance vmInstance(hintType, hintValue);
 
-	for(;;);
+	while(vmInstance.window->shouldClose()){
+		vmInstance.startRender();
+		vmInstance.endRender();
+	}
 
 	return 0;
 }
