@@ -4,6 +4,8 @@
 #include <vermilion/window.hpp>
 #include <vermilion/logger.hpp>
 
+#include <memory>
+
 namespace Vermilion{
 namespace Core{
 
@@ -24,6 +26,8 @@ class Instance{
 		Logger logger;
 
 	private:
+		std::unique_ptr<API> api;
+		std::unique_ptr<Window> window;
 
 	public:
 

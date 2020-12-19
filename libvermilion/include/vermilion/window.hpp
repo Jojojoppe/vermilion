@@ -20,8 +20,18 @@ const std::string WindowPlatformString[] = {
 
 extern const int windowPlatform[];
 
-class Window{
+class Instance;
 
+class Window{
+	public:
+
+	private:
+
+	public:
+		static Window * create(int platform, Instance * instance);
+		virtual ~Window() = default;
+
+	private:
 };
 
 }}

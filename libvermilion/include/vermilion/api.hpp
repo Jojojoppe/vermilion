@@ -21,8 +21,18 @@ const std::string RenderPlatformString[] = {
 
 extern const int renderPlatform[];
 
-class API{
+class Instance;
 
+class API{
+	public:
+
+	private:
+
+	public:
+		static API * create(int platform, Instance * instance);
+		virtual ~API() = default;
+
+	private:
 };
 
 }}
