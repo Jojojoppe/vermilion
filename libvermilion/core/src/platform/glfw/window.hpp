@@ -3,6 +3,9 @@
 
 #include <vermilion/instance.hpp>
 
+#ifdef VMCORE_VULKAN
+	#define GLFW_INCLUDE_VULKAN
+#endif
 #include <GLFW/glfw3.h>
 
 namespace Vermilion{
@@ -35,7 +38,7 @@ class Window : public Vermilion::Core::Window{
 #endif
 #ifdef VMCORE_VULKAN
 		// Vulkan specific functions
-
+		virtual void * getRequiredExtensions(unsigned int * count) override;
 #endif
 
 	private:

@@ -14,7 +14,7 @@ int main(int argc, char ** argv){
 	0};
 	int hintValue[] = {
 		Vermilion::Core::WindowPlatform::WINDOW_PLATFORM_GLFW, 
-		Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL,
+		Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
 		400,
 		400,
 		VMCORE_LOGLEVEL_DEBUG,

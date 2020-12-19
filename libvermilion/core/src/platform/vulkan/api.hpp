@@ -3,6 +3,9 @@
 
 #include <vermilion/instance.hpp>
 
+#include <vulkan/vulkan.h>
+#include <stdint.h>
+
 namespace Vermilion{
 namespace Core{
 namespace Vulkan{
@@ -13,6 +16,10 @@ class API : public Vermilion::Core::API{
 	private:
 		Vermilion::Core::Instance * instance;
 
+		// Vulkan variables
+		VkInstance vk_instance;
+		VkPhysicalDevice vk_physicalDevice = VK_NULL_HANDLE;
+
 	public:
 		API(Vermilion::Core::Instance * instance);
 		virtual ~API() override;
@@ -22,6 +29,8 @@ class API : public Vermilion::Core::API{
 		virtual void endRender() override;
 
 	private:
+
+		void createInstance();
 
 };
 

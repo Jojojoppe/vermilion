@@ -3,6 +3,8 @@
 #include "window.hpp"
 #include <vermilion/instance.hpp>
 
+#include <stdint.h>
+
 Vermilion::Core::GLFW::Window::Window(int renderPlatform, Vermilion::Core::Instance * instance){
 	this->instance = instance;
 	this->renderPlatform = renderPlatform;
@@ -77,6 +79,10 @@ void Vermilion::Core::GLFW::Window::activateContext(){
 
 #ifdef VMCORE_VULKAN
 // Vulkan specific functions
+
+void * Vermilion::Core::GLFW::Window::getRequiredExtensions(unsigned int * count){
+	return (void*)glfwGetRequiredInstanceExtensions((uint32_t*)count);
+}
 
 #endif
 
