@@ -47,8 +47,7 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/api.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/api.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/validationlayers.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/physicaldevice.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkInstance.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/glfw/window.cpp
 

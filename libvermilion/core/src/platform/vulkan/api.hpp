@@ -5,6 +5,9 @@
 
 #include <vulkan/vulkan.h>
 #include <stdint.h>
+#include <memory>
+
+#include "vkInstance.hpp"
 
 namespace Vermilion{
 namespace Core{
@@ -12,13 +15,13 @@ namespace Vulkan{
 
 class API : public Vermilion::Core::API{
 	public:
+		Vermilion::Core::Instance * instance;
+		static Vermilion::Core::Instance * static_instance;
 
 	private:
-		Vermilion::Core::Instance * instance;
-
 		// Vulkan variables
-		VkInstance vk_instance;
-		VkPhysicalDevice vk_physicalDevice = VK_NULL_HANDLE;
+		std::unique_ptr<vkInstance> vk_instance;
+		VkDebugUtilsMessengerEXT vk_debugMessenger;
 
 	public:
 		API(Vermilion::Core::Instance * instance);
@@ -29,10 +32,20 @@ class API : public Vermilion::Core::API{
 		virtual void endRender() override;
 
 	private:
-
-		void createInstance();
-		void pickPhysicalDevice();
-
+		// DEBUG STUFF
+		// -----------
+		static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+					VkDebugUtilsMessageTypeFlagsEXT messageType,
+                    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                    void* pUserData);
+        static VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, 
+					const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, 
+					const VkAllocationCallbacks* pAllocator, 
+					VkDebugUtilsMessengerEXT* pDebugMessenger);
+        static void DestroyDebugUtilsMessengerEXT(VkInstance instance, 
+					VkDebugUtilsMessengerEXT debugMessenger, 
+					const VkAllocationCallbacks* pAllocator);	
+		// -----------
 };
 
 }}}

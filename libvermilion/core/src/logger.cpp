@@ -2,6 +2,7 @@
 #include <cstdio>
 
 const char * VmCoreLoggerLevelNames[] = {
+	"TRACE",
 	"DEBUG", 
 	"INFO", 
 	"WARN", 
@@ -9,6 +10,7 @@ const char * VmCoreLoggerLevelNames[] = {
 	"FATAL"
 };
 const char * VmCoreLoggerLevelColors[] = {
+	"\033[00;90m",
 	"\033[00;37m",
 	"\033[00;33m",
 	"\033[01;33m",

@@ -17,9 +17,10 @@ int main(int argc, char ** argv){
 		Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
 		400,
 		400,
-		VMCORE_LOGLEVEL_DEBUG,
+		VMCORE_LOGLEVEL_TRACE,
 	0};
 	Vermilion::Core::Instance vmInstance(hintType, hintValue);
+//	Vermilion::Core::Instance vmInstance(nullptr, nullptr);
 
 	while(vmInstance.window->shouldClose()){
 		vmInstance.startRender();
