@@ -39,6 +39,7 @@ class Window : public Vermilion::Core::Window{
 #ifdef VMCORE_VULKAN
 		// Vulkan specific functions
 		virtual void * getRequiredExtensions(unsigned int * count) override;
+		virtual void * getSurface(void * instance) override;
 #endif
 
 	private:

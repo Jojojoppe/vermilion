@@ -9,8 +9,13 @@
 #include <stdexcept>
 
 // VULKAN SETTINGS
-const std::vector<const char*> validationLayers = {
+std::vector<const char*> Vermilion::Core::Vulkan::validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
+};
+
+std::vector<const char*> Vermilion::Core::Vulkan::deviceExtensions = {
+	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+	VK_KHR_MAINTENANCE1_EXTENSION_NAME,
 };
 
 Vermilion::Core::Vulkan::vkInstance::vkInstance(API * api){

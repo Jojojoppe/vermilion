@@ -46,6 +46,7 @@ class Window{
 #ifdef VMCORE_VULKAN
 		// Vulkan specific functions
 		virtual void * getRequiredExtensions(unsigned int * count){return nullptr;};
+		virtual void * getSurface(void * instance){return nullptr;};
 
 #endif
 

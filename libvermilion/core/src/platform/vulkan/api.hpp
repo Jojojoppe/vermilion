@@ -9,10 +9,14 @@
 
 #include "vkInstance.hpp"
 #include "vkPhysicalDevice.hpp"
+#include "vkDevice.hpp"
 
 namespace Vermilion{
 namespace Core{
 namespace Vulkan{
+
+extern std::vector<const char*> validationLayers;
+extern std::vector<const char*> deviceExtensions;
 
 class API : public Vermilion::Core::API{
 	public:
@@ -21,8 +25,10 @@ class API : public Vermilion::Core::API{
 
 		// Vulkan variables
 		std::unique_ptr<vkInstance> vk_instance;
+		VkSurfaceKHR vk_surface;
 		VkDebugUtilsMessengerEXT vk_debugMessenger;
 		std::unique_ptr<vkPhysicalDevice> vk_physicaldevice;
+		std::unique_ptr<vkDevice> vk_device;
 
 	private:
 

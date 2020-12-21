@@ -18,8 +18,10 @@ Vermilion::Core::Vulkan::API::API(Vermilion::Core::Instance * instance){
 Vermilion::Core::Vulkan::API::~API(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Destroying Vulkan context");
 
+	vk_device.reset();
 	vk_physicaldevice.reset();
 	DestroyDebugUtilsMessengerEXT(vk_instance->vk_instance, vk_debugMessenger, nullptr);
+	vkDestroySurfaceKHR(vk_instance->vk_instance, vk_surface, nullptr);
 	vk_instance.reset();
 }
 
@@ -27,6 +29,9 @@ void Vermilion::Core::Vulkan::API::init(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Initializing Vulkan context");
 
 	this->vk_instance.reset(new Vermilion::Core::Vulkan::vkInstance(this));
+
+	// Get surface from window
+	this->vk_surface = (VkSurfaceKHR) this->instance->window->getSurface(&vk_instance->vk_instance);
 
 	// Setup debug messenger
 	VkDebugUtilsMessengerCreateInfoEXT createInfo = {};
@@ -40,6 +45,7 @@ void Vermilion::Core::Vulkan::API::init(){
 	}
 
 	this->vk_physicaldevice.reset(new Vermilion::Core::Vulkan::vkPhysicalDevice(this));
+	this->vk_device.reset(new Vermilion::Core::Vulkan::vkDevice(this));
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){

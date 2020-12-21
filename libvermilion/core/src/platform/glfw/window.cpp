@@ -4,6 +4,7 @@
 #include <vermilion/instance.hpp>
 
 #include <stdint.h>
+#include <stdexcept>
 
 Vermilion::Core::GLFW::Window::Window(int renderPlatform, Vermilion::Core::Instance * instance){
 	this->instance = instance;
@@ -82,6 +83,16 @@ void Vermilion::Core::GLFW::Window::activateContext(){
 
 void * Vermilion::Core::GLFW::Window::getRequiredExtensions(unsigned int * count){
 	return (void*)glfwGetRequiredInstanceExtensions((uint32_t*)count);
+}
+
+void * Vermilion::Core::GLFW::Window::getSurface(void * instance){
+	VkInstance * vkinstance = (VkInstance*)instance;
+	VkSurfaceKHR surface;
+	if(glfwCreateWindowSurface(*vkinstance, this->window, nullptr, &surface)!=VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create Vulkan window surface");
+		throw std::runtime_error("Vermilion::Core::GLFW::Window::getSurface() - Could not create Vulkan window surface");
+	}
+	return (void*) surface;
 }
 
 #endif

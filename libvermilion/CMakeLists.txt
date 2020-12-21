@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -49,6 +49,7 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/api.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkInstance.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkPhysicalDevice.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkDevice.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/glfw/window.cpp
 
