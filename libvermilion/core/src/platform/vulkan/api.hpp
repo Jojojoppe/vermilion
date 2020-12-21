@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "vkInstance.hpp"
+#include "vkPhysicalDevice.hpp"
 
 namespace Vermilion{
 namespace Core{
@@ -18,10 +19,12 @@ class API : public Vermilion::Core::API{
 		Vermilion::Core::Instance * instance;
 		static Vermilion::Core::Instance * static_instance;
 
-	private:
 		// Vulkan variables
 		std::unique_ptr<vkInstance> vk_instance;
 		VkDebugUtilsMessengerEXT vk_debugMessenger;
+		std::unique_ptr<vkPhysicalDevice> vk_physicaldevice;
+
+	private:
 
 	public:
 		API(Vermilion::Core::Instance * instance);
