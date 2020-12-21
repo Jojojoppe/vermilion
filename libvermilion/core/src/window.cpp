@@ -2,6 +2,7 @@
 #include <vermilion/instance.hpp>
 
 #include "platform/glfw/window.hpp"
+#include <stdexcept>
 
 const int Vermilion::Core::windowPlatform[] = {
 #ifdef VMCORE_GLFW
@@ -19,6 +20,7 @@ Vermilion::Core::Window * Vermilion::Core::Window::create(int platform, int rend
 #endif
 		default:
 			instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Render platform not supported");
+			throw std::runtime_error("Vermilion::Core::Windor::create() - Render platform not supported");
 			break;
 	}
 	return nullptr;

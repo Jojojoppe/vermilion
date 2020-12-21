@@ -6,6 +6,7 @@
 #include "api.hpp"
 
 #include <string.h>
+#include <stdexcept>
 
 // VULKAN SETTINGS
 const std::vector<const char*> validationLayers = {
@@ -67,7 +68,8 @@ Vermilion::Core::Vulkan::vkInstance::vkInstance(API * api){
 	createInfo.ppEnabledLayerNames = validationLayers.data();
 
 	if(vkCreateInstance(&createInfo, nullptr, &vk_instance)!=VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_ERROR, "Could not create vk_instance");
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create vk_instance");
+		throw std::runtime_error("Vermilion::Core::Vulkan::vkInstance::vkInstance() - Could not create vk_instance");
 	}
 
 }

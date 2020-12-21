@@ -4,6 +4,8 @@
 #include "platform/opengl/api.hpp"
 #include "platform/vulkan/api.hpp"
 
+#include <stdexcept>
+
 const int Vermilion::Core::renderPlatform[] = {
 #ifdef VMCORE_OPENGL
 	Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL,
@@ -28,6 +30,7 @@ Vermilion::Core::API * Vermilion::Core::API::create(int platform, Vermilion::Cor
 #endif
 		default:
 			instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Render platform not supported");
+			throw std::runtime_error("Vermilion::Core::API::create() - Render platform not supported");
 			break;
 	}
 	return nullptr;
