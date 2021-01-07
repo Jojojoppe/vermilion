@@ -15,9 +15,10 @@ int main(int argc, char ** argv){
 	int hintValue[] = {
 		Vermilion::Core::WindowPlatform::WINDOW_PLATFORM_GLFW, 
 		Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
+//		Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL,
 		400,
 		400,
-		VMCORE_LOGLEVEL_TRACE,
+		VMCORE_LOGLEVEL_DEBUG,
 	0};
 	Vermilion::Core::Instance vmInstance(hintType, hintValue);
 //	Vermilion::Core::Instance vmInstance(nullptr, nullptr);
