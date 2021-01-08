@@ -23,6 +23,12 @@ struct QueueFamilyIndices{
 	}
 };
 
+struct SwapChainSupportDetails{
+	VkSurfaceCapabilitiesKHR capabilities;
+	std::vector<VkSurfaceFormatKHR> formats;
+	std::vector<VkPresentModeKHR> presentModes;
+};
+
 class vkPhysicalDevice{
 	public:
 		VkPhysicalDevice vk_physicaldevice = VK_NULL_HANDLE;
@@ -36,6 +42,7 @@ class vkPhysicalDevice{
 		~vkPhysicalDevice();
 
 		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+		SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
 	private:
 };

@@ -60,6 +60,15 @@ Vermilion::Core::Vulkan::vkPhysicalDevice::vkPhysicalDevice(API * api){
 			continue;
 		}
 
+		// Check for swap chain support
+		bool swapChainAdequate = false;
+		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(dev);
+		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+		if(!swapChainAdequate){
+			this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "    Swap chain not supported");
+			continue;
+		}
+
 		vk_physicaldevice = dev;
 	}
 	if(vk_physicaldevice==VK_NULL_HANDLE){
@@ -94,6 +103,28 @@ Vermilion::Core::Vulkan::QueueFamilyIndices Vermilion::Core::Vulkan::vkPhysicalD
 		i++;
 	}
 	return indices;
+}
+
+Vermilion::Core::Vulkan::SwapChainSupportDetails Vermilion::Core::Vulkan::vkPhysicalDevice::querySwapChainSupport(VkPhysicalDevice device){
+	Vermilion::Core::Vulkan::SwapChainSupportDetails details;
+
+	VkSurfaceKHR m_surface = this->api->vk_surface;
+
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_surface, &details.capabilities);
+	uint32_t formatCount;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, nullptr);
+	if(formatCount != 0){
+		details.formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, details.formats.data());
+	}
+	uint32_t presentModeCount;
+	vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, nullptr);
+	if(presentModeCount != 0){
+		details.presentModes.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, details.presentModes.data());
+	}
+
+	return details;
 }
 
 #endif
