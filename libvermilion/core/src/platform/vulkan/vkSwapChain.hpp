@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include <vector>
 #include <optional>
+#include <memory>
+
+#include "vkImageView.hpp"
 
 namespace Vermilion{
 namespace Core{
@@ -21,6 +24,8 @@ class vkSwapChain{
 		std::vector<VkImage> swapChainImages;
 		VkFormat swapChainImageFormat;
 		VkExtent2D swapChainExtent;
+
+		std::vector<std::unique_ptr<vkImageView2D>> swapChainImageViews;
 	
 	private:
 		API * api;

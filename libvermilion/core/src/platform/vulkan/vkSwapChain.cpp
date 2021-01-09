@@ -62,7 +62,11 @@ Vermilion::Core::Vulkan::vkSwapChain::vkSwapChain(API * api){
 	swapChainExtent = extent;
 	vkGetSwapchainImagesKHR(this->api->vk_device->vk_device, swapChain, &imageCount, nullptr);
 	swapChainImages.resize(imageCount);
+	swapChainImageViews.resize(imageCount);
 	vkGetSwapchainImagesKHR(this->api->vk_device->vk_device, swapChain, &imageCount, swapChainImages.data());
+	for(int i=0; i<imageCount; i++){
+		swapChainImageViews[i].reset(new vkImageView2D(this->api, swapChainImages[i], swapChainImageFormat));
+	}
 }
 
 Vermilion::Core::Vulkan::vkSwapChain::~vkSwapChain(){	
