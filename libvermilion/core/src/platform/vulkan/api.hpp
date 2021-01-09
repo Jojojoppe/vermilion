@@ -11,6 +11,7 @@
 #include "vkPhysicalDevice.hpp"
 #include "vkDevice.hpp"
 #include "vkSwapChain.hpp"
+#include "RenderTarget.hpp"
 
 namespace Vermilion{
 namespace Core{
@@ -32,6 +33,8 @@ class API : public Vermilion::Core::API{
 		std::unique_ptr<vkDevice> vk_device;
 		std::unique_ptr<vkSwapChain> vk_swapchain;
 
+		std::shared_ptr<RenderTarget> default_renderTarget;
+
 	private:
 
 	public:
@@ -41,6 +44,8 @@ class API : public Vermilion::Core::API{
 		virtual void init() override;
 		virtual void startRender() override;
 		virtual void endRender() override;
+
+		virtual std::shared_ptr<Vermilion::Core::RenderTarget> getDefaultRenderTarget() override;
 
 	private:
 		// DEBUG STUFF

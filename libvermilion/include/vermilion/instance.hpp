@@ -1,13 +1,17 @@
 #pragma once
 
+#include <memory>
+
 #include <vermilion/api.hpp>
 #include <vermilion/window.hpp>
 #include <vermilion/logger.hpp>
 
-#include <memory>
 
 namespace Vermilion{
 namespace Core{
+
+class API;
+class RenderTarget;
 
 /**
  * @brief Hint types
@@ -30,6 +34,9 @@ class Instance{
 		std::unique_ptr<API> api;
 		std::unique_ptr<Window> window;
 
+		int platform_render;
+		int platform_window;
+
 	private:
 
 	public:
@@ -46,6 +53,8 @@ class Instance{
 
 		void startRender();
 		void endRender();
+
+		std::shared_ptr<RenderTarget> getDefaultRenderTarget();
 
 	private:
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);

@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#include <memory>
+
+#include <vermilion/RenderTarget.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -22,6 +25,7 @@ const std::string RenderPlatformString[] = {
 extern const int renderPlatform[];
 
 class Instance;
+class RenderTarget;
 
 class API{
 	public:
@@ -35,6 +39,8 @@ class API{
 		virtual void init(){};
 		virtual void startRender(){};
 		virtual void endRender(){};
+
+		virtual std::shared_ptr<RenderTarget> getDefaultRenderTarget(){return nullptr;};
 
 	private:
 };

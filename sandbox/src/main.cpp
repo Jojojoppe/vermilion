@@ -1,6 +1,9 @@
 #include <vermilion/vermilion.hpp>
 
 #include <vermilion/instance.hpp>
+#include <vermilion/RenderTarget.hpp>
+
+#include <memory>
 
 int main(int argc, char ** argv){
 
@@ -22,6 +25,8 @@ int main(int argc, char ** argv){
 	0};
 	Vermilion::Core::Instance vmInstance(hintType, hintValue);
 //	Vermilion::Core::Instance vmInstance(nullptr, nullptr);
+
+	std::shared_ptr<Vermilion::Core::RenderTarget> defaultRenderTarget = vmInstance.getDefaultRenderTarget();
 
 	while(vmInstance.window->shouldClose()){
 		vmInstance.startRender();

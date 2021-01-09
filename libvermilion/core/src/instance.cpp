@@ -4,9 +4,9 @@ Vermilion::Core::Instance::Instance(int * hintType, int * hintValue){
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "Initializing Vermilion");
 
 	// Parse hints
-	int platform_render = parseHintType_RENDER_PLATFORM(hintType, hintValue);
+	platform_render = parseHintType_RENDER_PLATFORM(hintType, hintValue);
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "RENDER_PLATFORM: %s", Vermilion::Core::RenderPlatformString[platform_render].c_str());
-	int platform_window = parseHintType_WINDOW_PLATFORM(hintType, hintValue);
+	platform_window = parseHintType_WINDOW_PLATFORM(hintType, hintValue);
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "WINDOW_PLATFORM: %s", Vermilion::Core::WindowPlatformString[platform_window].c_str());
 	int window_height = parseHintType_WINDOW_HEIGHT(hintType, hintValue);
 	int window_width = parseHintType_WINDOW_WIDTH(hintType, hintValue);
@@ -36,6 +36,10 @@ void Vermilion::Core::Instance::startRender(){
 
 void Vermilion::Core::Instance::endRender(){
 	this->window->endRender();
+}
+
+std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Instance::getDefaultRenderTarget(){
+	return this->api->getDefaultRenderTarget();
 }
 
 int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue){

@@ -18,6 +18,7 @@ Vermilion::Core::Vulkan::API::API(Vermilion::Core::Instance * instance){
 Vermilion::Core::Vulkan::API::~API(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Destroying Vulkan context");
 
+	default_renderTarget.reset();
 	vk_swapchain.reset();
 	vk_device.reset();
 	vk_physicaldevice.reset();
@@ -48,6 +49,10 @@ void Vermilion::Core::Vulkan::API::init(){
 	this->vk_physicaldevice.reset(new Vermilion::Core::Vulkan::vkPhysicalDevice(this));
 	this->vk_device.reset(new Vermilion::Core::Vulkan::vkDevice(this));
 	this->vk_swapchain.reset(new Vermilion::Core::Vulkan::vkSwapChain(this));
+
+	// Create render target
+	this->default_renderTarget.reset(new Vermilion::Core::Vulkan::RenderTarget(instance, 
+				vk_swapchain->swapChainExtent.width, vk_swapchain->swapChainExtent.height));
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){
@@ -55,6 +60,10 @@ void Vermilion::Core::Vulkan::API::startRender(){
 
 void Vermilion::Core::Vulkan::API::endRender(){
 }
+
+std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Vulkan::API::getDefaultRenderTarget(){
+	return std::static_pointer_cast<Vermilion::Core::RenderTarget>(default_renderTarget);
+};
 
 // DEBUG STUFF
 // -----------

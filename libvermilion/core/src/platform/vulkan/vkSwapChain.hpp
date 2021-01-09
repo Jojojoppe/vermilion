@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "vkImageView.hpp"
+#include "vkRenderPass.hpp"
 
 namespace Vermilion{
 namespace Core{
