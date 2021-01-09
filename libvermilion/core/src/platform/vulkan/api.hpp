@@ -10,6 +10,7 @@
 #include "vkInstance.hpp"
 #include "vkPhysicalDevice.hpp"
 #include "vkDevice.hpp"
+#include "vkSwapChain.hpp"
 
 namespace Vermilion{
 namespace Core{
@@ -29,6 +30,7 @@ class API : public Vermilion::Core::API{
 		VkDebugUtilsMessengerEXT vk_debugMessenger;
 		std::unique_ptr<vkPhysicalDevice> vk_physicaldevice;
 		std::unique_ptr<vkDevice> vk_device;
+		std::unique_ptr<vkSwapChain> vk_swapchain;
 
 	private:
 

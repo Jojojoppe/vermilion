@@ -18,6 +18,7 @@ Vermilion::Core::Vulkan::API::API(Vermilion::Core::Instance * instance){
 Vermilion::Core::Vulkan::API::~API(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Destroying Vulkan context");
 
+	vk_swapchain.reset();
 	vk_device.reset();
 	vk_physicaldevice.reset();
 	DestroyDebugUtilsMessengerEXT(vk_instance->vk_instance, vk_debugMessenger, nullptr);
@@ -46,6 +47,7 @@ void Vermilion::Core::Vulkan::API::init(){
 
 	this->vk_physicaldevice.reset(new Vermilion::Core::Vulkan::vkPhysicalDevice(this));
 	this->vk_device.reset(new Vermilion::Core::Vulkan::vkDevice(this));
+	this->vk_swapchain.reset(new Vermilion::Core::Vulkan::vkSwapChain(this));
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){

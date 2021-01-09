@@ -65,6 +65,10 @@ bool Vermilion::Core::GLFW::Window::shouldClose(){
 	return !glfwWindowShouldClose(this->window);
 }
 
+void Vermilion::Core::GLFW::Window::getFrameBufferSize(int * width, int * height){
+	glfwGetFramebufferSize(this->window, width, height);
+}
+
 #ifdef VMCORE_OPENGL
 // OpenGL specific functions
 

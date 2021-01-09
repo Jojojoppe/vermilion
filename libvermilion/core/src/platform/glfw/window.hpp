@@ -31,6 +31,8 @@ class Window : public Vermilion::Core::Window{
 
 		virtual bool shouldClose() override;
 
+		virtual void getFrameBufferSize(int * width, int * height) override;
+
 #ifdef VMCORE_OPENGL
 		// OpenGL specific functions
 		virtual void * getLoadProc() override;

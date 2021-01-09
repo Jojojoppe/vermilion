@@ -38,6 +38,8 @@ class Window{
 
 		virtual bool shouldClose(){return true;};
 
+		virtual void getFrameBufferSize(int * width, int * height){};
+
 #ifdef VMCORE_OPENGL
 		// OpenGL specific functions
 		virtual void * getLoadProc(){return nullptr;};

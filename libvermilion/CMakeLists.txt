@@ -50,6 +50,7 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkInstance.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkPhysicalDevice.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkDevice.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkSwapChain.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/glfw/window.cpp
 
