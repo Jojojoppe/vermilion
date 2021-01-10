@@ -54,6 +54,7 @@ Vermilion::Core::Vulkan::vkRenderPass::vkRenderPass(API * api, VkFormat format){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to create render pass");
 		throw std::runtime_error("Vermilion::Core::Vulkan::vkRenderPass::vkRenderPass() - Failed to create render pass");
 	}
+	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Render pass created");
 }
 
 Vermilion::Core::Vulkan::vkRenderPass::~vkRenderPass(){	

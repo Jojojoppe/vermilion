@@ -31,7 +31,7 @@ enum HintType{
 class Instance{
 	public:
 		Logger logger;
-		std::unique_ptr<API> api;
+		std::shared_ptr<API> api;
 		std::unique_ptr<Window> window;
 
 		int platform_render;

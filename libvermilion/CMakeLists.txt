@@ -55,6 +55,7 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkSwapChain.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkImageView.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkRenderPass.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkFrameBuffer.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/glfw/window.cpp
 

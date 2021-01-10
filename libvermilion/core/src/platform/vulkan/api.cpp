@@ -51,8 +51,7 @@ void Vermilion::Core::Vulkan::API::init(){
 	this->vk_swapchain.reset(new Vermilion::Core::Vulkan::vkSwapChain(this));
 
 	// Create render target
-	this->default_renderTarget.reset(new Vermilion::Core::Vulkan::RenderTarget(instance, 
-				vk_swapchain->swapChainExtent.width, vk_swapchain->swapChainExtent.height));
+	this->default_renderTarget.reset(new Vermilion::Core::Vulkan::RenderTarget(this));
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){
