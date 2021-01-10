@@ -3,6 +3,7 @@
 #include "api.hpp"
 #include <vermilion/vermilion.hpp>
 #include <vermilion/instance.hpp>
+#include "Shader.hpp"
 
 #include <string.h>
 
@@ -63,6 +64,14 @@ void Vermilion::Core::Vulkan::API::endRender(){
 std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Vulkan::API::getDefaultRenderTarget(){
 	return std::static_pointer_cast<Vermilion::Core::RenderTarget>(default_renderTarget);
 };
+
+std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Vulkan::API::createShader(std::string source, Vermilion::Core::ShaderType type){
+	return std::static_pointer_cast<Vermilion::Core::Shader>(std::make_shared<Vermilion::Core::Vulkan::Shader>(this, source, type));
+}
+
+std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders){
+	return std::static_pointer_cast<Vermilion::Core::ShaderProgram>(std::make_shared<Vermilion::Core::Vulkan::ShaderProgram>(this, shaders));
+}
 
 // DEBUG STUFF
 // -----------

@@ -23,7 +23,7 @@ find_package(Vulkan)
 if(Vulkan_FOUND)
 	message("-- Vulkan found, add to source tree")
 	add_compile_definitions(VMCORE_VULKAN)
-	set(VERMILION_CORE_LIBS ${VERMILION_CORE_LIBS} ${Vulkan_LIBRARIES})
+	set(VERMILION_CORE_LIBS ${VERMILION_CORE_LIBS} ${Vulkan_LIBRARIES} shaderc_shared)
 	set(VERMILION_CORE_INCLUDE_DIRS ${VERMILION_CORE_INCLUDE_DIRS} ${Vulkan_INCLUDE_DIRS})
 endif()
 
@@ -43,12 +43,12 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/window.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/api.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/instance.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/core/src/RenderTarget.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/api.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/api.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/RenderTarget.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/Shader.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkInstance.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkPhysicalDevice.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkDevice.cpp

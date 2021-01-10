@@ -5,7 +5,7 @@
 #include <vermilion/api.hpp>
 #include <vermilion/window.hpp>
 #include <vermilion/logger.hpp>
-
+#include <vermilion/Shader.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -55,6 +55,9 @@ class Instance{
 		void endRender();
 
 		std::shared_ptr<RenderTarget> getDefaultRenderTarget();
+
+		std::shared_ptr<Shader> createShader(std::string source, ShaderType type);
+		std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders);
 
 	private:
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);

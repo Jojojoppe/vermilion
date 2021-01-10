@@ -12,8 +12,6 @@ namespace Core{
 class RenderTarget{
 	public:
 		~RenderTarget() = default;
-
-		static RenderTarget * create(Vermilion::Core::Instance * instance, int width, int height);
 };
 
 }}

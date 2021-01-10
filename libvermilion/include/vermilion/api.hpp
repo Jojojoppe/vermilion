@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <vermilion/RenderTarget.hpp>
+#include <vermilion/Shader.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -41,6 +42,9 @@ class API{
 		virtual void endRender(){};
 
 		virtual std::shared_ptr<RenderTarget> getDefaultRenderTarget(){return nullptr;};
+
+		virtual std::shared_ptr<Shader> createShader(std::string source, ShaderType type){return nullptr;};
+		virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders){return nullptr;};
 
 	private:
 };

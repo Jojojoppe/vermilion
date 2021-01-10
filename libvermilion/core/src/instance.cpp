@@ -42,6 +42,14 @@ std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Instance::getDef
 	return this->api->getDefaultRenderTarget();
 }
 
+std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Instance::createShader(std::string source, Vermilion::Core::ShaderType type){
+	return this->api->createShader(source, type);
+}
+
+std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Instance::createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders){
+	return this->api->createShaderProgram(shaders);
+}
+
 int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue){
 	int API = Vermilion::Core::renderPlatform[0];
 
