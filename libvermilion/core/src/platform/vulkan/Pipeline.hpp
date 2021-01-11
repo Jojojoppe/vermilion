@@ -15,6 +15,7 @@ namespace Core{
 
 class Instance;
 class ShaderProgram;
+class RenderTarget;
 
 namespace Vulkan{
 
@@ -29,7 +30,7 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		VkPipeline vk_pipeline;
 		VkPipelineLayout vk_pipelineLayout;
 
-		Pipeline(API * api, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram);
+		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram);
 		~Pipeline();
 };
 

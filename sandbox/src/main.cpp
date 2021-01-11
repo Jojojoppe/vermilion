@@ -66,7 +66,7 @@ int main(int argc, char ** argv){
 	std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
 
 	// Create render pipeline
-	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(shaderProgram);
+	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram);
 
 	while(vmInstance.window->shouldClose()){
 		vmInstance.startRender();

@@ -47,7 +47,7 @@ class API{
 		virtual std::shared_ptr<Shader> createShader(std::string source, ShaderType type){return nullptr;};
 		virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders){return nullptr;};
 
-		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<ShaderProgram> shaderProgram){return nullptr;};
+		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram){return nullptr;};
 
 	private:
 };
