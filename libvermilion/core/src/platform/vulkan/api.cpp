@@ -20,6 +20,7 @@ Vermilion::Core::Vulkan::API::API(Vermilion::Core::Instance * instance){
 Vermilion::Core::Vulkan::API::~API(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Destroying Vulkan context");
 
+	vk_commandPool.reset();
 	default_renderTarget.reset();
 	vk_swapchain.reset();
 	vk_device.reset();
@@ -54,6 +55,8 @@ void Vermilion::Core::Vulkan::API::init(){
 
 	// Create render target
 	this->default_renderTarget.reset(new Vermilion::Core::Vulkan::RenderTarget(this));
+
+	this->vk_commandPool.reset(new Vermilion::Core::Vulkan::vkCommandPool(this));
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){

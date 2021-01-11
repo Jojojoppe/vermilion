@@ -11,6 +11,7 @@
 #include "vkPhysicalDevice.hpp"
 #include "vkDevice.hpp"
 #include "vkSwapChain.hpp"
+#include "vkCommandPool.hpp"
 #include "RenderTarget.hpp"
 
 namespace Vermilion{
@@ -32,6 +33,7 @@ class API : public Vermilion::Core::API{
 		std::unique_ptr<vkPhysicalDevice> vk_physicaldevice;
 		std::unique_ptr<vkDevice> vk_device;
 		std::unique_ptr<vkSwapChain> vk_swapchain;
+		std::unique_ptr<vkCommandPool> vk_commandPool;
 
 		std::shared_ptr<RenderTarget> default_renderTarget;
 
