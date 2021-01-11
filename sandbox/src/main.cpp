@@ -1,7 +1,6 @@
 #include <vermilion/vermilion.hpp>
 
 #include <vermilion/instance.hpp>
-#include <vermilion/RenderTarget.hpp>
 
 #include <memory>
 
@@ -66,6 +65,8 @@ int main(int argc, char ** argv){
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
 	std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
 
+	// Create render pipeline
+	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(shaderProgram);
 
 	while(vmInstance.window->shouldClose()){
 		vmInstance.startRender();

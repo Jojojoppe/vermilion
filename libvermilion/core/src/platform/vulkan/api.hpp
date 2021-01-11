@@ -50,6 +50,8 @@ class API : public Vermilion::Core::API{
 		virtual std::shared_ptr<Vermilion::Core::Shader> createShader(std::string source, Vermilion::Core::ShaderType type) override;
 		virtual std::shared_ptr<Vermilion::Core::ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders) override;
 
+		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram) override;
+
 	private:
 		// DEBUG STUFF
 		// -----------

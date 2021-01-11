@@ -66,9 +66,25 @@ Vermilion::Core::Vulkan::Shader::~Shader(){
 Vermilion::Core::Vulkan::ShaderProgram::ShaderProgram(Vermilion::Core::Vulkan::API * api, std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders){
 	this->api = api;
 	this->instance = api->instance;
+
+	// Create shader modules
+	for(const auto& shader : shaders){
+		std::shared_ptr<Vermilion::Core::Vulkan::Shader> vulkanShader = std::static_pointer_cast<Vermilion::Core::Vulkan::Shader>(shader);
+		VkShaderModule module;
+		if(vkCreateShaderModule(api->vk_device->vk_device, &vulkanShader->vk_createInfo, nullptr, &module)!=VK_SUCCESS){
+			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create shader module");
+			throw std::runtime_error("Vermilion::Core::Vulkan::ShaderProgram::ShaderProgram() - Could not create shader module");
+		}
+		this->vk_shadermodules.push_back(module);
+		vulkanShader->vk_shaderStageInfo.module = module;
+		this->shaders.push_back(shader);
+	}
 }
 
 Vermilion::Core::Vulkan::ShaderProgram::~ShaderProgram(){	
+	for(const auto& module : this->vk_shadermodules){
+		vkDestroyShaderModule(this->api->vk_device->vk_device, module, nullptr);
+	}
 }
 
 #endif

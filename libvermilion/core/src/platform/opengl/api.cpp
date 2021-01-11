@@ -36,4 +36,16 @@ void Vermilion::Core::OpenGL::API::startRender(){
 void Vermilion::Core::OpenGL::API::endRender(){
 }
 
+std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::OpenGL::API::getDefaultRenderTarget(){
+	return nullptr;
+}
+
+std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::OpenGL::API::createShader(std::string source, Vermilion::Core::ShaderType type){
+	return nullptr;
+}
+
+std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::OpenGL::API::createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders){
+	return nullptr;
+}
+
 #endif

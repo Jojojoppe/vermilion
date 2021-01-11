@@ -50,6 +50,10 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Instance::creat
 	return this->api->createShaderProgram(shaders);
 }
 
+std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Instance::createPipeline(std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram){
+	return this->api->createPipeline(shaderProgram);
+}
+
 int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue){
 	int API = Vermilion::Core::renderPlatform[0];
 

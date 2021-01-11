@@ -4,6 +4,7 @@
 #include <vermilion/vermilion.hpp>
 #include <vermilion/instance.hpp>
 #include "Shader.hpp"
+#include "Pipeline.hpp"
 
 #include <string.h>
 
@@ -71,6 +72,10 @@ std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Vulkan::API::createSha
 
 std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders){
 	return std::static_pointer_cast<Vermilion::Core::ShaderProgram>(std::make_shared<Vermilion::Core::Vulkan::ShaderProgram>(this, shaders));
+}
+
+std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram){
+	return std::static_pointer_cast<Vermilion::Core::Pipeline>(std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, shaderProgram));
 }
 
 // DEBUG STUFF

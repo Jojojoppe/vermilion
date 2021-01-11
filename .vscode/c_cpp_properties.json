@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/libvermilion/include",
+                "${workspaceFolder}/libvermilion/core/src/**",
+                "${workspaceFolder}/sandbox/src/**",
+                "/usr/include/**",
+                "/usr/include/c++/10.2.0/**",
+                "${workspaceFolder}/third_party/glad/include/**"
+            ],
+            "defines": [
+                "VMCORE_OPENGL",
+                "VMCORE_VULKAN",
+                "VMCORE_GLFW"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "${default}"
+        }
+    ],
+    "version": 4
+}

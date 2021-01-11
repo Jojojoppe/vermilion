@@ -5,6 +5,7 @@
 
 #include <vermilion/RenderTarget.hpp>
 #include <vermilion/Shader.hpp>
+#include <vermilion/Pipeline.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -45,6 +46,8 @@ class API{
 
 		virtual std::shared_ptr<Shader> createShader(std::string source, ShaderType type){return nullptr;};
 		virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders){return nullptr;};
+
+		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<ShaderProgram> shaderProgram){return nullptr;};
 
 	private:
 };
