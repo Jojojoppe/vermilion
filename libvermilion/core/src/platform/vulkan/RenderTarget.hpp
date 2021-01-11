@@ -23,6 +23,8 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 		std::unique_ptr<vkRenderPass> renderpass;
 		std::vector<std::unique_ptr<vkFrameBuffer>> framebuffers;
 
+		std::vector<VkCommandBuffer> vk_commandBuffers;
+
 	private:
 		Vermilion::Core::Instance * instance;
 		API * api;

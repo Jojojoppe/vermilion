@@ -52,11 +52,10 @@ void Vermilion::Core::Vulkan::API::init(){
 	this->vk_physicaldevice.reset(new Vermilion::Core::Vulkan::vkPhysicalDevice(this));
 	this->vk_device.reset(new Vermilion::Core::Vulkan::vkDevice(this));
 	this->vk_swapchain.reset(new Vermilion::Core::Vulkan::vkSwapChain(this));
+	this->vk_commandPool.reset(new Vermilion::Core::Vulkan::vkCommandPool(this));
 
 	// Create render target
 	this->default_renderTarget.reset(new Vermilion::Core::Vulkan::RenderTarget(this));
-
-	this->vk_commandPool.reset(new Vermilion::Core::Vulkan::vkCommandPool(this));
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){
