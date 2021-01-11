@@ -22,9 +22,9 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 	public:
 		std::unique_ptr<vkRenderPass> renderpass;
 		std::vector<std::unique_ptr<vkFrameBuffer>> framebuffers;
-		VkExtent2D extent;
 
 		std::vector<VkCommandBuffer> vk_commandBuffers;
+		VkExtent2D extent;
 
 	private:
 		Vermilion::Core::Instance * instance;
@@ -37,6 +37,8 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 
 		virtual void start() override;
 		virtual void end() override;
+
+		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, int vertexCount, int instanceCount, int firstVertex, int firstInstance) override;
 
 	private:
 };

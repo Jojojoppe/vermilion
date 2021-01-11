@@ -4,6 +4,8 @@
 #include <vermilion/window.hpp>
 #include <vermilion/logger.hpp>
 
+#include <vermilion/Pipeline.hpp>
+
 #include <memory>
 
 namespace Vermilion{
@@ -15,6 +17,8 @@ class RenderTarget{
 
 		virtual void start(){};
 		virtual void end(){};
+
+		virtual void draw(std::shared_ptr<Pipeline> pipeline, int vertexCount, int instanceCount, int firstVertex, int firstInstance){};
 };
 
 }}

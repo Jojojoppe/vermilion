@@ -21,8 +21,13 @@ Vermilion::Core::Vulkan::API::API(Vermilion::Core::Instance * instance){
 Vermilion::Core::Vulkan::API::~API(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Destroying Vulkan context");
 
-	vkDestroySemaphore(vk_device->vk_device, imageAvailableSemaphore, nullptr);
-	vkDestroySemaphore(vk_device->vk_device, renderFinishedSemaphore, nullptr);
+	vkDeviceWaitIdle(vk_device->vk_device);
+
+	for(int i=0; i<maxFramesInFlight; i++){
+		vkDestroySemaphore(vk_device->vk_device, imageAvailableSemaphore[i], nullptr);
+		vkDestroySemaphore(vk_device->vk_device, renderFinishedSemaphore[i], nullptr);
+		vkDestroyFence(vk_device->vk_device, inFlightFences[i], nullptr);
+	}
 	vk_commandPool.reset();
 	default_renderTarget.reset();
 	vk_swapchain.reset();
@@ -60,16 +65,31 @@ void Vermilion::Core::Vulkan::API::init(){
 	// Create render target
 	this->default_renderTarget.reset(new Vermilion::Core::Vulkan::RenderTarget(this));
 
-	// Create render semaphores
+	maxFramesInFlight = vk_swapchain->swapChainImages.size()-1;
+	imageAvailableSemaphore.resize(maxFramesInFlight);
+	renderFinishedSemaphore.resize(maxFramesInFlight);
+	inFlightFences.resize(maxFramesInFlight);
+	imagesInFlight.resize(vk_swapchain->swapChainImages.size(), VK_NULL_HANDLE);
+
+	// Create render semaphores and fences
 	VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	if(vkCreateSemaphore(vk_device->vk_device, &semaphoreInfo, nullptr, &imageAvailableSemaphore)!=VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create semaphore");
-		throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create semaphore");
-	}
-	if(vkCreateSemaphore(vk_device->vk_device, &semaphoreInfo, nullptr, &renderFinishedSemaphore)!=VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create semaphore");
-		throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create semaphore");
+	VkFenceCreateInfo fenceInfo{};
+	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+	for(int i=0; i<maxFramesInFlight; i++){
+		if(vkCreateSemaphore(vk_device->vk_device, &semaphoreInfo, nullptr, &imageAvailableSemaphore[i])!=VK_SUCCESS){
+			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create semaphore");
+			throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create semaphore");
+		}
+		if(vkCreateSemaphore(vk_device->vk_device, &semaphoreInfo, nullptr, &renderFinishedSemaphore[i])!=VK_SUCCESS){
+			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create semaphore");
+			throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create semaphore");
+		}
+		if(vkCreateFence(vk_device->vk_device, &fenceInfo, nullptr, &inFlightFences[i])!=VK_SUCCESS){
+			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create fence");
+			throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create fence");
+		}
 	}
 }
 
@@ -78,14 +98,21 @@ void Vermilion::Core::Vulkan::API::startRender(){
 }
 
 void Vermilion::Core::Vulkan::API::endRender(){
+	vkWaitForFences(vk_device->vk_device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+
 	uint32_t imageIndex;
-    vkAcquireNextImageKHR(vk_device->vk_device, vk_swapchain->swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+    vkAcquireNextImageKHR(vk_device->vk_device, vk_swapchain->swapChain, UINT64_MAX, imageAvailableSemaphore[currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+	if(imagesInFlight[imageIndex] != VK_NULL_HANDLE){
+		vkWaitForFences(vk_device->vk_device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+	}
+	imagesInFlight[imageIndex] = inFlightFences[currentFrame];
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	
-	VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
-	VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
+	VkSemaphore waitSemaphores[] = {imageAvailableSemaphore[currentFrame]};
+	VkSemaphore signalSemaphores[] = {renderFinishedSemaphore[currentFrame]};
 	VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
@@ -95,7 +122,8 @@ void Vermilion::Core::Vulkan::API::endRender(){
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	if(vkQueueSubmit(vk_device->vk_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+	vkResetFences(vk_device->vk_device, 1, &inFlightFences[currentFrame]);
+	if(vkQueueSubmit(vk_device->vk_graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not submit to graphics queue");
 		throw std::runtime_error("Vermilion::Core::Vulkan::API::endRender() - Could not submit to graphics queue");
 	}
@@ -110,6 +138,10 @@ void Vermilion::Core::Vulkan::API::endRender(){
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr; // Optional
 	vkQueuePresentKHR(vk_device->vk_presentQueue, &presentInfo);
+
+	vkDeviceWaitIdle(vk_device->vk_device);
+
+	currentFrame = (currentFrame+1)%maxFramesInFlight;
 }
 
 std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Vulkan::API::getDefaultRenderTarget(){

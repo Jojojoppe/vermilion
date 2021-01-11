@@ -6,6 +6,7 @@
 #include "api.hpp"
 #include <vermilion/window.hpp>
 #include "vkPhysicalDevice.hpp"
+#include "Pipeline.hpp"
 
 #include <string.h>
 #include <stdexcept>
@@ -81,6 +82,13 @@ void Vermilion::Core::Vulkan::RenderTarget::end(){
 			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to end command buffer recording");
 			throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarget::end() - Failed to end command buffer recording");
 		}
+	}
+}
+
+void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, int vertexCount, int instanceCount, int firstVertex, int firstInstance){
+	for(int i=0; i<vk_commandBuffers.size(); i++){
+		vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_pipeline);
+		vkCmdDraw(vk_commandBuffers[i], vertexCount, instanceCount, firstVertex, firstInstance);
 	}
 }
 

@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.h>
 #include <stdint.h>
 #include <memory>
+#include <vector>
 
 #include "vkInstance.hpp"
 #include "vkPhysicalDevice.hpp"
@@ -37,8 +38,13 @@ class API : public Vermilion::Core::API{
 
 		std::shared_ptr<RenderTarget> default_renderTarget;
 
-		VkSemaphore imageAvailableSemaphore;
-		VkSemaphore renderFinishedSemaphore;
+		std::vector<VkSemaphore> imageAvailableSemaphore;
+		std::vector<VkSemaphore> renderFinishedSemaphore;
+		std::vector<VkFence> inFlightFences;
+		std::vector<VkFence> imagesInFlight;
+
+		int maxFramesInFlight;
+		int currentFrame = 0;
 
 	private:
 

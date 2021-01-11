@@ -70,7 +70,7 @@ int main(int argc, char ** argv){
 
 	// Start queueing commands to static queue
 	defaultRenderTarget->start();
-
+	defaultRenderTarget->draw(pipeline, 3, 1, 0, 0);
 	defaultRenderTarget->end();
 
 	while(vmInstance.window->shouldClose()){

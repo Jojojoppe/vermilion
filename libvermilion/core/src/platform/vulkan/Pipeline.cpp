@@ -100,11 +100,11 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 	//colorBlending.blendConstants[3] = 0.0f; // Optional
 
 	// Dynamic states
-	std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT};
-	VkPipelineDynamicStateCreateInfo dynamicCreateInfo = {};
-	dynamicCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	dynamicCreateInfo.pDynamicStates = dynamicStateEnables.data();
-	dynamicCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
+	// std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT};
+	// VkPipelineDynamicStateCreateInfo dynamicCreateInfo = {};
+	// dynamicCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	// dynamicCreateInfo.pDynamicStates = dynamicStateEnables.data();
+	// dynamicCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
 
 	// Pipeline layout
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
@@ -130,7 +130,7 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 	pipelineInfo.pMultisampleState = &multisampling;
 	pipelineInfo.pDepthStencilState = nullptr; // Optional
 	pipelineInfo.pColorBlendState = &colorBlending;
-	pipelineInfo.pDynamicState = &dynamicCreateInfo; // Optional
+	pipelineInfo.pDynamicState = nullptr; // Optional
 	pipelineInfo.layout = vk_pipelineLayout;
 	pipelineInfo.renderPass = std::static_pointer_cast<Vermilion::Core::Vulkan::RenderTarget>(renderTarget)->renderpass->vk_renderPass;
 	pipelineInfo.subpass = 0;
