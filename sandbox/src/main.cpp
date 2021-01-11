@@ -68,6 +68,11 @@ int main(int argc, char ** argv){
 	// Create render pipeline
 	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram);
 
+	// Start queueing commands to static queue
+	defaultRenderTarget->start();
+
+	defaultRenderTarget->end();
+
 	while(vmInstance.window->shouldClose()){
 		vmInstance.startRender();
 		vmInstance.endRender();

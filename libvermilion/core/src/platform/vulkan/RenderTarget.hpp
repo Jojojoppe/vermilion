@@ -22,6 +22,7 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 	public:
 		std::unique_ptr<vkRenderPass> renderpass;
 		std::vector<std::unique_ptr<vkFrameBuffer>> framebuffers;
+		VkExtent2D extent;
 
 		std::vector<VkCommandBuffer> vk_commandBuffers;
 
@@ -33,6 +34,9 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 		RenderTarget(Vermilion::Core::Instance * instance, int width, int height);
 		RenderTarget(API * api);
 		~RenderTarget();
+
+		virtual void start() override;
+		virtual void end() override;
 
 	private:
 };

@@ -7,6 +7,7 @@
 #include "Pipeline.hpp"
 
 #include <string.h>
+#include <stdexcept>
 
 Vermilion::Core::Instance * Vermilion::Core::Vulkan::API::static_instance;
 
@@ -20,6 +21,8 @@ Vermilion::Core::Vulkan::API::API(Vermilion::Core::Instance * instance){
 Vermilion::Core::Vulkan::API::~API(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Destroying Vulkan context");
 
+	vkDestroySemaphore(vk_device->vk_device, imageAvailableSemaphore, nullptr);
+	vkDestroySemaphore(vk_device->vk_device, renderFinishedSemaphore, nullptr);
 	vk_commandPool.reset();
 	default_renderTarget.reset();
 	vk_swapchain.reset();
@@ -56,12 +59,57 @@ void Vermilion::Core::Vulkan::API::init(){
 
 	// Create render target
 	this->default_renderTarget.reset(new Vermilion::Core::Vulkan::RenderTarget(this));
+
+	// Create render semaphores
+	VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	if(vkCreateSemaphore(vk_device->vk_device, &semaphoreInfo, nullptr, &imageAvailableSemaphore)!=VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create semaphore");
+		throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create semaphore");
+	}
+	if(vkCreateSemaphore(vk_device->vk_device, &semaphoreInfo, nullptr, &renderFinishedSemaphore)!=VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create semaphore");
+		throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create semaphore");
+	}
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){
+
 }
 
 void Vermilion::Core::Vulkan::API::endRender(){
+	uint32_t imageIndex;
+    vkAcquireNextImageKHR(vk_device->vk_device, vk_swapchain->swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	
+	VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
+	VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
+	VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitDstStageMask = waitStages;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &default_renderTarget->vk_commandBuffers[imageIndex];
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = signalSemaphores;
+
+	if(vkQueueSubmit(vk_device->vk_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not submit to graphics queue");
+		throw std::runtime_error("Vermilion::Core::Vulkan::API::endRender() - Could not submit to graphics queue");
+	}
+
+	VkPresentInfoKHR presentInfo{};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = signalSemaphores;
+	VkSwapchainKHR swapChains[] = {vk_swapchain->swapChain};
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = swapChains;
+	presentInfo.pImageIndices = &imageIndex;
+	presentInfo.pResults = nullptr; // Optional
+	vkQueuePresentKHR(vk_device->vk_presentQueue, &presentInfo);
 }
 
 std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Vulkan::API::getDefaultRenderTarget(){

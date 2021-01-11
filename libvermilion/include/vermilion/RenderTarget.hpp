@@ -12,6 +12,9 @@ namespace Core{
 class RenderTarget{
 	public:
 		~RenderTarget() = default;
+
+		virtual void start(){};
+		virtual void end(){};
 };
 
 }}

@@ -31,6 +31,7 @@ Vermilion::Core::Vulkan::RenderTarget::RenderTarget(Vermilion::Core::Vulkan::API
 					api->vk_swapchain->swapChainExtent.width, api->vk_swapchain->swapChainExtent.height, 
 					api->vk_swapchain->swapChainImageViews[i]->imageView, this->renderpass->vk_renderPass));
 	}
+	this->extent = api->vk_swapchain->swapChainExtent;
 
 	// Create command buffers for render target (one for each swapchain image)
 	vk_commandBuffers.resize(swapchainsize);
@@ -46,6 +47,41 @@ Vermilion::Core::Vulkan::RenderTarget::RenderTarget(Vermilion::Core::Vulkan::API
 }
 
 Vermilion::Core::Vulkan::RenderTarget::~RenderTarget(){	
+}
+
+void Vermilion::Core::Vulkan::RenderTarget::start(){
+	for (size_t i = 0; i < vk_commandBuffers.size(); i++) {
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = 0; // Optional
+		beginInfo.pInheritanceInfo = nullptr; // Optional
+
+		if(vkBeginCommandBuffer(vk_commandBuffers[i], &beginInfo) != VK_SUCCESS){
+			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to start command buffer recording");
+			throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarget::start() - Failed to start command buffer recording");
+		}
+
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = this->renderpass->vk_renderPass;
+		renderPassInfo.framebuffer = this->framebuffers[i]->vk_frameBuffer;
+		renderPassInfo.renderArea.offset = {0, 0};
+		renderPassInfo.renderArea.extent = this->extent;
+		VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+		renderPassInfo.clearValueCount = 1;
+		renderPassInfo.pClearValues = &clearColor;
+		vkCmdBeginRenderPass(vk_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	}
+}
+
+void Vermilion::Core::Vulkan::RenderTarget::end(){
+	for(int i=0; i<vk_commandBuffers.size(); i++){
+		vkCmdEndRenderPass(vk_commandBuffers[i]);
+		if(vkEndCommandBuffer(vk_commandBuffers[i]) != VK_SUCCESS){
+			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to end command buffer recording");
+			throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarget::end() - Failed to end command buffer recording");
+		}
+	}
 }
 
 #endif

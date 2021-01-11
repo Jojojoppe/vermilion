@@ -37,6 +37,9 @@ class API : public Vermilion::Core::API{
 
 		std::shared_ptr<RenderTarget> default_renderTarget;
 
+		VkSemaphore imageAvailableSemaphore;
+		VkSemaphore renderFinishedSemaphore;
+
 	private:
 
 	public:
