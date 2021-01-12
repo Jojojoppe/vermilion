@@ -40,6 +40,9 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 
 		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, int vertexCount, int instanceCount, int firstVertex, int firstInstance) override;
 
+		void create();
+		void reset();
+
 	private:
 };
 

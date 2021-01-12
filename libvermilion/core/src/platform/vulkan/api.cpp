@@ -23,6 +23,10 @@ Vermilion::Core::Vulkan::API::~API(){
 
 	vkDeviceWaitIdle(vk_device->vk_device);
 
+	for(int i=0; i<pipelines.size(); i++){
+		pipelines[i].reset();
+	}
+
 	for(int i=0; i<maxFramesInFlight; i++){
 		vkDestroySemaphore(vk_device->vk_device, imageAvailableSemaphore[i], nullptr);
 		vkDestroySemaphore(vk_device->vk_device, renderFinishedSemaphore[i], nullptr);
@@ -93,6 +97,28 @@ void Vermilion::Core::Vulkan::API::init(){
 	}
 }
 
+void Vermilion::Core::Vulkan::API::resize(){
+	// Recreate swapchain etc for resize
+	vkDeviceWaitIdle(vk_device->vk_device);
+
+	// Cleanup swapchain
+	for(const auto& pipeline : pipelines){
+		pipeline->destroy();
+	}
+	this->vk_commandPool.reset();
+	default_renderTarget->reset();
+	vk_swapchain.reset();
+
+	// Rebuild all
+	this->vk_swapchain.reset(new Vermilion::Core::Vulkan::vkSwapChain(this));
+	this->vk_commandPool.reset(new Vermilion::Core::Vulkan::vkCommandPool(this));
+	this->default_renderTarget->create();
+	for(const auto& pipeline : pipelines){
+		pipeline->create();
+	}
+	vkDeviceWaitIdle(vk_device->vk_device);
+}
+
 void Vermilion::Core::Vulkan::API::startRender(){
 
 }
@@ -101,7 +127,13 @@ void Vermilion::Core::Vulkan::API::endRender(){
 	vkWaitForFences(vk_device->vk_device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
 	uint32_t imageIndex;
-    vkAcquireNextImageKHR(vk_device->vk_device, vk_swapchain->swapChain, UINT64_MAX, imageAvailableSemaphore[currentFrame], VK_NULL_HANDLE, &imageIndex);
+    VkResult res = vkAcquireNextImageKHR(vk_device->vk_device, vk_swapchain->swapChain, UINT64_MAX, imageAvailableSemaphore[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	if(res==VK_ERROR_OUT_OF_DATE_KHR){
+		this->resize();
+		return;
+	}else if(res!=VK_SUCCESS && res !=VK_SUBOPTIMAL_KHR){
+		throw std::runtime_error("Vermilion::Core::Vulkan::API::endRender() - Failed to acquire swap chain image");
+	}
 
 	if(imagesInFlight[imageIndex] != VK_NULL_HANDLE){
 		vkWaitForFences(vk_device->vk_device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -137,7 +169,13 @@ void Vermilion::Core::Vulkan::API::endRender(){
 	presentInfo.pSwapchains = swapChains;
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr; // Optional
-	vkQueuePresentKHR(vk_device->vk_presentQueue, &presentInfo);
+	res = vkQueuePresentKHR(vk_device->vk_presentQueue, &presentInfo);
+	if(res==VK_ERROR_OUT_OF_DATE_KHR || res==VK_SUBOPTIMAL_KHR){
+		this->resize();
+		return;
+	}else if(res!=VK_SUCCESS){
+		throw std::runtime_error("Vermilion::Core::Vulkan::API::endRender() - Failed to present swap chain image");
+	}
 
 	vkDeviceWaitIdle(vk_device->vk_device);
 
@@ -157,7 +195,9 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::cr
 }
 
 std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram){
-	return std::static_pointer_cast<Vermilion::Core::Pipeline>(std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram));
+	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram);
+	pipelines.push_back(newpipeline);
+	return std::static_pointer_cast<Vermilion::Core::Pipeline>(newpipeline);
 }
 
 // DEBUG STUFF

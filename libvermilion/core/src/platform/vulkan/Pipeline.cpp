@@ -14,6 +14,17 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 	this->api = api;
 	this->instance = api->instance;
 
+	this->renderTarget = renderTarget;
+	this->shaderProgram = shaderProgram;
+
+	this->create();
+}
+
+Vermilion::Core::Vulkan::Pipeline::~Pipeline(){
+	this->destroy();
+}
+
+void Vermilion::Core::Vulkan::Pipeline::create(){
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfo;
 	for(const auto& shader : shaderProgram->shaders){
 		shaderStageInfo.push_back(std::static_pointer_cast<Vermilion::Core::Vulkan::Shader>(shader)->vk_shaderStageInfo);
@@ -141,10 +152,9 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create pipeline");
 		throw std::runtime_error("Vermilion::Core::Vulkan::Pipeline::Pipeline() - Could not create pipeline");
 	}
-
 }
 
-Vermilion::Core::Vulkan::Pipeline::~Pipeline(){
+void Vermilion::Core::Vulkan::Pipeline::destroy(){
 	vkDestroyPipeline(api->vk_device->vk_device, vk_pipeline, nullptr);
 	vkDestroyPipelineLayout(api->vk_device->vk_device, vk_pipelineLayout, nullptr);
 }

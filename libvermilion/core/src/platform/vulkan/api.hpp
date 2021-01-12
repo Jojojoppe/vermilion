@@ -22,6 +22,8 @@ namespace Vulkan{
 extern std::vector<const char*> validationLayers;
 extern std::vector<const char*> deviceExtensions;
 
+class Pipeline;
+
 class API : public Vermilion::Core::API{
 	public:
 		Vermilion::Core::Instance * instance;
@@ -46,6 +48,8 @@ class API : public Vermilion::Core::API{
 		int maxFramesInFlight;
 		int currentFrame = 0;
 
+		std::vector<std::shared_ptr<Pipeline>> pipelines;
+
 	private:
 
 	public:
@@ -64,6 +68,9 @@ class API : public Vermilion::Core::API{
 		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram) override;
 
 	private:
+
+		void resize();
+
 		// DEBUG STUFF
 		// -----------
 		static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

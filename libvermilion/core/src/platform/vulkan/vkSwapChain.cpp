@@ -67,7 +67,6 @@ Vermilion::Core::Vulkan::vkSwapChain::vkSwapChain(API * api){
 	for(int i=0; i<imageCount; i++){
 		swapChainImageViews[i].reset(new vkImageView2D(this->api, swapChainImages[i], swapChainImageFormat));
 	}
-	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Swap chain has %d images", imageCount);
 }
 
 Vermilion::Core::Vulkan::vkSwapChain::~vkSwapChain(){	

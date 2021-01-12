@@ -26,12 +26,18 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		Vermilion::Core::Instance * instance;
 		API * api;
 
+		std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget;
+		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram;
+
 	public:
 		VkPipeline vk_pipeline;
 		VkPipelineLayout vk_pipelineLayout;
 
 		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram);
 		~Pipeline();
+
+		void destroy();
+		void create();
 };
 
 }}}

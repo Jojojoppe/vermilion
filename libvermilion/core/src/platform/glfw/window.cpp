@@ -22,7 +22,7 @@ void Vermilion::Core::GLFW::Window::createWindow(int width, int height){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Creating window of %dx%d", this->width, this->height);
 
 	// Set glfw settings accordingly to render API
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);	
+	// glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);	
 	switch(this->renderPlatform){
 		case Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL:
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);

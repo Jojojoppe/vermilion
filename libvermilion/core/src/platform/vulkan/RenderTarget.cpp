@@ -24,27 +24,7 @@ Vermilion::Core::Vulkan::RenderTarget::RenderTarget(Vermilion::Core::Vulkan::API
 	this->api = api;
 	this->instance = api->instance;
 
-	this->renderpass.reset(new vkRenderPass(api, api->vk_swapchain->swapChainImageFormat));
-	int swapchainsize = api->vk_swapchain->swapChainImages.size();
-	this->framebuffers.resize(swapchainsize);
-	for(int i=0; i<swapchainsize; i++){
-		this->framebuffers[i].reset(new Vermilion::Core::Vulkan::vkFrameBuffer(api, 
-					api->vk_swapchain->swapChainExtent.width, api->vk_swapchain->swapChainExtent.height, 
-					api->vk_swapchain->swapChainImageViews[i]->imageView, this->renderpass->vk_renderPass));
-	}
-	this->extent = api->vk_swapchain->swapChainExtent;
-
-	// Create command buffers for render target (one for each swapchain image)
-	vk_commandBuffers.resize(swapchainsize);
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = api->vk_commandPool->vk_commandPool;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = (uint32_t) vk_commandBuffers.size();
-	if(vkAllocateCommandBuffers(api->vk_device->vk_device, &allocInfo, vk_commandBuffers.data()) != VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to create command buffers for swapchain images");
-		throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarget::RenderTarget() - Failed to create command buffers for swapchain images");
-	}
+	this->create();
 }
 
 Vermilion::Core::Vulkan::RenderTarget::~RenderTarget(){	
@@ -90,6 +70,34 @@ void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core
 		vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_pipeline);
 		vkCmdDraw(vk_commandBuffers[i], vertexCount, instanceCount, firstVertex, firstInstance);
 	}
+}
+
+void Vermilion::Core::Vulkan::RenderTarget::create(){
+	this->renderpass.reset(new vkRenderPass(api, api->vk_swapchain->swapChainImageFormat));
+	int swapchainsize = api->vk_swapchain->swapChainImages.size();
+	this->framebuffers.resize(swapchainsize);
+	for(int i=0; i<swapchainsize; i++){
+		this->framebuffers[i].reset(new Vermilion::Core::Vulkan::vkFrameBuffer(api, 
+					api->vk_swapchain->swapChainExtent.width, api->vk_swapchain->swapChainExtent.height, 
+					api->vk_swapchain->swapChainImageViews[i]->imageView, this->renderpass->vk_renderPass));
+	}
+	this->extent = api->vk_swapchain->swapChainExtent;
+
+	// Create command buffers for render target (one for each swapchain image)
+	vk_commandBuffers.resize(swapchainsize);
+	VkCommandBufferAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = api->vk_commandPool->vk_commandPool;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = (uint32_t) vk_commandBuffers.size();
+	if(vkAllocateCommandBuffers(api->vk_device->vk_device, &allocInfo, vk_commandBuffers.data()) != VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to create command buffers for swapchain images");
+		throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarget::RenderTarget() - Failed to create command buffers for swapchain images");
+	}
+}
+
+void Vermilion::Core::Vulkan::RenderTarget::reset(){
+
 }
 
 #endif

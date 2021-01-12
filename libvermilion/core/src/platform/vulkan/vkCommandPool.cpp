@@ -20,7 +20,7 @@ Vermilion::Core::Vulkan::vkCommandPool::vkCommandPool(API * api){
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
-	poolInfo.flags = 0; // Optional
+	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	if(vkCreateCommandPool(api->vk_device->vk_device, &poolInfo, nullptr, &this->vk_commandPool) != VK_SUCCESS){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to create command pool");
 		throw std::runtime_error("Vermilion::Core::Vulkan::vkCommandPool::vkCommandPool() - Failed to create command pool");
