@@ -10,6 +10,16 @@
 #include <stdexcept>
 #include <cstdint>
 
+VkFormat VulkanBufferLayoutElementTypeToVulkanBaseType[] = {
+	VK_FORMAT_UNDEFINED,
+	VK_FORMAT_R32_SFLOAT,
+	VK_FORMAT_R32G32_SFLOAT,
+	VK_FORMAT_R32G32B32_SFLOAT,
+	VK_FORMAT_R32G32B32A32_SFLOAT,
+	VK_FORMAT_R32_UINT,
+	VK_FORMAT_R8_UINT
+};
+
 Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout){
 	this->api = api;
 	this->instance = api->instance;
@@ -33,12 +43,37 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	VkPipelineShaderStageCreateInfo * shaderStages = shaderStageInfo.data();
 
 	// Vertex data layout
+	// Calculate stride and offset
+	std::vector<Vermilion::Core::VertexBufferLayoutElement> elements(vertexLayout);
+	unsigned int offset = 0;
+	unsigned int stride = 0;
+	for(auto& element : elements){
+		element.offset = offset;
+		offset += element.size;
+		stride += element.size;
+	}
+	// Create descriptors
+	VkVertexInputBindingDescription bindingDescription = {};
+	bindingDescription.binding = 0;
+	bindingDescription.stride = stride;
+	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+	int i = 0;
+	for(auto& element : elements){
+		VkVertexInputAttributeDescription desc = {};
+		desc.binding = 0;
+		desc.location = i++;
+		desc.format = VulkanBufferLayoutElementTypeToVulkanBaseType[element.type];
+		desc.offset = element.offset;
+		attributeDescriptions.push_back(desc);
+	}
+
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; // Optional
+	vertexInputInfo.vertexAttributeDescriptionCount = attributeDescriptions.size();
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();                                                                                                                                                                                                                                                                                                                       
 
 	// Input assembly
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};

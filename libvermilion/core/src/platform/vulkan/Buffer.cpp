@@ -12,6 +12,7 @@
 Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API* api, void * data, size_t length){
 	this->api = api;
 	this->instance = api->instance;
+	this->size = length;
 
 	// Create staging buffer
 	VkBuffer stagingBuffer;
@@ -91,6 +92,7 @@ Vermilion::Core::Vulkan::VertexBuffer::~VertexBuffer(){
 Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer(Vermilion::Core::Vulkan::API* api, void * data, size_t length){
 	this->api = api;
 	this->instance = api->instance;
+	this->size = length;
 
 	// Create staging buffer
 	VkBuffer stagingBuffer;
