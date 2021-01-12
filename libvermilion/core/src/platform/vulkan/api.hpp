@@ -14,6 +14,7 @@
 #include "vkSwapChain.hpp"
 #include "vkCommandPool.hpp"
 #include "RenderTarget.hpp"
+#include "vk_mem_alloc.h"
 
 namespace Vermilion{
 namespace Core{
@@ -37,6 +38,7 @@ class API : public Vermilion::Core::API{
 		std::unique_ptr<vkDevice> vk_device;
 		std::unique_ptr<vkSwapChain> vk_swapchain;
 		std::unique_ptr<vkCommandPool> vk_commandPool;
+		VmaAllocator vma_allocator;
 
 		std::shared_ptr<RenderTarget> default_renderTarget;
 
@@ -65,7 +67,10 @@ class API : public Vermilion::Core::API{
 		virtual std::shared_ptr<Vermilion::Core::Shader> createShader(std::string source, Vermilion::Core::ShaderType type) override;
 		virtual std::shared_ptr<Vermilion::Core::ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders) override;
 
-		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram) override;
+		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout) override;
+
+		virtual std::shared_ptr<Vermilion::Core::VertexBuffer> createVertexBuffer(void * data, size_t length) override;
+		virtual std::shared_ptr<Vermilion::Core::IndexBuffer> createIndexBuffer(void * data, size_t length) override;
 
 	private:
 

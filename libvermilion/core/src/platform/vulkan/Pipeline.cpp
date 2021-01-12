@@ -10,12 +10,13 @@
 #include <stdexcept>
 #include <cstdint>
 
-Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram){
+Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout){
 	this->api = api;
 	this->instance = api->instance;
 
 	this->renderTarget = renderTarget;
 	this->shaderProgram = shaderProgram;
+	this->vertexLayout = vertexLayout;
 
 	this->create();
 }

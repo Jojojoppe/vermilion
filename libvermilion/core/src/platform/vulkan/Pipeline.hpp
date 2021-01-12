@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <vermilion/Pipeline.hpp>
+#include <vermilion/Buffer.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -28,12 +29,13 @@ class Pipeline : public Vermilion::Core::Pipeline{
 
 		std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget;
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram;
+		std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout;
 
 	public:
 		VkPipeline vk_pipeline;
 		VkPipelineLayout vk_pipelineLayout;
 
-		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram);
+		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout);
 		~Pipeline();
 
 		void destroy();

@@ -5,6 +5,7 @@
 #include <vermilion/instance.hpp>
 #include "Shader.hpp"
 #include "Pipeline.hpp"
+#include "Buffer.hpp"
 
 #include <string.h>
 #include <stdexcept>
@@ -22,6 +23,8 @@ Vermilion::Core::Vulkan::API::~API(){
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Destroying Vulkan context");
 
 	vkDeviceWaitIdle(vk_device->vk_device);
+
+	vmaDestroyAllocator(vma_allocator);
 
 	for(int i=0; i<pipelines.size(); i++){
 		pipelines[i].reset();
@@ -95,6 +98,12 @@ void Vermilion::Core::Vulkan::API::init(){
 			throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create fence");
 		}
 	}
+
+	// Create memory allocator
+	VmaAllocatorCreateInfo allocatorInfo = {};
+	allocatorInfo.physicalDevice = vk_physicaldevice->vk_physicaldevice;
+	allocatorInfo.device = vk_device->vk_device;
+	vmaCreateAllocator(&allocatorInfo, &vma_allocator);
 }
 
 void Vermilion::Core::Vulkan::API::resize(){
@@ -194,10 +203,18 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::cr
 	return std::static_pointer_cast<Vermilion::Core::ShaderProgram>(std::make_shared<Vermilion::Core::Vulkan::ShaderProgram>(this, shaders));
 }
 
-std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram){
-	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram);
+std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout){
+	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram, vertexLayout);
 	pipelines.push_back(newpipeline);
 	return std::static_pointer_cast<Vermilion::Core::Pipeline>(newpipeline);
+}
+
+std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Vulkan::API::createVertexBuffer(void * data, size_t length){
+	return std::static_pointer_cast<Vermilion::Core::VertexBuffer>(std::make_shared<Vermilion::Core::Vulkan::VertexBuffer>(this, data, length));
+}
+
+std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Vulkan::API::createIndexBuffer(void * data, size_t length){
+	return std::static_pointer_cast<Vermilion::Core::IndexBuffer>(std::make_shared<Vermilion::Core::Vulkan::IndexBuffer>(this, data, length));
 }
 
 // DEBUG STUFF

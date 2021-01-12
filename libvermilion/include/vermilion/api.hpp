@@ -6,6 +6,7 @@
 #include <vermilion/RenderTarget.hpp>
 #include <vermilion/Shader.hpp>
 #include <vermilion/Pipeline.hpp>
+#include <vermilion/Buffer.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -47,7 +48,10 @@ class API{
 		virtual std::shared_ptr<Shader> createShader(std::string source, ShaderType type){return nullptr;};
 		virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders){return nullptr;};
 
-		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram){return nullptr;};
+		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, std::initializer_list<VertexBufferLayoutElement> vertexLayout){return nullptr;};
+
+		virtual std::shared_ptr<VertexBuffer> createVertexBuffer(void * data, size_t length){return nullptr;};
+		virtual std::shared_ptr<IndexBuffer> createIndexBuffer(void * data, size_t length){return nullptr;};
 
 	private:
 };

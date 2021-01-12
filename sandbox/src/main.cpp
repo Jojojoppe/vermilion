@@ -65,8 +65,24 @@ int main(int argc, char ** argv){
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
 	std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
 
+	// Render object
+	std::vector<float> vertices({
+		-0.8,	-0.8,	0.0,	1.0,		1.0,	0.0,	0.0,
+		0.0	,	0.8,	0.0,	1.0,		0.0,	1.0,	0.0,
+		0.8,	-0.8,	0.0,	1.0,		0.0,	0.0,	1.0
+	});
+	std::vector<unsigned int> indices({
+		0, 1, 2
+	});
+	// Create vertex and index buffers
+	std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer = vmInstance.createVertexBuffer(vertices.data(), vertices.size()*sizeof(float));
+	std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer = vmInstance.createIndexBuffer(indices.data(), indices.size()*sizeof(unsigned int));
+
 	// Create render pipeline
-	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram);
+	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
+		Vermilion::Core::VertexBufferLayoutElementFloat4("aPos"),
+		Vermilion::Core::VertexBufferLayoutElementFloat3("aColor")
+	});
 
 	while(vmInstance.window->shouldClose()){
 		vmInstance.startRender();
