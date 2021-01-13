@@ -1,7 +1,4 @@
 #include <vermilion/vermilion.hpp>
-
-#include <vermilion/instance.hpp>
-
 #include <memory>
 
 int main(int argc, char ** argv){

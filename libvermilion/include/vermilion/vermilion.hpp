@@ -14,3 +14,5 @@
 /*
  * ---------------------------
  */
+
+#include <vermilion/instance.hpp>

@@ -38,8 +38,6 @@ else()
 	add_compile_definitions(VMCORE_GLFW)
 endif()
 
-set(VERMILION_CORE_INCLUDE_DIRS ${VERMILION_CORE_INCLUDE_DIRS} ${PROJECT_BINARY_DIR}/third_party/glm/glm)
-
 add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/logger.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/window.cpp
