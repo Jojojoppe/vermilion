@@ -69,8 +69,9 @@ class API : public Vermilion::Core::API{
 
 		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout) override;
 
-		virtual std::shared_ptr<Vermilion::Core::VertexBuffer> createVertexBuffer(void * data, size_t length) override;
-		virtual std::shared_ptr<Vermilion::Core::IndexBuffer> createIndexBuffer(void * data, size_t length) override;
+		virtual std::shared_ptr<Vermilion::Core::VertexBuffer> createVertexBuffer(std::vector<float>& vertices) override;
+		virtual std::shared_ptr<Vermilion::Core::IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices) override;
+		virtual std::shared_ptr<Vermilion::Core::Renderable> createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length) override;
 
 	private:
 

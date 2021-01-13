@@ -9,6 +9,7 @@
 #include "vkFrameBuffer.hpp"
 #include <vermilion/RenderTarget.hpp>
 #include <vermilion/Buffer.hpp>
+#include <vermilion/Renderable.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -39,8 +40,7 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 		virtual void start() override;
 		virtual void end() override;
 
-		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, int vertexCount, int instanceCount, int firstVertex, int firstInstance) override;
-		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, int indexCount, int instanceCount, int firstInstance) override;
+		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance) override;
 
 		void create();
 		void reset();

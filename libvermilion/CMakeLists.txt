@@ -38,7 +38,7 @@ else()
 	add_compile_definitions(VMCORE_GLFW)
 endif()
 
-set(VERMILION_CORE_INCLUDE_DIRS ${VERMILION_CORE_INCLUDE_DIRS ${PROJECT_BINARY_DIR}/third_party/glm/glm})
+set(VERMILION_CORE_INCLUDE_DIRS ${VERMILION_CORE_INCLUDE_DIRS} ${PROJECT_BINARY_DIR}/third_party/glm/glm)
 
 add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/logger.cpp
@@ -54,6 +54,7 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/Shader.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/Pipeline.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/Buffer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/Renderable.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkInstance.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkPhysicalDevice.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkDevice.cpp

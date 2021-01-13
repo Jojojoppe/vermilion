@@ -54,12 +54,16 @@ std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Instance::createPipe
 	return this->api->createPipeline(renderTarget, shaderProgram, vertexLayout);
 }
 
-std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(void * data, size_t length){
-	return this->api->createVertexBuffer(data, length);
+std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(std::vector<float>& vertices){
+	return this->api->createVertexBuffer(vertices);
 }
 
-std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Instance::createIndexBuffer(void * data, size_t length){
-	return this->api->createIndexBuffer(data, length);
+std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Instance::createIndexBuffer(std::vector<unsigned int>& indices){
+	return this->api->createIndexBuffer(indices);
+}
+
+std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Instance::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
+	return this->api->createRenderable(vertexBuffer, indexBuffer, vertexOffset, indexOffset, length);
 }
 
 int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue){

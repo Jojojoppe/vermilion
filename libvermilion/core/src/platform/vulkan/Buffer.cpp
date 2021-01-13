@@ -9,17 +9,19 @@
 #include <stdexcept>
 #include <cstdint>
 
-Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API* api, void * data, size_t length){
+Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API* api, std::vector<float>& vertices){
 	this->api = api;
 	this->instance = api->instance;
-	this->size = length;
+	this->element_size = sizeof(float);
+	this->count = vertices.size();
+	this->size = this->element_size*this->count;
 
 	// Create staging buffer
 	VkBuffer stagingBuffer;
 	VmaAllocation stagingBufferMemory;
 	VkBufferCreateInfo bufferInfo = {};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = length;
+	bufferInfo.size = size;
 	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	VmaAllocationCreateInfo allocInfo = {};
@@ -32,12 +34,12 @@ Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API
 	// Fill buffer
 	void * gpudata;
 	vmaMapMemory(api->vma_allocator, stagingBufferMemory, &gpudata);
-	memcpy(gpudata, data, length);
+	memcpy(gpudata, vertices.data(), size);
 	vmaUnmapMemory(api->vma_allocator, stagingBufferMemory);
 	
 	bufferInfo = {};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = length;
+	bufferInfo.size = size;
 	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	allocInfo = {};
@@ -65,7 +67,7 @@ Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API
 		VkBufferCopy copyRegion = {};
 		copyRegion.srcOffset = 0; // Optional
 		copyRegion.dstOffset = 0; // Optional
-		copyRegion.size = length;
+		copyRegion.size = size;
 		vkCmdCopyBuffer(commandBuffer, stagingBuffer, vk_buffer, 1, &copyRegion);
 		
 		vkEndCommandBuffer(commandBuffer);
@@ -89,17 +91,19 @@ Vermilion::Core::Vulkan::VertexBuffer::~VertexBuffer(){
 	vmaDestroyBuffer(api->vma_allocator, vk_buffer, vk_allocation);
 }
 
-Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer(Vermilion::Core::Vulkan::API* api, void * data, size_t length){
+Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer(Vermilion::Core::Vulkan::API* api, std::vector<unsigned int>& indices){
 	this->api = api;
 	this->instance = api->instance;
-	this->size = length;
+	this->element_size = sizeof(float);
+	this->count = indices.size();
+	this->size = this->element_size*this->count;
 
 	// Create staging buffer
 	VkBuffer stagingBuffer;
 	VmaAllocation stagingBufferMemory;
 	VkBufferCreateInfo bufferInfo = {};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = length;
+	bufferInfo.size = size;
 	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	VmaAllocationCreateInfo allocInfo = {};
@@ -112,12 +116,12 @@ Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer(Vermilion::Core::Vulkan::API* 
 	// Fill buffer
 	void * gpudata;
 	vmaMapMemory(api->vma_allocator, stagingBufferMemory, &gpudata);
-	memcpy(gpudata, data, length);
+	memcpy(gpudata, indices.data(), size);
 	vmaUnmapMemory(api->vma_allocator, stagingBufferMemory);
 	
 	bufferInfo = {};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = length;
+	bufferInfo.size = size;
 	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	allocInfo = {};
@@ -145,7 +149,7 @@ Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer(Vermilion::Core::Vulkan::API* 
 		VkBufferCopy copyRegion = {};
 		copyRegion.srcOffset = 0; // Optional
 		copyRegion.dstOffset = 0; // Optional
-		copyRegion.size = length;
+		copyRegion.size = size;
 		vkCmdCopyBuffer(commandBuffer, stagingBuffer, vk_buffer, 1, &copyRegion);
 		
 		vkEndCommandBuffer(commandBuffer);

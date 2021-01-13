@@ -29,7 +29,7 @@ class VertexBuffer : public Vermilion::Core::VertexBuffer{
 		VkBuffer vk_buffer;
 		VmaAllocation vk_allocation;
 
-		VertexBuffer(API * api, void * data, size_t length);
+		VertexBuffer(API * api, std::vector<float>& vertices);
 		~VertexBuffer();
 };
 
@@ -42,7 +42,7 @@ class IndexBuffer : public Vermilion::Core::IndexBuffer{
 		VkBuffer vk_buffer;
 		VmaAllocation vk_allocation;
 
-		IndexBuffer(API * api, void * data, size_t length);
+		IndexBuffer(API * api, std::vector<unsigned int>& indices);
 		~IndexBuffer();
 };
 

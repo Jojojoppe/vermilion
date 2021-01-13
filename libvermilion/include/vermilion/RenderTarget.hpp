@@ -6,6 +6,7 @@
 
 #include <vermilion/Pipeline.hpp>
 #include <vermilion/Buffer.hpp>
+#include <vermilion/Renderable.hpp>
 
 #include <memory>
 
@@ -19,8 +20,7 @@ class RenderTarget{
 		virtual void start(){};
 		virtual void end(){};
 
-		virtual void draw(std::shared_ptr<Pipeline> pipeline, std::shared_ptr<VertexBuffer> vertexBuffer, int vertexCount, int instanceCount, int firstVertex, int firstInstance){};
-		virtual void draw(std::shared_ptr<Pipeline> pipeline, std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, int indexCount, int instanceCount, int firstInstance){};
+		virtual void draw(std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Renderable> renderable, int instanceCount=1, int firstInstance=0){};
 };
 
 }}

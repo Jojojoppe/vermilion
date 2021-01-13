@@ -66,21 +66,9 @@ void Vermilion::Core::Vulkan::RenderTarget::end(){
 	}
 }
 
-void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, int vertexCount, int instanceCount, int firstVertex, int firstInstance){
-	std::shared_ptr<Vermilion::Core::Vulkan::VertexBuffer> vkVertexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::VertexBuffer>(vertexBuffer);	
-	VkBuffer vertexBuffers[] = {vkVertexBuffer->vk_buffer};
-	VkDeviceSize offsets[] = {0};
-
-	for(int i=0; i<vk_commandBuffers.size(); i++){
-		vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_pipeline);
-		vkCmdBindVertexBuffers(vk_commandBuffers[i], 0, 1, vertexBuffers, offsets);
-		vkCmdDraw(vk_commandBuffers[i], vertexCount, instanceCount, firstVertex, firstInstance);
-	}
-}
-
-void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, int indexCount, int instanceCount, int firstInstance){
-	std::shared_ptr<Vermilion::Core::Vulkan::VertexBuffer> vkVertexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::VertexBuffer>(vertexBuffer);	
-	std::shared_ptr<Vermilion::Core::Vulkan::IndexBuffer> vkIndexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::IndexBuffer>(indexBuffer);	
+void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance){
+	std::shared_ptr<Vermilion::Core::Vulkan::VertexBuffer> vkVertexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::VertexBuffer>(renderable->vertexBuffer);	
+	std::shared_ptr<Vermilion::Core::Vulkan::IndexBuffer> vkIndexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::IndexBuffer>(renderable->indexBuffer);	
 
 	VkBuffer vertexBuffers[] = {vkVertexBuffer->vk_buffer};
 	VkDeviceSize offsets[] = {0};
@@ -89,7 +77,7 @@ void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core
 		vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_pipeline);
 		vkCmdBindVertexBuffers(vk_commandBuffers[i], 0, 1, vertexBuffers, offsets);
 		vkCmdBindIndexBuffer(vk_commandBuffers[i], vkIndexBuffer->vk_buffer, 0, VK_INDEX_TYPE_UINT32);
-		vkCmdDrawIndexed(vk_commandBuffers[i], indexCount, instanceCount, 0, 0, firstInstance);
+		vkCmdDrawIndexed(vk_commandBuffers[i], renderable->length, instanceCount, renderable->indexOffset, renderable->vertexOffset, firstInstance);
 	}
 }
 

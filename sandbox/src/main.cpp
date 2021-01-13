@@ -60,15 +60,15 @@ int main(int argc, char ** argv){
 	std::vector<float> vertices({
 		0.0,	-0.5,	0.0,	1.0,		1.0,	0.0,	0.0,
 		0.5	,	0.5,	0.0,	1.0,		0.0,	1.0,	0.0,
-		-0.5,	0.5,	0.0,	1.0,		0.0,	0.0,	1.0,
-		0.8	,	0.8,	0.0,	1.0,		0.0,	1.0,	0.0
+		-0.5,	0.5,	0.0,	1.0,		0.0,	0.0,	1.0
 	});
 	std::vector<unsigned int> indices({
-		0, 3, 2
+		0, 1, 2,
 	});
 	// Create vertex and index buffers
-	std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer = vmInstance.createVertexBuffer(vertices.data(), vertices.size()*sizeof(float));
-	std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer = vmInstance.createIndexBuffer(indices.data(), indices.size()*sizeof(unsigned int));
+	std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer = vmInstance.createVertexBuffer(vertices);
+	std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer = vmInstance.createIndexBuffer(indices);
+	std::shared_ptr<Vermilion::Core::Renderable> renderObject = vmInstance.createRenderable(vertexBuffer, indexBuffer);
 
 	// Create render pipeline
 	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
@@ -81,7 +81,7 @@ int main(int argc, char ** argv){
 
 		// Start queueing commands to static queue
 		defaultRenderTarget->start();
-		defaultRenderTarget->draw(pipeline, vertexBuffer, indexBuffer, indices.size(), 1, 0);
+		defaultRenderTarget->draw(pipeline, renderObject);
 		defaultRenderTarget->end();
 
 		vmInstance.endRender();

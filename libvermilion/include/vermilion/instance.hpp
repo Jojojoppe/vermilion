@@ -8,6 +8,7 @@
 #include <vermilion/Shader.hpp>
 #include <vermilion/Pipeline.hpp>
 #include <vermilion/Buffer.hpp>
+#include <vermilion/Renderable.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -63,8 +64,9 @@ class Instance{
 
 		std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, std::initializer_list<VertexBufferLayoutElement> vertexLayout);
 
-		std::shared_ptr<VertexBuffer> createVertexBuffer(void * data, size_t length);
-		std::shared_ptr<IndexBuffer> createIndexBuffer(void * data, size_t length);
+		std::shared_ptr<VertexBuffer> createVertexBuffer(std::vector<float>& vertices);
+		std::shared_ptr<IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices);
+		std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, unsigned int vertexOffset=0, unsigned int indexOffset=0, unsigned int length=0);
 
 	private:
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);

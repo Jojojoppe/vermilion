@@ -57,6 +57,8 @@ struct VertexBufferLayoutElementFloat4 : public VertexBufferLayoutElement{
 class Buffer{
 	public:
 		size_t size;
+		unsigned int count;
+		size_t element_size;
 		~Buffer() = default;
 };
 

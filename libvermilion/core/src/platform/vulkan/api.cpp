@@ -6,6 +6,7 @@
 #include "Shader.hpp"
 #include "Pipeline.hpp"
 #include "Buffer.hpp"
+#include "Renderable.hpp"
 
 #include <string.h>
 #include <stdexcept>
@@ -209,12 +210,16 @@ std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createP
 	return std::static_pointer_cast<Vermilion::Core::Pipeline>(newpipeline);
 }
 
-std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Vulkan::API::createVertexBuffer(void * data, size_t length){
-	return std::static_pointer_cast<Vermilion::Core::VertexBuffer>(std::make_shared<Vermilion::Core::Vulkan::VertexBuffer>(this, data, length));
+std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Vulkan::API::createVertexBuffer(std::vector<float>& vertices){
+	return std::static_pointer_cast<Vermilion::Core::VertexBuffer>(std::make_shared<Vermilion::Core::Vulkan::VertexBuffer>(this, vertices));
 }
 
-std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Vulkan::API::createIndexBuffer(void * data, size_t length){
-	return std::static_pointer_cast<Vermilion::Core::IndexBuffer>(std::make_shared<Vermilion::Core::Vulkan::IndexBuffer>(this, data, length));
+std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Vulkan::API::createIndexBuffer(std::vector<unsigned int>& indices){
+	return std::static_pointer_cast<Vermilion::Core::IndexBuffer>(std::make_shared<Vermilion::Core::Vulkan::IndexBuffer>(this, indices));
+}
+
+std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Vulkan::API::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
+	return std::static_pointer_cast<Vermilion::Core::Renderable>(std::make_shared<Vermilion::Core::Vulkan::Renderable>(this, vertexBuffer, indexBuffer, vertexOffset, indexOffset, length));
 }
 
 // DEBUG STUFF
