@@ -173,4 +173,41 @@ Vermilion::Core::Vulkan::IndexBuffer::~IndexBuffer(){
 	vmaDestroyBuffer(api->vma_allocator, vk_buffer, vk_allocation);
 }
 
+Vermilion::Core::Vulkan::UniformBuffer::UniformBuffer(Vermilion::Core::Vulkan::API* api, size_t length){
+	this->api = api;
+	this->instance = api->instance;
+	this->size = length;
+
+	VkBufferCreateInfo bufferInfo = {};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size = size;
+	bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	VmaAllocationCreateInfo allocInfo = {};
+	allocInfo.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+	vk_buffer.resize(api->vk_swapchain->swapChainImages.size());
+	vk_allocation.resize(api->vk_swapchain->swapChainImages.size());
+
+	for(int i=0; i<api->vk_swapchain->swapChainImages.size(); i++){
+		if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &vk_buffer[i], &vk_allocation[i], nullptr)!=VK_SUCCESS){
+			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create uniform buffer");
+			throw std::runtime_error("Vermilion::Core::Vulkan::UniformBuffer::UniformBuffer() - Could not create uniform buffer");
+		}
+	}
+}
+
+Vermilion::Core::Vulkan::UniformBuffer::~UniformBuffer(){
+	for(int i=0; i<api->vk_swapchain->swapChainImages.size(); i++){
+		vmaDestroyBuffer(api->vma_allocator, vk_buffer[i], vk_allocation[i]);
+	}
+}
+
+void Vermilion::Core::Vulkan::UniformBuffer::streamData(void * data){
+	void* gpudata;
+	vmaMapMemory(api->vma_allocator, vk_allocation[api->imageIndex], &gpudata);
+	memcpy(gpudata, data, this->size);
+	vmaUnmapMemory(api->vma_allocator, vk_allocation[api->imageIndex]);
+}
+
 #endif

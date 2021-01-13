@@ -46,5 +46,20 @@ class IndexBuffer : public Vermilion::Core::IndexBuffer{
 		~IndexBuffer();
 };
 
+class UniformBuffer : public Vermilion::Core::UniformBuffer{
+	private:
+		Vermilion::Core::Instance * instance;
+		API * api;
+
+	public:
+		std::vector<VkBuffer> vk_buffer;
+		std::vector<VmaAllocation> vk_allocation;
+
+		UniformBuffer(API * api, size_t length);
+		~UniformBuffer();
+
+		void streamData(void * data);
+};
+
 }}}
 #endif

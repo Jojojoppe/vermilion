@@ -77,6 +77,7 @@ void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core
 		vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_pipeline);
 		vkCmdBindVertexBuffers(vk_commandBuffers[i], 0, 1, vertexBuffers, offsets);
 		vkCmdBindIndexBuffer(vk_commandBuffers[i], vkIndexBuffer->vk_buffer, 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindDescriptorSets(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_pipelineLayout, 0, 1, &std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_descriptorSets[i], 0, nullptr);
 		vkCmdDrawIndexed(vk_commandBuffers[i], renderable->length, instanceCount, renderable->indexOffset, renderable->vertexOffset, firstInstance);
 	}
 }

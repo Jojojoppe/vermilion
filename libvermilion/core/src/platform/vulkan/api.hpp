@@ -39,6 +39,7 @@ class API : public Vermilion::Core::API{
 		std::unique_ptr<vkSwapChain> vk_swapchain;
 		std::unique_ptr<vkCommandPool> vk_commandPool;
 		VmaAllocator vma_allocator;
+		VkDescriptorPool vk_descriptorPool;
 
 		std::shared_ptr<RenderTarget> default_renderTarget;
 
@@ -49,6 +50,7 @@ class API : public Vermilion::Core::API{
 
 		int maxFramesInFlight;
 		int currentFrame = 0;
+		uint32_t imageIndex = 0;
 
 		std::vector<std::shared_ptr<Pipeline>> pipelines;
 
@@ -67,11 +69,17 @@ class API : public Vermilion::Core::API{
 		virtual std::shared_ptr<Vermilion::Core::Shader> createShader(std::string source, Vermilion::Core::ShaderType type) override;
 		virtual std::shared_ptr<Vermilion::Core::ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders) override;
 
-		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout) override;
+		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
+			std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
+			std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers) override;
 
 		virtual std::shared_ptr<Vermilion::Core::VertexBuffer> createVertexBuffer(std::vector<float>& vertices) override;
 		virtual std::shared_ptr<Vermilion::Core::IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices) override;
-		virtual std::shared_ptr<Vermilion::Core::Renderable> createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length) override;
+		virtual std::shared_ptr<Vermilion::Core::UniformBuffer> createUniformBuffer(size_t length) override;
+		virtual std::shared_ptr<Vermilion::Core::Renderable> createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, 
+			std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length) override;
+
+		virtual void streamData(std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer, void * data) override;
 
 	private:
 

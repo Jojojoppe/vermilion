@@ -25,6 +25,7 @@ Vermilion::Core::Vulkan::API::~API(){
 
 	vkDeviceWaitIdle(vk_device->vk_device);
 
+	vkDestroyDescriptorPool(vk_device->vk_device, vk_descriptorPool, nullptr);
 	vmaDestroyAllocator(vma_allocator);
 
 	for(int i=0; i<pipelines.size(); i++){
@@ -105,6 +106,22 @@ void Vermilion::Core::Vulkan::API::init(){
 	allocatorInfo.physicalDevice = vk_physicaldevice->vk_physicaldevice;
 	allocatorInfo.device = vk_device->vk_device;
 	vmaCreateAllocator(&allocatorInfo, &vma_allocator);
+
+	// Create descriptor pool
+	std::array<VkDescriptorPoolSize, 2> poolSizes = {};
+	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSizes[0].descriptorCount = static_cast<uint32_t>(vk_swapchain->swapChainImages.size());
+	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	poolSizes[1].descriptorCount = static_cast<uint32_t>(vk_swapchain->swapChainImages.size());
+	VkDescriptorPoolCreateInfo poolInfo = {};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	poolInfo.pPoolSizes = poolSizes.data();
+	poolInfo.maxSets = static_cast<uint32_t>(vk_swapchain->swapChainImages.size());;
+	if(vkCreateDescriptorPool(vk_device->vk_device, &poolInfo, nullptr, &vk_descriptorPool)!=VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create descriptor pool");
+		throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create descriptor pool");
+	}
 }
 
 void Vermilion::Core::Vulkan::API::resize(){
@@ -136,7 +153,6 @@ void Vermilion::Core::Vulkan::API::startRender(){
 void Vermilion::Core::Vulkan::API::endRender(){
 	vkWaitForFences(vk_device->vk_device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
-	uint32_t imageIndex;
     VkResult res = vkAcquireNextImageKHR(vk_device->vk_device, vk_swapchain->swapChain, UINT64_MAX, imageAvailableSemaphore[currentFrame], VK_NULL_HANDLE, &imageIndex);
 	if(res==VK_ERROR_OUT_OF_DATE_KHR){
 		this->resize();
@@ -204,8 +220,10 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::cr
 	return std::static_pointer_cast<Vermilion::Core::ShaderProgram>(std::make_shared<Vermilion::Core::Vulkan::ShaderProgram>(this, shaders));
 }
 
-std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout){
-	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram, vertexLayout);
+std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
+		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
+		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers){
+	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram, vertexLayout, uniformBuffers);
 	pipelines.push_back(newpipeline);
 	return std::static_pointer_cast<Vermilion::Core::Pipeline>(newpipeline);
 }
@@ -218,9 +236,17 @@ std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Vulkan::API::crea
 	return std::static_pointer_cast<Vermilion::Core::IndexBuffer>(std::make_shared<Vermilion::Core::Vulkan::IndexBuffer>(this, indices));
 }
 
+std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Vulkan::API::createUniformBuffer(size_t length){
+	return std::static_pointer_cast<Vermilion::Core::UniformBuffer>(std::make_shared<Vermilion::Core::Vulkan::UniformBuffer>(this, length));
+}
+
 std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Vulkan::API::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
 	return std::static_pointer_cast<Vermilion::Core::Renderable>(std::make_shared<Vermilion::Core::Vulkan::Renderable>(this, vertexBuffer, indexBuffer, vertexOffset, indexOffset, length));
 }
+
+void Vermilion::Core::Vulkan::API::streamData(std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer, void * data){
+	std::static_pointer_cast<Vermilion::Core::Vulkan::UniformBuffer>(uniformBuffer)->streamData(data);
+};
 
 // DEBUG STUFF
 // -----------

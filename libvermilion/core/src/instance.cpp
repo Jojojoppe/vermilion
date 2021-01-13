@@ -50,8 +50,10 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Instance::creat
 	return this->api->createShaderProgram(shaders);
 }
 
-std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Instance::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout){
-	return this->api->createPipeline(renderTarget, shaderProgram, vertexLayout);
+std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Instance::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
+		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
+		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers){
+	return this->api->createPipeline(renderTarget, shaderProgram, vertexLayout, uniformBuffers);
 }
 
 std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(std::vector<float>& vertices){
@@ -62,8 +64,16 @@ std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Instance::createI
 	return this->api->createIndexBuffer(indices);
 }
 
+std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Instance::createUniformBuffer(size_t length){
+	return this->api->createUniformBuffer(length);
+}
+
 std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Instance::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
 	return this->api->createRenderable(vertexBuffer, indexBuffer, vertexOffset, indexOffset, length);
+}
+
+void Vermilion::Core::Instance::streamData(std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer, void * data){
+	this->api->streamData(uniformBuffer, data);
 }
 
 int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue){

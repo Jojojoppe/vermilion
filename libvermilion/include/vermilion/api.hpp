@@ -49,11 +49,17 @@ class API{
 		virtual std::shared_ptr<Shader> createShader(std::string source, ShaderType type){return nullptr;};
 		virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders){return nullptr;};
 
-		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, std::initializer_list<VertexBufferLayoutElement> vertexLayout){return nullptr;};
+		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, 
+			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers){return nullptr;};
 
 		virtual std::shared_ptr<VertexBuffer> createVertexBuffer(std::vector<float>& vertices){return nullptr;};
 		virtual std::shared_ptr<IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices){return nullptr;};
-		virtual std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){return nullptr;};
+		virtual std::shared_ptr<UniformBuffer> createUniformBuffer(size_t length){return nullptr;};
+		virtual std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, 
+			unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){return nullptr;};
+
+
+		virtual void streamData(std::shared_ptr<UniformBuffer> uniformBuffer, void * data){};
 
 	private:
 };

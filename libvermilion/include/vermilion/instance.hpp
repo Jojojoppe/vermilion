@@ -62,11 +62,16 @@ class Instance{
 		std::shared_ptr<Shader> createShader(std::string source, ShaderType type);
 		std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders);
 
-		std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, std::initializer_list<VertexBufferLayoutElement> vertexLayout);
+		std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, 
+			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers);
 
 		std::shared_ptr<VertexBuffer> createVertexBuffer(std::vector<float>& vertices);
 		std::shared_ptr<IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices);
-		std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, unsigned int vertexOffset=0, unsigned int indexOffset=0, unsigned int length=0);
+		std::shared_ptr<UniformBuffer> createUniformBuffer(size_t size);
+		std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, 
+			unsigned int vertexOffset=0, unsigned int indexOffset=0, unsigned int length=0);
+
+		void streamData(std::shared_ptr<UniformBuffer> uniformBuffer, void * data);
 
 	private:
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);

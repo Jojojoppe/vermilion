@@ -29,13 +29,17 @@ class Pipeline : public Vermilion::Core::Pipeline{
 
 		std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget;
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram;
-		std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout;
+		std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout;
+		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers;
 
 	public:
 		VkPipeline vk_pipeline;
 		VkPipelineLayout vk_pipelineLayout;
+		VkDescriptorSetLayout vk_descriptorSetLayout;
+		std::vector<VkDescriptorSet> vk_descriptorSets;
 
-		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout);
+		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, 
+			std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers);
 		~Pipeline();
 
 		void destroy();

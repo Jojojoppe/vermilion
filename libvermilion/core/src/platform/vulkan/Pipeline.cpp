@@ -5,6 +5,7 @@
 #include <vermilion/instance.hpp>
 #include "api.hpp"
 #include "Shader.hpp"
+#include "Buffer.hpp"
 
 #include <string.h>
 #include <stdexcept>
@@ -20,18 +21,79 @@ VkFormat VulkanBufferLayoutElementTypeToVulkanBaseType[] = {
 	VK_FORMAT_R8_UINT
 };
 
-Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::VertexBufferLayoutElement> vertexLayout){
+Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
+		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
+		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers){
 	this->api = api;
 	this->instance = api->instance;
 
 	this->renderTarget = renderTarget;
 	this->shaderProgram = shaderProgram;
 	this->vertexLayout = vertexLayout;
+	this->uniformBuffers = uniformBuffers;
+
+	std::vector<VkDescriptorSetLayoutBinding> layoutBindings;
+	unsigned int binding=0;
+
+	// Uniform buffer layout
+	for(auto& ubuffer: uniformBuffers){
+		VkDescriptorSetLayoutBinding uboLayoutBinding = {};
+		uboLayoutBinding.binding = binding++;
+		uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		uboLayoutBinding.descriptorCount = 1;
+		uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+		uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+		layoutBindings.push_back(uboLayoutBinding);
+	};
+
+	VkDescriptorSetLayoutCreateInfo layoutInfo = {};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = binding;
+	layoutInfo.pBindings = layoutBindings.data();
+	if(vkCreateDescriptorSetLayout(api->vk_device->vk_device, &layoutInfo, nullptr, &vk_descriptorSetLayout)!=VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create descriptor set layout");
+		throw std::runtime_error("Vermilion::Core::Vulkan::Pipeline::Pipeline() - Could not create descriptor set layout");
+	}
+	std::vector<VkDescriptorSetLayout> layouts(api->vk_swapchain->swapChainImages.size(), vk_descriptorSetLayout);
+	VkDescriptorSetAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = api->vk_descriptorPool;
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(api->vk_swapchain->swapChainImages.size());
+	allocInfo.pSetLayouts = layouts.data();
+	vk_descriptorSets.resize(api->vk_swapchain->swapChainImages.size());
+	if(vkAllocateDescriptorSets(api->vk_device->vk_device, &allocInfo, vk_descriptorSets.data())!=VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not allocate descriptor sets");
+		throw std::runtime_error("Vermilion::Core::Vulkan::Pipeline::Pipeline() - Could not allocate descriptor sets");
+	}
+
+	for(int i = 0; i<api->vk_swapchain->swapChainImages.size(); i++){
+		int offset = 0;
+		// Uniform buffer bindings
+		for(auto& ubo : uniformBuffers){
+			VkDescriptorBufferInfo bufferInfo = {};
+			bufferInfo.buffer = std::static_pointer_cast<Vermilion::Core::Vulkan::UniformBuffer>(ubo)->vk_buffer[i];
+			bufferInfo.offset = 0;
+			bufferInfo.range = ubo->size;
+			
+			VkWriteDescriptorSet descriptorWrite = {};
+			descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrite.dstSet = vk_descriptorSets[i];
+			descriptorWrite.dstBinding = offset++;
+			descriptorWrite.dstArrayElement = 0;
+			descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrite.descriptorCount = 1;
+			descriptorWrite.pBufferInfo = &bufferInfo;
+			descriptorWrite.pImageInfo = nullptr;
+			descriptorWrite.pTexelBufferView = nullptr;
+			vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
+		}
+	}
 
 	this->create();
 }
 
 Vermilion::Core::Vulkan::Pipeline::~Pipeline(){
+	vkDestroyDescriptorSetLayout(api->vk_device->vk_device, vk_descriptorSetLayout, nullptr);
 	this->destroy();
 }
 
@@ -44,7 +106,7 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 
 	// Vertex data layout
 	// Calculate stride and offset
-	std::vector<Vermilion::Core::VertexBufferLayoutElement> elements(vertexLayout);
+	std::vector<Vermilion::Core::BufferLayoutElement> elements(vertexLayout);
 	unsigned int offset = 0;
 	unsigned int stride = 0;
 	for(auto& element : elements){
@@ -84,9 +146,9 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	// Viewports and scissors
 	VkViewport viewport{};
 	viewport.x = 0.0f;
-	viewport.y = 0.0f;
+	viewport.y = (float) api->vk_swapchain->swapChainExtent.height;
 	viewport.width = (float) api->vk_swapchain->swapChainExtent.width;
-	viewport.height = (float) api->vk_swapchain->swapChainExtent.height;
+	viewport.height = -(float) api->vk_swapchain->swapChainExtent.height;
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
 	VkRect2D scissor{};
@@ -107,7 +169,7 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
 	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 	rasterizer.depthBiasConstantFactor = 0.0f; // Optional
 	rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -156,8 +218,8 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	// Pipeline layout
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 0;
-	pipelineLayoutInfo.pSetLayouts = nullptr;
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &vk_descriptorSetLayout;
 	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 	if(vkCreatePipelineLayout(api->vk_device->vk_device, &pipelineLayoutInfo, nullptr, &this->vk_pipelineLayout)!=VK_SUCCESS){

@@ -9,48 +9,48 @@
 namespace Vermilion{
 namespace Core{
 
-enum VertexBufferLayoutElementType{
-	VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_NONE = 0,
-	VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT1,
-	VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT2,
-	VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT3,
-	VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT4,
-	VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_INT32,
-	VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_BYTE,
+enum BufferLayoutElementType{
+	BUFFER_LAYOUT_ELEMENT_TYPE_NONE = 0,
+	BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT1,
+	BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT2,
+	BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT3,
+	BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT4,
+	BUFFER_LAYOUT_ELEMENT_TYPE_INT32,
+	BUFFER_LAYOUT_ELEMENT_TYPE_BYTE,
 };
 
-struct VertexBufferLayoutElement{
+struct BufferLayoutElement{
 	std::string name;
 	unsigned int count;
 	unsigned int size;
 	bool normalized;
 	unsigned int offset;
-	VertexBufferLayoutElementType type;
-	VertexBufferLayoutElement(std::string name, unsigned int count, unsigned int size, bool normalized);
+	BufferLayoutElementType type;
+	BufferLayoutElement(std::string name, unsigned int count, unsigned int size, bool normalized);
 };
 
-struct VertexBufferLayoutElementFloat1 : public VertexBufferLayoutElement{
-	VertexBufferLayoutElementFloat1(std::string name, bool normalized=false) :
-		VertexBufferLayoutElement(name, 1, sizeof(float), normalized){
-			type = VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT1;
+struct BufferLayoutElementFloat1 : public BufferLayoutElement{
+	BufferLayoutElementFloat1(std::string name, bool normalized=false) :
+		BufferLayoutElement(name, 1, sizeof(float), normalized){
+			type = BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT1;
 		}
 };
-struct VertexBufferLayoutElementFloat2 : public VertexBufferLayoutElement{
-	VertexBufferLayoutElementFloat2(std::string name, bool normalized=false) :
-		VertexBufferLayoutElement(name, 2, sizeof(float), normalized){
-			type = VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT2;
+struct BufferLayoutElementFloat2 : public BufferLayoutElement{
+	BufferLayoutElementFloat2(std::string name, bool normalized=false) :
+		BufferLayoutElement(name, 2, sizeof(float), normalized){
+			type = BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT2;
 		}
 };
-struct VertexBufferLayoutElementFloat3 : public VertexBufferLayoutElement{
-	VertexBufferLayoutElementFloat3(std::string name, bool normalized=false) :
-		VertexBufferLayoutElement(name, 3, sizeof(float), normalized){
-			type = VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT3;
+struct BufferLayoutElementFloat3 : public BufferLayoutElement{
+	BufferLayoutElementFloat3(std::string name, bool normalized=false) :
+		BufferLayoutElement(name, 3, sizeof(float), normalized){
+			type = BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT3;
 		}
 };
-struct VertexBufferLayoutElementFloat4 : public VertexBufferLayoutElement{
-	VertexBufferLayoutElementFloat4(std::string name, bool normalized=false) :
-		VertexBufferLayoutElement(name, 4, sizeof(float), normalized){
-			type = VERTEX_BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT4;
+struct BufferLayoutElementFloat4 : public BufferLayoutElement{
+	BufferLayoutElementFloat4(std::string name, bool normalized=false) :
+		BufferLayoutElement(name, 4, sizeof(float), normalized){
+			type = BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT4;
 		}
 };
 
@@ -70,6 +70,11 @@ class VertexBuffer : public Buffer{
 class IndexBuffer : public Buffer{
 	public:
 		~IndexBuffer() = default;
+};
+
+class UniformBuffer : public Buffer{
+	public:
+		~UniformBuffer() = default;
 };
 
 }}
