@@ -38,6 +38,9 @@ else()
 	add_compile_definitions(VMCORE_GLFW)
 endif()
 
+# Add STB libraries
+set(VERMILION_CORE_INCLUDE_DIRS ${VERMILION_CORE_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/third_party/stb)
+
 add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/logger.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/window.cpp

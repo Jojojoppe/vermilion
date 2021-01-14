@@ -88,7 +88,7 @@ int main(int argc, char ** argv){
 	std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer = vmInstance.createUniformBuffer(sizeof(UniformBufferObject));
 	UniformBufferObject uboData;
 	uboData.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	uboData.proj = glm::perspective(glm::radians(45.0f), 400 / (float) 400, 0.1f, 10.0f); // TODO get window data
+	uboData.proj = glm::perspective(glm::radians(45.0f), vmInstance.window->width / (float) vmInstance.window->height, 0.1f, 10.0f); // TODO get window data
 
 	// Create render pipeline
 	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
@@ -102,7 +102,7 @@ int main(int argc, char ** argv){
 		vmInstance.startRender();
 
 		uboData.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		vmInstance.streamData(uniformBuffer, &uboData);
+		vmInstance.streamData(uniformBuffer, &uboData);		// TODO move function to uniformBuffer->streamData(&uboData); ....
 		time += 0.01f;
 
 		// Start queueing commands to static queue
