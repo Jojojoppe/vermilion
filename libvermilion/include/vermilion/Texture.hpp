@@ -16,6 +16,8 @@ class Texture{
         unsigned int mipLevels;
 
         ~Texture() = default;
+
+        virtual void setData(void * data){};
 };
 
 class Sampler{

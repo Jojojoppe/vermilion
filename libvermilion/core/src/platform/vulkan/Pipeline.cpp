@@ -6,6 +6,7 @@
 #include "api.hpp"
 #include "Shader.hpp"
 #include "Buffer.hpp"
+#include "Texture.hpp"
 
 #include <string.h>
 #include <stdexcept>
@@ -23,7 +24,7 @@ VkFormat VulkanBufferLayoutElementTypeToVulkanBaseType[] = {
 
 Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers){
+		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
 	this->api = api;
 	this->instance = api->instance;
 
@@ -31,6 +32,7 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 	this->shaderProgram = shaderProgram;
 	this->vertexLayout = vertexLayout;
 	this->uniformBuffers = uniformBuffers;
+	this->samplers = samplers;
 
 	std::vector<VkDescriptorSetLayoutBinding> layoutBindings;
 	unsigned int binding=0;
@@ -45,6 +47,17 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 		uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
 		layoutBindings.push_back(uboLayoutBinding);
 	};
+
+	// Samplers layout
+	for(auto& sampler : samplers){
+		VkDescriptorSetLayoutBinding texLayoutBinding = {};
+		texLayoutBinding.binding = binding++;
+		texLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		texLayoutBinding.descriptorCount = 1;
+		texLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+		texLayoutBinding.pImmutableSamplers = nullptr; // Optional
+		layoutBindings.push_back(texLayoutBinding);
+	}
 
 	VkDescriptorSetLayoutCreateInfo layoutInfo = {};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -87,6 +100,25 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 			descriptorWrite.pTexelBufferView = nullptr;
 			vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
 		}
+		// Sampler bindings
+		for(auto& sampler : samplers){
+			VkDescriptorImageInfo imageInfo = {};
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageInfo.imageView = std::static_pointer_cast<Vermilion::Core::Vulkan::Sampler>(sampler)->texture->vk_imageView->imageView;
+			imageInfo.sampler = std::static_pointer_cast<Vermilion::Core::Vulkan::Sampler>(sampler)->vk_sampler;
+			
+			VkWriteDescriptorSet descriptorWrite = {};
+			descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrite.dstSet = vk_descriptorSets[i];
+			descriptorWrite.dstBinding = offset++;
+			descriptorWrite.dstArrayElement = 0;
+			descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrite.descriptorCount = 1;
+			descriptorWrite.pBufferInfo = nullptr;
+			descriptorWrite.pImageInfo = &imageInfo;
+			descriptorWrite.pTexelBufferView = nullptr;
+			vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
+		}
 	}
 
 	this->create();
@@ -98,6 +130,7 @@ Vermilion::Core::Vulkan::Pipeline::~Pipeline(){
 }
 
 void Vermilion::Core::Vulkan::Pipeline::create(){
+	std::static_pointer_cast<Vermilion::Core::Vulkan::ShaderProgram>(shaderProgram)->createModules();
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfo;
 	for(const auto& shader : shaderProgram->shaders){
 		shaderStageInfo.push_back(std::static_pointer_cast<Vermilion::Core::Vulkan::Shader>(shader)->vk_shaderStageInfo);
@@ -250,6 +283,7 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create pipeline");
 		throw std::runtime_error("Vermilion::Core::Vulkan::Pipeline::Pipeline() - Could not create pipeline");
 	}
+	std::static_pointer_cast<Vermilion::Core::Vulkan::ShaderProgram>(shaderProgram)->destroyModules();
 }
 
 void Vermilion::Core::Vulkan::Pipeline::destroy(){

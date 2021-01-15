@@ -52,8 +52,8 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Instance::creat
 
 std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Instance::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers){
-	return this->api->createPipeline(renderTarget, shaderProgram, vertexLayout, uniformBuffers);
+		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+	return this->api->createPipeline(renderTarget, shaderProgram, vertexLayout, uniformBuffers, samplers);
 }
 
 std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(std::vector<float>& vertices){
@@ -80,8 +80,8 @@ std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Instance::createTextu
 	return this->api->createTexture(path, width, height, channels);
 }
 
-std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Instance::createSampler(){
-	return this->api->createSampler();
+std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Instance::createSampler(std::shared_ptr<Vermilion::Core::Texture> texture){
+	return this->api->createSampler(texture);
 }
 
 int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue){

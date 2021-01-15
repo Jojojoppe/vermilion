@@ -10,6 +10,7 @@
 
 #include <vermilion/Pipeline.hpp>
 #include <vermilion/Buffer.hpp>
+#include <vermilion/Texture.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -31,6 +32,7 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram;
 		std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout;
 		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers;
+		std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers;
 
 	public:
 		VkPipeline vk_pipeline;
@@ -39,7 +41,8 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		std::vector<VkDescriptorSet> vk_descriptorSets;
 
 		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, 
-			std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers);
+			std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers,
+			std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers);
 		~Pipeline();
 
 		void destroy();

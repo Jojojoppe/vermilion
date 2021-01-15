@@ -223,8 +223,8 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::cr
 
 std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers){
-	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram, vertexLayout, uniformBuffers);
+		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram, vertexLayout, uniformBuffers, samplers);
 	pipelines.push_back(newpipeline);
 	return std::static_pointer_cast<Vermilion::Core::Pipeline>(newpipeline);
 }
@@ -253,8 +253,8 @@ std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Vulkan::API::createTe
 	return std::static_pointer_cast<Vermilion::Core::Texture>(std::make_shared<Vermilion::Core::Vulkan::Texture>(this, path, width, height, channels));
 }
 
-std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Vulkan::API::createSampler(){
-	return std::static_pointer_cast<Vermilion::Core::Sampler>(std::make_shared<Vermilion::Core::Vulkan::Sampler>(this));
+std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Vulkan::API::createSampler(std::shared_ptr<Vermilion::Core::Texture> texture){
+	return std::static_pointer_cast<Vermilion::Core::Sampler>(std::make_shared<Vermilion::Core::Vulkan::Sampler>(this, texture));
 }
 
 

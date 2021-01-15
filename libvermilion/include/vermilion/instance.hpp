@@ -64,7 +64,8 @@ class Instance{
 		std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders);
 
 		std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, 
-			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers);
+			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers,
+			std::initializer_list<std::shared_ptr<Sampler>> samplers);
 
 		std::shared_ptr<VertexBuffer> createVertexBuffer(std::vector<float>& vertices);
 		std::shared_ptr<IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices);
@@ -75,7 +76,7 @@ class Instance{
 		void streamData(std::shared_ptr<UniformBuffer> uniformBuffer, void * data);
 
 		std::shared_ptr<Texture> createTexture(const std::string& path="", size_t width=0, size_t height=0, unsigned int channels=0);
-		std::shared_ptr<Sampler> createSampler();
+		std::shared_ptr<Sampler> createSampler(std::shared_ptr<Texture> texture);
 
 	private:
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);

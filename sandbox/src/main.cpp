@@ -38,8 +38,10 @@ int main(int argc, char ** argv){
 
 			layout(location = 0) in vec4 aPos;
 			layout(location = 1) in vec3 aColor;
+			layout(location = 2) in vec2 aTexCoord;
 			
 			layout(location = 0) out vec3 fColor;
+			layout(location = 1) out vec2 fTexCoord;
 
 			layout(binding=0) uniform UniformBufferObject{
 				mat4 model;
@@ -49,8 +51,8 @@ int main(int argc, char ** argv){
 			
 			void main() {
 			    gl_Position = ubo.proj * ubo.view * ubo.model * aPos;
-			    //gl_Position = aPos;
 			    fColor = aColor;
+				fTexCoord = aTexCoord;
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
 	std::shared_ptr<Vermilion::Core::Shader> fragmentShader = vmInstance.createShader(
@@ -59,21 +61,24 @@ int main(int argc, char ** argv){
 			#extension GL_ARB_separate_shader_objects : enable
 
 			layout(location = 0) in vec3 fColor;
+			layout(location = 1) in vec2 fTexCoord;
 
 			layout(location = 0) out vec4 outColor;
 
+			layout(binding = 1) uniform sampler2D s_tex;
+
 			void main() {
-				outColor = vec4(fColor, 1.0);
+				outColor = texture(s_tex, fTexCoord);
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
 	std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
 
 	// Render object
 	std::vector<float> vertices({
-		-0.5,	-0.5,	0.0,	1.0,		1.0,	0.0,	0.0,
-		0.5	,	-0.5,	0.0,	1.0,		0.0,	1.0,	0.0,
-		0.5,	0.5,	0.0,	1.0,		0.0,	0.0,	1.0,
-		-0.5,	0.5,	0.0,	1.0,		1.0,	1.0,	1.0,
+		-0.5,	-0.5,	0.0,	1.0,		1.0,	0.0,	0.0,		1.0, 	0.0,
+		0.5	,	-0.5,	0.0,	1.0,		0.0,	1.0,	0.0,		0.0,	0.0,
+		0.5,	0.5,	0.0,	1.0,		0.0,	0.0,	1.0,		0.0,	1.0,
+		-0.5,	0.5,	0.0,	1.0,		1.0,	1.0,	1.0,		1.0,	1.0,
 	});
 	std::vector<unsigned int> indices({
 		0, 1, 2,
@@ -93,13 +98,14 @@ int main(int argc, char ** argv){
 	// Create texture
 	std::shared_ptr<Vermilion::Core::Texture> texture = vmInstance.createTexture("/home/joppe/Pictures/texture.jpg");
 	// Create sampler to use texture
-	std::shared_ptr<Vermilion::Core::Sampler> sampler = vmInstance.createSampler();
+	std::shared_ptr<Vermilion::Core::Sampler> sampler = vmInstance.createSampler(texture);
 
 	// Create render pipeline
 	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
 		Vermilion::Core::BufferLayoutElementFloat4("aPos"),
-		Vermilion::Core::BufferLayoutElementFloat3("aColor")
-	},{uniformBuffer});
+		Vermilion::Core::BufferLayoutElementFloat3("aColor"),
+		Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
+	},{uniformBuffer}, {sampler});
 
 	float time = 0.0f;
 

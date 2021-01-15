@@ -8,6 +8,7 @@
 #include <vector>
 #include <vermilion/Texture.hpp>
 #include "vk_mem_alloc.h"
+#include "vkImageView.hpp"
 
 namespace Vermilion{
 namespace Core{
@@ -27,9 +28,12 @@ class Texture : public Vermilion::Core::Texture{
 
 		VkImage vk_image;
 		VmaAllocation vma_allocation;
+		std::unique_ptr<vkImageView2D> vk_imageView;
 
 		Texture(API * api, const std::string& path, size_t width, size_t height, unsigned int channels);
 		~Texture();
+
+		virtual void setData(void * data) override;
 };
 
 class Sampler : public Vermilion::Core::Sampler{
@@ -38,7 +42,11 @@ class Sampler : public Vermilion::Core::Sampler{
 		API * api;
 
 	public:
-		Sampler(API * api);
+
+		VkSampler vk_sampler;
+		std::shared_ptr<Texture> texture;
+
+		Sampler(API * api, std::shared_ptr<Vermilion::Core::Texture> texture);
 		~Sampler();
 };
 

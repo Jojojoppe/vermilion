@@ -49,7 +49,8 @@ class API{
 		virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders){return nullptr;};
 
 		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, 
-			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers){return nullptr;};
+			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers,
+			std::initializer_list<std::shared_ptr<Sampler>> samplers){return nullptr;};
 
 		virtual std::shared_ptr<VertexBuffer> createVertexBuffer(std::vector<float>& vertices){return nullptr;};
 		virtual std::shared_ptr<IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices){return nullptr;};
@@ -60,7 +61,7 @@ class API{
 		virtual void streamData(std::shared_ptr<UniformBuffer> uniformBuffer, void * data){};
 
 		virtual std::shared_ptr<Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){return nullptr;};
-		virtual std::shared_ptr<Sampler> createSampler(){return nullptr;};
+		virtual std::shared_ptr<Sampler> createSampler(std::shared_ptr<Texture> texture){return nullptr;};
 
 	private:
 };

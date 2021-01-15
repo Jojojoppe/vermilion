@@ -25,7 +25,7 @@ Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API
 	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	VmaAllocationCreateInfo allocInfo = {};
-	allocInfo.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	allocInfo.requiredFlags = VMA_MEMORY_USAGE_CPU_TO_GPU;
 	if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &stagingBuffer, &stagingBufferMemory, nullptr)!=VK_SUCCESS){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create vertex staging buffer");
 		throw std::runtime_error("Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer() - Could not create vertex staging buffer");
@@ -43,7 +43,7 @@ Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API
 	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	allocInfo = {};
-	allocInfo.requiredFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	allocInfo.requiredFlags = VMA_MEMORY_USAGE_GPU_ONLY;
 	if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &vk_buffer, &vk_allocation, nullptr)!=VK_SUCCESS){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create vertex buffer");
 		throw std::runtime_error("Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer() - Could not create vertex buffer");
@@ -107,7 +107,7 @@ Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer(Vermilion::Core::Vulkan::API* 
 	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	VmaAllocationCreateInfo allocInfo = {};
-	allocInfo.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	allocInfo.requiredFlags = VMA_MEMORY_USAGE_CPU_TO_GPU;
 	if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &stagingBuffer, &stagingBufferMemory, nullptr)!=VK_SUCCESS){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create index staging buffer");
 		throw std::runtime_error("Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer() - Could not create index staging buffer");
@@ -125,7 +125,7 @@ Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer(Vermilion::Core::Vulkan::API* 
 	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	allocInfo = {};
-	allocInfo.requiredFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	allocInfo.requiredFlags = VMA_MEMORY_USAGE_GPU_ONLY;
 	if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &vk_buffer, &vk_allocation, nullptr)!=VK_SUCCESS){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create index buffer");
 		throw std::runtime_error("Vermilion::Core::Vulkan::Indexuffer::IndexBuffer() - Could not create index buffer");
@@ -184,7 +184,7 @@ Vermilion::Core::Vulkan::UniformBuffer::UniformBuffer(Vermilion::Core::Vulkan::A
 	bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	VmaAllocationCreateInfo allocInfo = {};
-	allocInfo.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	allocInfo.requiredFlags = VMA_MEMORY_USAGE_CPU_TO_GPU;
 
 	vk_buffer.resize(api->vk_swapchain->swapChainImages.size());
 	vk_allocation.resize(api->vk_swapchain->swapChainImages.size());

@@ -67,8 +67,14 @@ Vermilion::Core::Vulkan::ShaderProgram::ShaderProgram(Vermilion::Core::Vulkan::A
 	this->api = api;
 	this->instance = api->instance;
 
-	// Create shader modules
 	for(const auto& shader : shaders){
+		this->shaders.push_back(shader);
+	}
+}
+
+void Vermilion::Core::Vulkan::ShaderProgram::createModules(){
+	this->vk_shadermodules.clear();
+	for(const auto& shader : this->shaders){
 		std::shared_ptr<Vermilion::Core::Vulkan::Shader> vulkanShader = std::static_pointer_cast<Vermilion::Core::Vulkan::Shader>(shader);
 		VkShaderModule module;
 		if(vkCreateShaderModule(api->vk_device->vk_device, &vulkanShader->vk_createInfo, nullptr, &module)!=VK_SUCCESS){
@@ -77,14 +83,16 @@ Vermilion::Core::Vulkan::ShaderProgram::ShaderProgram(Vermilion::Core::Vulkan::A
 		}
 		this->vk_shadermodules.push_back(module);
 		vulkanShader->vk_shaderStageInfo.module = module;
-		this->shaders.push_back(shader);
+	}
+}
+
+void Vermilion::Core::Vulkan::ShaderProgram::destroyModules(){
+	for(const auto& module : this->vk_shadermodules){
+		vkDestroyShaderModule(this->api->vk_device->vk_device, module, nullptr);
 	}
 }
 
 Vermilion::Core::Vulkan::ShaderProgram::~ShaderProgram(){	
-	for(const auto& module : this->vk_shadermodules){
-		vkDestroyShaderModule(this->api->vk_device->vk_device, module, nullptr);
-	}
 }
 
 #endif

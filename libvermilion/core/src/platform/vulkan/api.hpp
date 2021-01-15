@@ -71,7 +71,7 @@ class API : public Vermilion::Core::API{
 
 		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
 			std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-			std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers) override;
+			std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers)override;
 
 		virtual std::shared_ptr<Vermilion::Core::VertexBuffer> createVertexBuffer(std::vector<float>& vertices) override;
 		virtual std::shared_ptr<Vermilion::Core::IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices) override;
@@ -82,7 +82,7 @@ class API : public Vermilion::Core::API{
 		virtual void streamData(std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer, void * data) override;
 
 		virtual std::shared_ptr<Vermilion::Core::Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels) override;
-		virtual std::shared_ptr<Vermilion::Core::Sampler> createSampler() override;
+		virtual std::shared_ptr<Vermilion::Core::Sampler> createSampler(std::shared_ptr<Vermilion::Core::Texture> texture) override;
 
 	private:
 
