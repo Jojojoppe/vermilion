@@ -9,6 +9,7 @@
 #include <vermilion/Pipeline.hpp>
 #include <vermilion/Buffer.hpp>
 #include <vermilion/Renderable.hpp>
+#include <vermilion/Texture.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -59,7 +60,7 @@ class Instance{
 
 		std::shared_ptr<RenderTarget> getDefaultRenderTarget();
 
-		std::shared_ptr<Shader> createShader(std::string source, ShaderType type);
+		std::shared_ptr<Shader> createShader(const std::string& source, ShaderType type);
 		std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders);
 
 		std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, 
@@ -72,6 +73,9 @@ class Instance{
 			unsigned int vertexOffset=0, unsigned int indexOffset=0, unsigned int length=0);
 
 		void streamData(std::shared_ptr<UniformBuffer> uniformBuffer, void * data);
+
+		std::shared_ptr<Texture> createTexture(const std::string& path="", size_t width=0, size_t height=0, unsigned int channels=0);
+		std::shared_ptr<Sampler> createSampler();
 
 	private:
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);

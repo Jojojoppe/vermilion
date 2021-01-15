@@ -23,7 +23,7 @@ class API : public Vermilion::Core::API{
 
 		virtual std::shared_ptr<Vermilion::Core::RenderTarget> getDefaultRenderTarget() override;
 
-		virtual std::shared_ptr<Vermilion::Core::Shader> createShader(std::string source, Vermilion::Core::ShaderType type) override;
+		virtual std::shared_ptr<Vermilion::Core::Shader> createShader(const std::string& source, Vermilion::Core::ShaderType type) override;
 		virtual std::shared_ptr<Vermilion::Core::ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders) override;
 
 	private:

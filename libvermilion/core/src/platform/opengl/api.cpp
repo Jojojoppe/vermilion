@@ -40,7 +40,7 @@ std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::OpenGL::API::get
 	return nullptr;
 }
 
-std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::OpenGL::API::createShader(std::string source, Vermilion::Core::ShaderType type){
+std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::OpenGL::API::createShader(const std::string& source, Vermilion::Core::ShaderType type){
 	return nullptr;
 }
 

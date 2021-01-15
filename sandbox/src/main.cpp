@@ -90,6 +90,11 @@ int main(int argc, char ** argv){
 	uboData.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	uboData.proj = glm::perspective(glm::radians(45.0f), vmInstance.window->width / (float) vmInstance.window->height, 0.1f, 10.0f); // TODO get window data
 
+	// Create texture
+	std::shared_ptr<Vermilion::Core::Texture> texture = vmInstance.createTexture("/home/joppe/Pictures/texture.jpg");
+	// Create sampler to use texture
+	std::shared_ptr<Vermilion::Core::Sampler> sampler = vmInstance.createSampler();
+
 	// Create render pipeline
 	std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
 		Vermilion::Core::BufferLayoutElementFloat4("aPos"),

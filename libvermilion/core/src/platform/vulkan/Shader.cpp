@@ -12,7 +12,7 @@
 #include <shaderc/shaderc.h>
 #include <shaderc/shaderc.hpp>
 
-Vermilion::Core::Vulkan::Shader::Shader(Vermilion::Core::Vulkan::API * api, std::string source, Vermilion::Core::ShaderType type){
+Vermilion::Core::Vulkan::Shader::Shader(Vermilion::Core::Vulkan::API * api, const std::string& source, Vermilion::Core::ShaderType type){
 	this->api = api;
 	this->instance = api->instance;
 	this->type = type;

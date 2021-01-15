@@ -66,7 +66,7 @@ class API : public Vermilion::Core::API{
 
 		virtual std::shared_ptr<Vermilion::Core::RenderTarget> getDefaultRenderTarget() override;
 
-		virtual std::shared_ptr<Vermilion::Core::Shader> createShader(std::string source, Vermilion::Core::ShaderType type) override;
+		virtual std::shared_ptr<Vermilion::Core::Shader> createShader(const std::string& source, Vermilion::Core::ShaderType type) override;
 		virtual std::shared_ptr<Vermilion::Core::ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders) override;
 
 		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
@@ -80,6 +80,9 @@ class API : public Vermilion::Core::API{
 			std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length) override;
 
 		virtual void streamData(std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer, void * data) override;
+
+		virtual std::shared_ptr<Vermilion::Core::Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels) override;
+		virtual std::shared_ptr<Vermilion::Core::Sampler> createSampler() override;
 
 	private:
 

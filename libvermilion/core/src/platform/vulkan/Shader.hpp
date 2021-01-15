@@ -30,7 +30,7 @@ class Shader : public Vermilion::Core::Shader{
 		VkPipelineShaderStageCreateInfo vk_shaderStageInfo;
 		std::vector<uint32_t> bytecode;
 
-		Shader(API * api, std::string source, Vermilion::Core::ShaderType type);
+		Shader(API * api, const std::string& source, Vermilion::Core::ShaderType type);
 		~Shader();
 };
 

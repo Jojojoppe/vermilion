@@ -42,7 +42,7 @@ std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Instance::getDef
 	return this->api->getDefaultRenderTarget();
 }
 
-std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Instance::createShader(std::string source, Vermilion::Core::ShaderType type){
+std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Instance::createShader(const std::string& source, Vermilion::Core::ShaderType type){
 	return this->api->createShader(source, type);
 }
 
@@ -74,6 +74,14 @@ std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Instance::createRe
 
 void Vermilion::Core::Instance::streamData(std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer, void * data){
 	this->api->streamData(uniformBuffer, data);
+}
+
+std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Instance::createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){
+	return this->api->createTexture(path, width, height, channels);
+}
+
+std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Instance::createSampler(){
+	return this->api->createSampler();
 }
 
 int Vermilion::Core::Instance::parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue){

@@ -7,6 +7,7 @@
 #include "Pipeline.hpp"
 #include "Buffer.hpp"
 #include "Renderable.hpp"
+#include "Texture.hpp"
 
 #include <string.h>
 #include <stdexcept>
@@ -212,7 +213,7 @@ std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Vulkan::API::get
 	return std::static_pointer_cast<Vermilion::Core::RenderTarget>(default_renderTarget);
 };
 
-std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Vulkan::API::createShader(std::string source, Vermilion::Core::ShaderType type){
+std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Vulkan::API::createShader(const std::string& source, Vermilion::Core::ShaderType type){
 	return std::static_pointer_cast<Vermilion::Core::Shader>(std::make_shared<Vermilion::Core::Vulkan::Shader>(this, source, type));
 }
 
@@ -247,6 +248,16 @@ std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Vulkan::API::creat
 void Vermilion::Core::Vulkan::API::streamData(std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer, void * data){
 	std::static_pointer_cast<Vermilion::Core::Vulkan::UniformBuffer>(uniformBuffer)->streamData(data);
 };
+
+std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Vulkan::API::createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){
+	return std::static_pointer_cast<Vermilion::Core::Texture>(std::make_shared<Vermilion::Core::Vulkan::Texture>(this, path, width, height, channels));
+}
+
+std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Vulkan::API::createSampler(){
+	return std::static_pointer_cast<Vermilion::Core::Sampler>(std::make_shared<Vermilion::Core::Vulkan::Sampler>(this));
+}
+
+
 
 // DEBUG STUFF
 // -----------

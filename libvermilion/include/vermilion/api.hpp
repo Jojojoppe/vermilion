@@ -8,6 +8,7 @@
 #include <vermilion/Pipeline.hpp>
 #include <vermilion/Buffer.hpp>
 #include <vermilion/Renderable.hpp>
+#include <vermilion/Texture.hpp>
 
 namespace Vermilion{
 namespace Core{
@@ -27,8 +28,6 @@ const std::string RenderPlatformString[] = {
 };
 
 extern const int renderPlatform[];
-
-class Instance;
 class RenderTarget;
 
 class API{
@@ -46,7 +45,7 @@ class API{
 
 		virtual std::shared_ptr<RenderTarget> getDefaultRenderTarget(){return nullptr;};
 
-		virtual std::shared_ptr<Shader> createShader(std::string source, ShaderType type){return nullptr;};
+		virtual std::shared_ptr<Shader> createShader(const std::string& source, ShaderType type){return nullptr;};
 		virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders){return nullptr;};
 
 		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, 
@@ -58,8 +57,10 @@ class API{
 		virtual std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, 
 			unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){return nullptr;};
 
-
 		virtual void streamData(std::shared_ptr<UniformBuffer> uniformBuffer, void * data){};
+
+		virtual std::shared_ptr<Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){return nullptr;};
+		virtual std::shared_ptr<Sampler> createSampler(){return nullptr;};
 
 	private:
 };
