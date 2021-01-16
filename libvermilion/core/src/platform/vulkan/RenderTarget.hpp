@@ -40,7 +40,7 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 		virtual void start() override;
 		virtual void end() override;
 
-		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance) override;
+		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance) override;
 
 		void create();
 		void reset();

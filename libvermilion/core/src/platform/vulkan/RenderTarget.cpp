@@ -66,18 +66,22 @@ void Vermilion::Core::Vulkan::RenderTarget::end(){
 	}
 }
 
-void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance){
+void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance){
 	std::shared_ptr<Vermilion::Core::Vulkan::VertexBuffer> vkVertexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::VertexBuffer>(renderable->vertexBuffer);	
 	std::shared_ptr<Vermilion::Core::Vulkan::IndexBuffer> vkIndexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::IndexBuffer>(renderable->indexBuffer);	
+	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> vkPipeline = std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline);
+	std::shared_ptr<Vermilion::Core::Vulkan::Binding> vkBinding = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding);
 
 	VkBuffer vertexBuffers[] = {vkVertexBuffer->vk_buffer};
 	VkDeviceSize offsets[] = {0};
 
+	vkPipeline->bind(binding);
+
 	for(int i=0; i<vk_commandBuffers.size(); i++){
-		vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_pipeline);
+		vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->vk_pipeline);
 		vkCmdBindVertexBuffers(vk_commandBuffers[i], 0, 1, vertexBuffers, offsets);
 		vkCmdBindIndexBuffer(vk_commandBuffers[i], vkIndexBuffer->vk_buffer, 0, VK_INDEX_TYPE_UINT32);
-		vkCmdBindDescriptorSets(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_pipelineLayout, 0, 1, &std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline)->vk_descriptorSets[i], 0, nullptr);
+		vkCmdBindDescriptorSets(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->vk_pipelineLayout, 0, 1, &vkPipeline->descriptorSets[vkBinding][i], 0, nullptr);
 		vkCmdDrawIndexed(vk_commandBuffers[i], renderable->length, instanceCount, renderable->indexOffset, renderable->vertexOffset, firstInstance);
 	}
 }

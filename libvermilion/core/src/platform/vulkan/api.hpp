@@ -39,7 +39,6 @@ class API : public Vermilion::Core::API{
 		std::unique_ptr<vkSwapChain> vk_swapchain;
 		std::unique_ptr<vkCommandPool> vk_commandPool;
 		VmaAllocator vma_allocator;
-		VkDescriptorPool vk_descriptorPool;
 
 		std::shared_ptr<RenderTarget> default_renderTarget;
 
@@ -71,7 +70,8 @@ class API : public Vermilion::Core::API{
 
 		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
 			std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-			std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers)override;
+			std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings) override;
+		virtual std::shared_ptr<Vermilion::Core::Binding> createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers)override;
 
 		virtual std::shared_ptr<Vermilion::Core::VertexBuffer> createVertexBuffer(std::vector<float>& vertices) override;
 		virtual std::shared_ptr<Vermilion::Core::IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices) override;

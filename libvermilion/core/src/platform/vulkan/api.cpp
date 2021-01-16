@@ -26,7 +26,6 @@ Vermilion::Core::Vulkan::API::~API(){
 
 	vkDeviceWaitIdle(vk_device->vk_device);
 
-	vkDestroyDescriptorPool(vk_device->vk_device, vk_descriptorPool, nullptr);
 	vmaDestroyAllocator(vma_allocator);
 
 	for(int i=0; i<pipelines.size(); i++){
@@ -107,22 +106,6 @@ void Vermilion::Core::Vulkan::API::init(){
 	allocatorInfo.physicalDevice = vk_physicaldevice->vk_physicaldevice;
 	allocatorInfo.device = vk_device->vk_device;
 	vmaCreateAllocator(&allocatorInfo, &vma_allocator);
-
-	// Create descriptor pool
-	std::array<VkDescriptorPoolSize, 2> poolSizes = {};
-	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSizes[0].descriptorCount = static_cast<uint32_t>(vk_swapchain->swapChainImages.size());
-	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	poolSizes[1].descriptorCount = static_cast<uint32_t>(vk_swapchain->swapChainImages.size());
-	VkDescriptorPoolCreateInfo poolInfo = {};
-	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = static_cast<uint32_t>(vk_swapchain->swapChainImages.size());;
-	if(vkCreateDescriptorPool(vk_device->vk_device, &poolInfo, nullptr, &vk_descriptorPool)!=VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create descriptor pool");
-		throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create descriptor pool");
-	}
 }
 
 void Vermilion::Core::Vulkan::API::resize(){
@@ -223,10 +206,14 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::cr
 
 std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
-	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram, vertexLayout, uniformBuffers, samplers);
+		std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings){
+	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram, vertexLayout, layoutBindings);
 	pipelines.push_back(newpipeline);
 	return std::static_pointer_cast<Vermilion::Core::Pipeline>(newpipeline);
+}
+
+std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Vulkan::API::createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+	return std::static_pointer_cast<Vermilion::Core::Binding>(std::make_shared<Vermilion::Core::Vulkan::Binding>(this, uniformBuffers, samplers));
 }
 
 std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Vulkan::API::createVertexBuffer(std::vector<float>& vertices){

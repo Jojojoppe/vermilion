@@ -20,7 +20,7 @@ class RenderTarget{
 		virtual void start(){};
 		virtual void end(){};
 
-		virtual void draw(std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Renderable> renderable, int instanceCount=1, int firstInstance=0){};
+		virtual void draw(std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Binding> binding, std::shared_ptr<Renderable> renderable, int instanceCount=1, int firstInstance=0){};
 };
 
 }}

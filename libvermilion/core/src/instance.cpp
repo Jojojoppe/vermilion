@@ -52,8 +52,12 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Instance::creat
 
 std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Instance::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
-	return this->api->createPipeline(renderTarget, shaderProgram, vertexLayout, uniformBuffers, samplers);
+		std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings){
+	return this->api->createPipeline(renderTarget, shaderProgram, vertexLayout, layoutBindings);
+}
+
+std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Instance::createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+	return this->api->createBinding(uniformBuffers, samplers);
 }
 
 std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(std::vector<float>& vertices){

@@ -24,109 +24,87 @@ VkFormat VulkanBufferLayoutElementTypeToVulkanBaseType[] = {
 
 Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-		std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+		std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings){
 	this->api = api;
 	this->instance = api->instance;
 
 	this->renderTarget = renderTarget;
 	this->shaderProgram = shaderProgram;
 	this->vertexLayout = vertexLayout;
-	this->uniformBuffers = uniformBuffers;
-	this->samplers = samplers;
+	this->layoutBindings = layoutBindings;
 
-	std::vector<VkDescriptorSetLayoutBinding> layoutBindings;
+	this->createDescriptorPool();
+
+	// Create pipeline descriptor layout
+	std::vector<VkDescriptorSetLayoutBinding> layoutBindingsVector;
 	unsigned int binding=0;
+	for(const auto& b : layoutBindings){
+		switch(b){
+			case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
+				VkDescriptorSetLayoutBinding uboLayoutBinding = {};
+				uboLayoutBinding.binding = binding++;
+				uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				uboLayoutBinding.descriptorCount = 1;
+				uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+				uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+				layoutBindingsVector.push_back(uboLayoutBinding);
+			} break;
 
-	// Uniform buffer layout
-	for(auto& ubuffer: uniformBuffers){
-		VkDescriptorSetLayoutBinding uboLayoutBinding = {};
-		uboLayoutBinding.binding = binding++;
-		uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		uboLayoutBinding.descriptorCount = 1;
-		uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-		uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
-		layoutBindings.push_back(uboLayoutBinding);
-	};
+			case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER:{
+				VkDescriptorSetLayoutBinding texLayoutBinding = {};
+				texLayoutBinding.binding = binding++;
+				texLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				texLayoutBinding.descriptorCount = 1;
+				texLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+				texLayoutBinding.pImmutableSamplers = nullptr; // Optional
+				layoutBindingsVector.push_back(texLayoutBinding);
+			} break;
 
-	// Samplers layout
-	for(auto& sampler : samplers){
-		VkDescriptorSetLayoutBinding texLayoutBinding = {};
-		texLayoutBinding.binding = binding++;
-		texLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		texLayoutBinding.descriptorCount = 1;
-		texLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-		texLayoutBinding.pImmutableSamplers = nullptr; // Optional
-		layoutBindings.push_back(texLayoutBinding);
+			default:
+				this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Unknown pipeline layout binding type");
+		}
 	}
-
 	VkDescriptorSetLayoutCreateInfo layoutInfo = {};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	layoutInfo.bindingCount = binding;
-	layoutInfo.pBindings = layoutBindings.data();
+	layoutInfo.pBindings = layoutBindingsVector.data();
 	if(vkCreateDescriptorSetLayout(api->vk_device->vk_device, &layoutInfo, nullptr, &vk_descriptorSetLayout)!=VK_SUCCESS){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create descriptor set layout");
 		throw std::runtime_error("Vermilion::Core::Vulkan::Pipeline::Pipeline() - Could not create descriptor set layout");
-	}
-	std::vector<VkDescriptorSetLayout> layouts(api->vk_swapchain->swapChainImages.size(), vk_descriptorSetLayout);
-	VkDescriptorSetAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = api->vk_descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(api->vk_swapchain->swapChainImages.size());
-	allocInfo.pSetLayouts = layouts.data();
-	vk_descriptorSets.resize(api->vk_swapchain->swapChainImages.size());
-	if(vkAllocateDescriptorSets(api->vk_device->vk_device, &allocInfo, vk_descriptorSets.data())!=VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not allocate descriptor sets");
-		throw std::runtime_error("Vermilion::Core::Vulkan::Pipeline::Pipeline() - Could not allocate descriptor sets");
-	}
-
-	for(int i = 0; i<api->vk_swapchain->swapChainImages.size(); i++){
-		int offset = 0;
-		// Uniform buffer bindings
-		for(auto& ubo : uniformBuffers){
-			VkDescriptorBufferInfo bufferInfo = {};
-			bufferInfo.buffer = std::static_pointer_cast<Vermilion::Core::Vulkan::UniformBuffer>(ubo)->vk_buffer[i];
-			bufferInfo.offset = 0;
-			bufferInfo.range = ubo->size;
-			
-			VkWriteDescriptorSet descriptorWrite = {};
-			descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrite.dstSet = vk_descriptorSets[i];
-			descriptorWrite.dstBinding = offset++;
-			descriptorWrite.dstArrayElement = 0;
-			descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrite.descriptorCount = 1;
-			descriptorWrite.pBufferInfo = &bufferInfo;
-			descriptorWrite.pImageInfo = nullptr;
-			descriptorWrite.pTexelBufferView = nullptr;
-			vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
-		}
-		// Sampler bindings
-		for(auto& sampler : samplers){
-			VkDescriptorImageInfo imageInfo = {};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			imageInfo.imageView = std::static_pointer_cast<Vermilion::Core::Vulkan::Sampler>(sampler)->texture->vk_imageView->imageView;
-			imageInfo.sampler = std::static_pointer_cast<Vermilion::Core::Vulkan::Sampler>(sampler)->vk_sampler;
-			
-			VkWriteDescriptorSet descriptorWrite = {};
-			descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrite.dstSet = vk_descriptorSets[i];
-			descriptorWrite.dstBinding = offset++;
-			descriptorWrite.dstArrayElement = 0;
-			descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			descriptorWrite.descriptorCount = 1;
-			descriptorWrite.pBufferInfo = nullptr;
-			descriptorWrite.pImageInfo = &imageInfo;
-			descriptorWrite.pTexelBufferView = nullptr;
-			vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
-		}
 	}
 
 	this->create();
 }
 
 Vermilion::Core::Vulkan::Pipeline::~Pipeline(){
-	vkDestroyDescriptorSetLayout(api->vk_device->vk_device, vk_descriptorSetLayout, nullptr);
+	vkDestroyDescriptorSetLayout(this->api->vk_device->vk_device, this->vk_descriptorSetLayout, nullptr);
 	this->destroy();
+	for(auto& pool : this->vk_descriptorPool){
+		vkDestroyDescriptorPool(this->api->vk_device->vk_device, pool, nullptr);
+	}
+}
+
+void Vermilion::Core::Vulkan::Pipeline::createDescriptorPool(){
+	// Create descriptor pool for the pipeline
+	std::array<VkDescriptorPoolSize, 2> poolSizes = {};
+	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	// poolSizes[0].descriptorCount = static_cast<uint32_t>(api->vk_swapchain->swapChainImages.size());
+	poolSizes[0].descriptorCount = 16;
+	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	// poolSizes[1].descriptorCount = static_cast<uint32_t>(api->vk_swapchain->swapChainImages.size());
+	poolSizes[1].descriptorCount = 16;
+	VkDescriptorPoolCreateInfo poolInfo = {};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	poolInfo.pPoolSizes = poolSizes.data();
+	// poolInfo.maxSets = static_cast<uint32_t>(api->vk_swapchain->swapChainImages.size());
+	poolInfo.maxSets = 16;
+	VkDescriptorPool descriptorPool;
+	if(vkCreateDescriptorPool(api->vk_device->vk_device, &poolInfo, nullptr, &descriptorPool)!=VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create descriptor pool");
+		throw std::runtime_error("Vermilion::Core::Vulkan::Pipeline::Pipeline() - Could not create descriptor pool");
+	}
+	this->vk_descriptorPool.push_back(descriptorPool);
 }
 
 void Vermilion::Core::Vulkan::Pipeline::create(){
@@ -222,24 +200,11 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 	colorBlendAttachment.blendEnable = VK_FALSE;
-	    // alpha blending
-	//colorBlendAttachment.blendEnable = VK_TRUE;
-	//colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-	//colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-	//colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
-	//colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-	//colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-	//colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
 	VkPipelineColorBlendStateCreateInfo colorBlending = {};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlending.logicOpEnable = VK_FALSE;
-	//colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
 	colorBlending.attachmentCount = 1;
 	colorBlending.pAttachments = &colorBlendAttachment;
-	//colorBlending.blendConstants[0] = 0.0f; // Optional
-	//colorBlending.blendConstants[1] = 0.0f; // Optional
-	//colorBlending.blendConstants[2] = 0.0f; // Optional
-	//colorBlending.blendConstants[3] = 0.0f; // Optional
 
 	// Dynamic states
 	// std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT};
@@ -289,6 +254,92 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 void Vermilion::Core::Vulkan::Pipeline::destroy(){
 	vkDestroyPipeline(api->vk_device->vk_device, vk_pipeline, nullptr);
 	vkDestroyPipelineLayout(api->vk_device->vk_device, vk_pipelineLayout, nullptr);
+}
+
+void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Binding> binding){
+	std::shared_ptr<Vermilion::Core::Vulkan::Binding> vkBinding = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding);
+	if(this->descriptorSets.find(vkBinding)==this->descriptorSets.end()){
+		// Descriptor set not yet created
+		this->descriptorSets[vkBinding] = std::vector<VkDescriptorSet>();
+		std::vector<VkDescriptorSetLayout> layouts(api->vk_swapchain->swapChainImages.size(), vk_descriptorSetLayout);
+		VkDescriptorSetAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.descriptorPool = this->vk_descriptorPool[0];
+		allocInfo.descriptorSetCount = static_cast<uint32_t>(api->vk_swapchain->swapChainImages.size());
+		allocInfo.pSetLayouts = layouts.data();
+		this->descriptorSets[vkBinding].resize(api->vk_swapchain->swapChainImages.size());
+		VkResult res = vkAllocateDescriptorSets(api->vk_device->vk_device, &allocInfo, this->descriptorSets[vkBinding].data());
+		if(res!=VK_SUCCESS){
+			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not allocate descriptor sets: %d", res);
+			throw std::runtime_error("Vermilion::Core::Vulkan::Binding::Binding() - Could not allocate descriptor sets");
+		}
+
+		for(int i = 0; i<api->vk_swapchain->swapChainImages.size(); i++){
+			int ubo_i = 0;
+			int sam_i = 0;
+			int offset = 0;
+			for(const auto& b : this->layoutBindings){
+				switch(b){
+					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
+						std::shared_ptr<Vermilion::Core::Vulkan::UniformBuffer> ubo = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->uniformBuffers[ubo_i++];
+						VkDescriptorBufferInfo bufferInfo = {};
+						bufferInfo.buffer = ubo->vk_buffer[i];
+						bufferInfo.offset = 0;
+						bufferInfo.range = ubo->size;
+						
+						VkWriteDescriptorSet descriptorWrite = {};
+						descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+						descriptorWrite.dstSet = (this->descriptorSets[vkBinding])[i];
+						descriptorWrite.dstBinding = offset++;
+						descriptorWrite.dstArrayElement = 0;
+						descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+						descriptorWrite.descriptorCount = 1;
+						descriptorWrite.pBufferInfo = &bufferInfo;
+						descriptorWrite.pImageInfo = nullptr;
+						descriptorWrite.pTexelBufferView = nullptr;
+						vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
+					} break;
+
+					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER:{
+						std::shared_ptr<Vermilion::Core::Vulkan::Sampler> sam = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->samplers[sam_i++];
+						VkDescriptorImageInfo imageInfo = {};
+						imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+						imageInfo.imageView = sam->texture->vk_imageView->imageView;
+						imageInfo.sampler = sam->vk_sampler;
+						
+						VkWriteDescriptorSet descriptorWrite = {};
+						descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+						descriptorWrite.dstSet = (this->descriptorSets[vkBinding])[i];
+						descriptorWrite.dstBinding = offset++;
+						descriptorWrite.dstArrayElement = 0;
+						descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+						descriptorWrite.descriptorCount = 1;
+						descriptorWrite.pBufferInfo = nullptr;
+						descriptorWrite.pImageInfo = &imageInfo;
+						descriptorWrite.pTexelBufferView = nullptr;
+						vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
+					} break;
+
+					default:
+						this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Unknown pipeline layout binding type");
+				}
+			}
+		}
+	}
+}
+
+Vermilion::Core::Vulkan::Binding::Binding(Vermilion::Core::Vulkan::API* api, std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+	this->api = api;
+	this->instance = api->instance;
+	for(const auto& u : uniformBuffers){
+		this->uniformBuffers.push_back(std::static_pointer_cast<Vermilion::Core::Vulkan::UniformBuffer>(u));
+	}
+	for(const auto& s : samplers){
+		this->samplers.push_back(std::static_pointer_cast<Vermilion::Core::Vulkan::Sampler>(s));
+	}
+}
+
+Vermilion::Core::Vulkan::Binding::~Binding(){
 }
 
 #endif
