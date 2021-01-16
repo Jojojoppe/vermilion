@@ -124,9 +124,9 @@ int main(int argc, char ** argv){
 	while(vmInstance.window->shouldClose()){
 		vmInstance.startRender();
 
-		uboData1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		uboData1.model = glm::translate(glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(0.0f, 0.5f, 0.0f));
 		vmInstance.streamData(uniformBuffer1, &uboData1);		// TODO move function to uniformBuffer->streamData(&uboData); ....
-		uboData2.model = glm::rotate(glm::mat4(1.0f), -time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		uboData2.model = glm::rotate(glm::mat4(1.0f), -time*glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 1.0f));
 		vmInstance.streamData(uniformBuffer2, &uboData2);		// TODO move function to uniformBuffer->streamData(&uboData); ....
 		time += 0.01f;
 

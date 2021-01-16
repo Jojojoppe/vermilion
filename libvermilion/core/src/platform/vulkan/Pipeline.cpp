@@ -30,10 +30,20 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 
 	this->renderTarget = renderTarget;
 	this->shaderProgram = shaderProgram;
-	this->vertexLayout = vertexLayout;
 	this->layoutBindings = layoutBindings;
 
 	this->createDescriptorPool();
+
+	// Vertex data layout
+	// Calculate stride and offset
+	unsigned int offset = 0;
+	for(auto& element : vertexLayout){
+		auto e = element;
+		e.offset = offset;
+		offset += e.size;
+		stride += e.size;
+		this->vertexLayout.push_back(e);
+	}
 
 	// Create pipeline descriptor layout
 	std::vector<VkDescriptorSetLayoutBinding> layoutBindingsVector;
@@ -115,16 +125,6 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	}
 	VkPipelineShaderStageCreateInfo * shaderStages = shaderStageInfo.data();
 
-	// Vertex data layout
-	// Calculate stride and offset
-	std::vector<Vermilion::Core::BufferLayoutElement> elements(vertexLayout);
-	unsigned int offset = 0;
-	unsigned int stride = 0;
-	for(auto& element : elements){
-		element.offset = offset;
-		offset += element.size;
-		stride += element.size;
-	}
 	// Create descriptors
 	VkVertexInputBindingDescription bindingDescription = {};
 	bindingDescription.binding = 0;
@@ -132,7 +132,7 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 	int i = 0;
-	for(auto& element : elements){
+	for(auto& element : this->vertexLayout){
 		VkVertexInputAttributeDescription desc = {};
 		desc.binding = 0;
 		desc.location = i++;
