@@ -68,8 +68,7 @@ int main(int argc, char ** argv){
 			layout(binding = 1) uniform sampler2D s_tex;
 
 			void main() {
-				// outColor = texture(s_tex, fTexCoord);
-				outColor = vec4(fColor, 1.0);
+				outColor = texture(s_tex, fTexCoord);
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
 	std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
@@ -80,8 +79,8 @@ int main(int argc, char ** argv){
 		Vermilion::Core::BufferLayoutElementFloat3("aColor"),
 		Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
 	},{
-		Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER
-		// Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
+		Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
+		Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 	});
 
 	// Render object
@@ -102,22 +101,17 @@ int main(int argc, char ** argv){
 
 	// Create uniform buffer
 	std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer1 = vmInstance.createUniformBuffer(sizeof(UniformBufferObject));
-	std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer2 = vmInstance.createUniformBuffer(sizeof(UniformBufferObject));
 	UniformBufferObject uboData1;
 	uboData1.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	uboData1.proj = glm::perspective(glm::radians(45.0f), vmInstance.window->width / (float) vmInstance.window->height, 0.1f, 10.0f); // TODO get window data
-	UniformBufferObject uboData2;
-	uboData2.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	uboData2.proj = glm::perspective(glm::radians(45.0f), vmInstance.window->width / (float) vmInstance.window->height, 0.1f, 10.0f); // TODO get window data
 
 	// Create texture
-	// std::shared_ptr<Vermilion::Core::Texture> texture = vmInstance.createTexture("/home/joppe/Pictures/texture.jpg");
+	std::shared_ptr<Vermilion::Core::Texture> texture = vmInstance.createTexture("/home/joppe/Pictures/texture.jpg");
 	// Create sampler to use texture
-	// std::shared_ptr<Vermilion::Core::Sampler> sampler = vmInstance.createSampler(texture);
+	std::shared_ptr<Vermilion::Core::Sampler> sampler = vmInstance.createSampler(texture);
 
 	// Create binding (Must be in the format as the pipeline layoutBinding)
-	std::shared_ptr<Vermilion::Core::Binding> binding1 = vmInstance.createBinding({uniformBuffer1}, {});
-	std::shared_ptr<Vermilion::Core::Binding> binding2 = vmInstance.createBinding({uniformBuffer2}, {});
+	std::shared_ptr<Vermilion::Core::Binding> binding1 = vmInstance.createBinding({uniformBuffer1}, {sampler});
 
 	float time = 0.0f;
 
@@ -126,14 +120,11 @@ int main(int argc, char ** argv){
 
 		uboData1.model = glm::translate(glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(0.0f, 0.5f, 0.0f));
 		vmInstance.streamData(uniformBuffer1, &uboData1);		// TODO move function to uniformBuffer->streamData(&uboData); ....
-		uboData2.model = glm::rotate(glm::mat4(1.0f), -time*glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 1.0f));
-		vmInstance.streamData(uniformBuffer2, &uboData2);		// TODO move function to uniformBuffer->streamData(&uboData); ....
 		time += 0.01f;
 
 		// Start queueing commands to static queue
 		defaultRenderTarget->start();
 		defaultRenderTarget->draw(pipeline, binding1, renderObject);
-		defaultRenderTarget->draw(pipeline, binding2, renderObject);
 		defaultRenderTarget->end();
 
 		vmInstance.endRender();

@@ -26,11 +26,15 @@ Vermilion::Core::Vulkan::API::~API(){
 
 	vkDeviceWaitIdle(vk_device->vk_device);
 
-	vmaDestroyAllocator(vma_allocator);
+	for(int i=0; i<uniformBuffers.size(); i++){
+		uniformBuffers[i].reset();
+	}
 
 	for(int i=0; i<pipelines.size(); i++){
 		pipelines[i].reset();
 	}
+
+	vmaDestroyAllocator(vma_allocator);
 
 	for(int i=0; i<maxFramesInFlight; i++){
 		vkDestroySemaphore(vk_device->vk_device, imageAvailableSemaphore[i], nullptr);
@@ -225,7 +229,9 @@ std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Vulkan::API::crea
 }
 
 std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Vulkan::API::createUniformBuffer(size_t length){
-	return std::static_pointer_cast<Vermilion::Core::UniformBuffer>(std::make_shared<Vermilion::Core::Vulkan::UniformBuffer>(this, length));
+	auto n = std::make_shared<Vermilion::Core::Vulkan::UniformBuffer>(this, length);
+	uniformBuffers.push_back(n);
+	return std::static_pointer_cast<Vermilion::Core::UniformBuffer>(n);
 }
 
 std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Vulkan::API::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){

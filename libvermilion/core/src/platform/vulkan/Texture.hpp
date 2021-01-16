@@ -32,8 +32,6 @@ class Texture : public Vermilion::Core::Texture{
 
 		Texture(API * api, const std::string& path, size_t width, size_t height, unsigned int channels);
 		~Texture();
-
-		virtual void setData(void * data) override;
 };
 
 class Sampler : public Vermilion::Core::Sampler{

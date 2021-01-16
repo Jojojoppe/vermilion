@@ -52,6 +52,7 @@ class API : public Vermilion::Core::API{
 		uint32_t imageIndex = 0;
 
 		std::vector<std::shared_ptr<Pipeline>> pipelines;
+		std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers;
 
 	private:
 

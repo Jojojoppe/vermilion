@@ -9,6 +9,21 @@
 #include <stdexcept>
 #include <cstdint>
 
+void Vermilion::Core::Vulkan::createBuffer(API * api, size_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VmaAllocation& memory){
+	VkBufferCreateInfo bufferInfo = {};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size = size;
+	bufferInfo.usage = usage;
+	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	VmaAllocationCreateInfo allocInfo = {};
+	allocInfo.requiredFlags = properties;
+	VkResult res = vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &buffer, &memory, nullptr);
+	if(res!=VK_SUCCESS){
+		api->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create buffer: %d", res);
+		throw std::runtime_error("Vermilion::Core::Vulkan::createBuffer() - Could not create buffer");
+	}
+}
+
 Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API* api, std::vector<float>& vertices){
 	this->api = api;
 	this->instance = api->instance;
@@ -16,39 +31,22 @@ Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API
 	this->count = vertices.size();
 	this->size = this->element_size*this->count;
 
+	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Create vertex buffer of size %d", this->size);
+
 	// Create staging buffer
 	VkBuffer stagingBuffer;
 	VmaAllocation stagingBufferMemory;
-	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = size;
-	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	VmaAllocationCreateInfo allocInfo = {};
-	allocInfo.requiredFlags = VMA_MEMORY_USAGE_CPU_TO_GPU;
-	if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &stagingBuffer, &stagingBufferMemory, nullptr)!=VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create vertex staging buffer");
-		throw std::runtime_error("Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer() - Could not create vertex staging buffer");
-	}
+	Vermilion::Core::Vulkan::createBuffer(api, this->size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, stagingBuffer, stagingBufferMemory);
 
 	// Fill buffer
 	void * gpudata;
 	vmaMapMemory(api->vma_allocator, stagingBufferMemory, &gpudata);
 	memcpy(gpudata, vertices.data(), size);
 	vmaUnmapMemory(api->vma_allocator, stagingBufferMemory);
-	
-	bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = size;
-	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	allocInfo = {};
-	allocInfo.requiredFlags = VMA_MEMORY_USAGE_GPU_ONLY;
-	if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &vk_buffer, &vk_allocation, nullptr)!=VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create vertex buffer");
-		throw std::runtime_error("Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer() - Could not create vertex buffer");
-	}
-	
+
+	// Create vertex buffer	
+	Vermilion::Core::Vulkan::createBuffer(api, this->size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_ONLY, vk_buffer, vk_allocation);
+
 	{
 		// Copy to buffer itself on GPU
 		VkCommandBufferAllocateInfo allocInfo = {};
@@ -98,38 +96,20 @@ Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer(Vermilion::Core::Vulkan::API* 
 	this->count = indices.size();
 	this->size = this->element_size*this->count;
 
+	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Create index buffer of size %d", this->size);
+
 	// Create staging buffer
 	VkBuffer stagingBuffer;
 	VmaAllocation stagingBufferMemory;
-	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = size;
-	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	VmaAllocationCreateInfo allocInfo = {};
-	allocInfo.requiredFlags = VMA_MEMORY_USAGE_CPU_TO_GPU;
-	if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &stagingBuffer, &stagingBufferMemory, nullptr)!=VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create index staging buffer");
-		throw std::runtime_error("Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer() - Could not create index staging buffer");
-	}
+	Vermilion::Core::Vulkan::createBuffer(api, this->size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, stagingBuffer, stagingBufferMemory);
 
 	// Fill buffer
 	void * gpudata;
 	vmaMapMemory(api->vma_allocator, stagingBufferMemory, &gpudata);
 	memcpy(gpudata, indices.data(), size);
 	vmaUnmapMemory(api->vma_allocator, stagingBufferMemory);
-	
-	bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = size;
-	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	allocInfo = {};
-	allocInfo.requiredFlags = VMA_MEMORY_USAGE_GPU_ONLY;
-	if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &vk_buffer, &vk_allocation, nullptr)!=VK_SUCCESS){
-		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create index buffer");
-		throw std::runtime_error("Vermilion::Core::Vulkan::Indexuffer::IndexBuffer() - Could not create index buffer");
-	}
+
+	Vermilion::Core::Vulkan::createBuffer(api, this->size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_ONLY, vk_buffer, vk_allocation);
 	
 	{
 		// Copy to buffer itself on GPU
@@ -178,22 +158,13 @@ Vermilion::Core::Vulkan::UniformBuffer::UniformBuffer(Vermilion::Core::Vulkan::A
 	this->instance = api->instance;
 	this->size = length;
 
-	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = size;
-	bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	VmaAllocationCreateInfo allocInfo = {};
-	allocInfo.requiredFlags = VMA_MEMORY_USAGE_CPU_TO_GPU;
+	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Create uniform buffer of size %d", this->size);
 
 	vk_buffer.resize(api->vk_swapchain->swapChainImages.size());
 	vk_allocation.resize(api->vk_swapchain->swapChainImages.size());
 
 	for(int i=0; i<api->vk_swapchain->swapChainImages.size(); i++){
-		if(vmaCreateBuffer(api->vma_allocator, &bufferInfo, &allocInfo, &vk_buffer[i], &vk_allocation[i], nullptr)!=VK_SUCCESS){
-			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create uniform buffer");
-			throw std::runtime_error("Vermilion::Core::Vulkan::UniformBuffer::UniformBuffer() - Could not create uniform buffer");
-		}
+		Vermilion::Core::Vulkan::createBuffer(api, this->size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, vk_buffer[i], vk_allocation[i]);
 	}
 }
 

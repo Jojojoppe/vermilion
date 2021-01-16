@@ -20,6 +20,8 @@ namespace Vulkan{
 
 class API;
 
+void createBuffer(API * api, size_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VmaAllocation& memory);
+
 class VertexBuffer : public Vermilion::Core::VertexBuffer{
 	private:
 		Vermilion::Core::Instance * instance;
