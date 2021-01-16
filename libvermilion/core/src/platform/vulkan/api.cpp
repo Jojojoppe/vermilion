@@ -34,7 +34,7 @@ Vermilion::Core::Vulkan::API::~API(){
 		pipelines[i].reset();
 	}
 
-	vmaDestroyAllocator(vma_allocator);
+	vkFreeCommandBuffers(this->vk_device->vk_device, this->vk_commandPool->vk_commandPool, 1, &vk_commandBuffer);
 
 	for(int i=0; i<maxFramesInFlight; i++){
 		vkDestroySemaphore(vk_device->vk_device, imageAvailableSemaphore[i], nullptr);
@@ -44,6 +44,7 @@ Vermilion::Core::Vulkan::API::~API(){
 	vk_commandPool.reset();
 	default_renderTarget.reset();
 	vk_swapchain.reset();
+	vmaDestroyAllocator(vma_allocator);
 	vk_device.reset();
 	vk_physicaldevice.reset();
 	DestroyDebugUtilsMessengerEXT(vk_instance->vk_instance, vk_debugMessenger, nullptr);
@@ -107,9 +108,25 @@ void Vermilion::Core::Vulkan::API::init(){
 
 	// Create memory allocator
 	VmaAllocatorCreateInfo allocatorInfo = {};
+	allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_0;
 	allocatorInfo.physicalDevice = vk_physicaldevice->vk_physicaldevice;
 	allocatorInfo.device = vk_device->vk_device;
+	allocatorInfo.instance = vk_instance->vk_instance;
 	vmaCreateAllocator(&allocatorInfo, &vma_allocator);
+
+	VmaBudget budget;
+	vmaGetBudget(vma_allocator, &budget);
+	instance->logger.log(VMCORE_LOGLEVEL_INFO, "Memory available:    %d", budget.budget);
+	instance->logger.log(VMCORE_LOGLEVEL_INFO, "Memory used:         %d", budget.usage);
+
+	// Allocate one time use command buffer
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = this->vk_commandPool->vk_commandPool;
+	allocInfo.commandBufferCount = 1;
+	vkAllocateCommandBuffers(this->vk_device->vk_device, &allocInfo, &vk_commandBuffer);
+
 }
 
 void Vermilion::Core::Vulkan::API::resize(){
@@ -135,7 +152,6 @@ void Vermilion::Core::Vulkan::API::resize(){
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){
-
 }
 
 void Vermilion::Core::Vulkan::API::endRender(){
@@ -251,6 +267,27 @@ std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Vulkan::API::createSa
 }
 
 
+
+
+
+void Vermilion::Core::Vulkan::API::beginSingleTimeCommands(){
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+	vkBeginCommandBuffer(vk_commandBuffer, &beginInfo);
+}
+
+void Vermilion::Core::Vulkan::API::endSingleTimeCommands(){
+	vkEndCommandBuffer(vk_commandBuffer);
+	
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &vk_commandBuffer;
+	vkQueueSubmit(this->vk_device->vk_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(this->vk_device->vk_graphicsQueue);
+	
+}
 
 // DEBUG STUFF
 // -----------

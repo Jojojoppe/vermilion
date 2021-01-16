@@ -22,6 +22,7 @@ namespace Vulkan{
 
 extern std::vector<const char*> validationLayers;
 extern std::vector<const char*> deviceExtensions;
+extern std::vector<const char*> instanceExtensions;
 
 class Pipeline;
 
@@ -39,6 +40,7 @@ class API : public Vermilion::Core::API{
 		std::unique_ptr<vkSwapChain> vk_swapchain;
 		std::unique_ptr<vkCommandPool> vk_commandPool;
 		VmaAllocator vma_allocator;
+		VkCommandBuffer vk_commandBuffer;
 
 		std::shared_ptr<RenderTarget> default_renderTarget;
 
@@ -84,6 +86,9 @@ class API : public Vermilion::Core::API{
 
 		virtual std::shared_ptr<Vermilion::Core::Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels) override;
 		virtual std::shared_ptr<Vermilion::Core::Sampler> createSampler(std::shared_ptr<Vermilion::Core::Texture> texture) override;
+
+		void beginSingleTimeCommands();
+		void endSingleTimeCommands();
 
 	private:
 

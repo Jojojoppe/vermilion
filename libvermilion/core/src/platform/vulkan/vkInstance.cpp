@@ -16,6 +16,11 @@ std::vector<const char*> Vermilion::Core::Vulkan::validationLayers = {
 std::vector<const char*> Vermilion::Core::Vulkan::deviceExtensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 	VK_KHR_MAINTENANCE1_EXTENSION_NAME,
+	VK_EXT_MEMORY_BUDGET_EXTENSION_NAME
+};
+
+std::vector<const char*> Vermilion::Core::Vulkan::instanceExtensions = {
+	VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
 };
 
 Vermilion::Core::Vulkan::vkInstance::vkInstance(API * api){
@@ -37,6 +42,10 @@ Vermilion::Core::Vulkan::vkInstance::vkInstance(API * api){
 	std::vector<const char*> requiredExtensions(windowExtensions, windowExtensions+windowExtensionCount);
 	// Add debug extension if in DEBUG build
 	requiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	// Add other extensions
+	for(const auto& e : Vermilion::Core::Vulkan::instanceExtensions){
+		requiredExtensions.push_back(e);
+	}
 	
 	// Get all available extensions
 	uint32_t extensionCount = 0;
