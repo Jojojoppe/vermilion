@@ -27,12 +27,12 @@ int main(int argc, char ** argv){
 			400,
 			VMCORE_LOGLEVEL_DEBUG,
 		0};
-		Vermilion::Core::Instance vmInstance(hintType, hintValue);
+		VmInstance vmInstance(hintType, hintValue);
 
-		std::shared_ptr<Vermilion::Core::RenderTarget> defaultRenderTarget = vmInstance.getDefaultRenderTarget();
+		VmRenderTarget defaultRenderTarget = vmInstance.getDefaultRenderTarget();
 
 		// Create shaders
-		std::shared_ptr<Vermilion::Core::Shader> vertexShader = vmInstance.createShader(
+		VmShader vertexShader = vmInstance.createShader(
 			R"(
 				#version 450
 				#extension GL_ARB_separate_shader_objects : enable
@@ -56,7 +56,7 @@ int main(int argc, char ** argv){
 					fTexCoord = aTexCoord;
 				}
 			)", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
-		std::shared_ptr<Vermilion::Core::Shader> fragmentShader = vmInstance.createShader(
+		VmShader fragmentShader = vmInstance.createShader(
 			R"(
 				#version 450
 				#extension GL_ARB_separate_shader_objects : enable
@@ -72,10 +72,10 @@ int main(int argc, char ** argv){
 					outColor = vec4(fColor, 1.0) * texture(s_tex, fTexCoord);
 				}
 			)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
-		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
+		VmShaderProgram shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
 
 		// Create render pipeline
-		std::shared_ptr<Vermilion::Core::Pipeline> pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
+		VmPipeline pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
 			Vermilion::Core::BufferLayoutElementFloat4("aPos"),
 			Vermilion::Core::BufferLayoutElementFloat3("aColor"),
 			Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
@@ -96,22 +96,22 @@ int main(int argc, char ** argv){
 			2, 3, 0,
 		});
 		// Create vertex and index buffers
-		std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer = vmInstance.createVertexBuffer(vertices);
-		std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer = vmInstance.createIndexBuffer(indices);
-		std::shared_ptr<Vermilion::Core::Renderable> renderObject = vmInstance.createRenderable(vertexBuffer, indexBuffer);
+		VmVertexBuffer vertexBuffer = vmInstance.createVertexBuffer(vertices);
+		VmIndexBuffer indexBuffer = vmInstance.createIndexBuffer(indices);
+		VmRenderable renderObject = vmInstance.createRenderable(vertexBuffer, indexBuffer);
 
 		// Create texture
-		std::shared_ptr<Vermilion::Core::Texture> texture = vmInstance.createTexture("/home/joppe/Pictures/texture.jpg");
-		std::shared_ptr<Vermilion::Core::Sampler> sampler = vmInstance.createSampler(texture);
+		VmTexture texture = vmInstance.createTexture("/home/joppe/Pictures/texture.jpg");
+		VmSampler sampler = vmInstance.createSampler(texture);
 
 		// Create uniform buffer
-		std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer1 = vmInstance.createUniformBuffer(sizeof(UniformBufferObject));
+		VmUniformBuffer uniformBuffer1 = vmInstance.createUniformBuffer(sizeof(UniformBufferObject));
 		UniformBufferObject uboData1;
 		uboData1.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		uboData1.proj = glm::perspective(glm::radians(45.0f), vmInstance.window->width / (float) vmInstance.window->height, 0.1f, 10.0f); // TODO get window data
 
 		// Create binding (Must be in the format as the pipeline layoutBinding)
-		std::shared_ptr<Vermilion::Core::Binding> binding1 = vmInstance.createBinding({uniformBuffer1}, {sampler});
+		VmBinding binding1 = vmInstance.createBinding({uniformBuffer1}, {sampler});
 
 		float time = 0.0f;
 

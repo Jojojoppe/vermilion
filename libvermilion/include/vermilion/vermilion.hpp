@@ -16,3 +16,16 @@
  */
 
 #include <vermilion/instance.hpp>
+
+typedef Vermilion::Core::Instance VmInstance;
+typedef std::shared_ptr<Vermilion::Core::RenderTarget> VmRenderTarget;
+typedef std::shared_ptr<Vermilion::Core::Shader> VmShader;
+typedef std::shared_ptr<Vermilion::Core::ShaderProgram> VmShaderProgram;
+typedef std::shared_ptr<Vermilion::Core::Pipeline> VmPipeline;
+typedef std::shared_ptr<Vermilion::Core::VertexBuffer> VmVertexBuffer;
+typedef std::shared_ptr<Vermilion::Core::IndexBuffer> VmIndexBuffer;
+typedef std::shared_ptr<Vermilion::Core::UniformBuffer> VmUniformBuffer;
+typedef std::shared_ptr<Vermilion::Core::Renderable> VmRenderable;
+typedef std::shared_ptr<Vermilion::Core::Texture> VmTexture;
+typedef std::shared_ptr<Vermilion::Core::Sampler> VmSampler;
+typedef std::shared_ptr<Vermilion::Core::Binding> VmBinding;
