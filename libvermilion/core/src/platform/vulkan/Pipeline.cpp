@@ -83,6 +83,20 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 		throw std::runtime_error("Vermilion::Core::Vulkan::Pipeline::Pipeline() - Could not create descriptor set layout");
 	}
 
+	VkViewport viewport{};
+	viewport.x = 0.0f;
+	viewport.y = (float) api->vk_swapchain->swapChainExtent.height;
+	viewport.width = (float) api->vk_swapchain->swapChainExtent.width;
+	viewport.height = -(float) api->vk_swapchain->swapChainExtent.height;
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+	VkRect2D scissor{};
+	scissor.offset = {0, 0};
+	scissor.extent = api->vk_swapchain->swapChainExtent;
+	
+	this->viewport = viewport;
+	this->scissor = scissor;
+
 	this->create();
 }
 
@@ -154,27 +168,6 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-	// Viewports and scissors
-	VkViewport viewport{};
-	viewport.x = 0.0f;
-	viewport.y = (float) api->vk_swapchain->swapChainExtent.height;
-	viewport.width = (float) api->vk_swapchain->swapChainExtent.width;
-	viewport.height = -(float) api->vk_swapchain->swapChainExtent.height;
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-	VkRect2D scissor{};
-	scissor.offset = {0, 0};
-	scissor.extent = api->vk_swapchain->swapChainExtent;
-	VkPipelineViewportStateCreateInfo viewportState{};
-	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	viewportState.viewportCount = 1;
-	viewportState.pViewports = &viewport;
-	viewportState.scissorCount = 1;
-	viewportState.pScissors = &scissor;
-	
-	this->viewport = viewport;
-	this->scissor = scissor;
-
 	// Rasterizer
 	VkPipelineRasterizationStateCreateInfo rasterizer = {};
 	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -228,6 +221,14 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	dynamicCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 	dynamicCreateInfo.pDynamicStates = dynamicStateEnables.data();
 	dynamicCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
+
+	// Viewport and Scissors
+	VkPipelineViewportStateCreateInfo viewportState{};
+	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewportState.viewportCount = 1;
+	viewportState.pViewports = &viewport;
+	viewportState.scissorCount = 1;
+	viewportState.pScissors = &scissor;
 
 	// Pipeline layout
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};

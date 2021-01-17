@@ -44,6 +44,8 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 		RenderTarget(API * api, std::shared_ptr<Vermilion::Core::Texture> texture);
 		~RenderTarget();
 
+		virtual void reset();
+
 		virtual void start() override;
 		virtual void end() override;
 
@@ -77,7 +79,7 @@ class DefaultRenderTarget : public RenderTarget{
 		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance) override;
 
 		void create();
-		void reset();
+		virtual void reset() override;
 };
 
 }}}

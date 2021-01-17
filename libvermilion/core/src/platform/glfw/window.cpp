@@ -65,6 +65,15 @@ bool Vermilion::Core::GLFW::Window::shouldClose(){
 	return !glfwWindowShouldClose(this->window);
 }
 
+void Vermilion::Core::GLFW::Window::setResizedCallback(void (*resize)(Vermilion::Core::Instance * instance)){
+	this->resize = resize;
+}
+void Vermilion::Core::GLFW::Window::resized(){
+	if(this->resize){
+		this->resize(this->instance);
+	}
+}
+
 void Vermilion::Core::GLFW::Window::getFrameBufferSize(int * width, int * height){
 	glfwGetFramebufferSize(this->window, width, height);
 }

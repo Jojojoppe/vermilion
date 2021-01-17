@@ -21,6 +21,8 @@ class Window : public Vermilion::Core::Window{
 		
 		GLFWwindow * window;
 
+		void (*resize)(Vermilion::Core::Instance * instance) = nullptr;
+
 	public:
 		Window(int renderPlatform, Vermilion::Core::Instance * instance);
 		virtual ~Window() override;
@@ -30,6 +32,9 @@ class Window : public Vermilion::Core::Window{
 		virtual void endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets) override;
 
 		virtual bool shouldClose() override;
+
+		virtual void setResizedCallback(void (*resize)(Vermilion::Core::Instance * instance)) override;
+		virtual void resized() override;
 
 		virtual void getFrameBufferSize(int * width, int * height) override;
 

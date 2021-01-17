@@ -39,8 +39,8 @@ Vermilion::Core::Vulkan::Texture::Texture(Vermilion::Core::Vulkan::API * api, co
         imageInfo.arrayLayers = 1;
         imageInfo.format = VulkanChannelFormatField[this->channels];
         imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;         // TODO use LINEAIR for direct access
-        imageInfo.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        imageInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        imageInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
         imageInfo.flags = 0; // Optional
@@ -50,6 +50,8 @@ Vermilion::Core::Vulkan::Texture::Texture(Vermilion::Core::Vulkan::API * api, co
             this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create image");
             throw std::runtime_error("Vermilion::Core::Vulkan::Texture::Texture() - Could not create image");
         }
+
+        this->format = imageInfo.format;
 
         vk_imageView.reset(new Vermilion::Core::Vulkan::vkImageView2D(this->api, this->vk_image, VulkanChannelFormatField[this->channels]));
 

@@ -25,7 +25,7 @@ class vkRenderPass{
 		Vermilion::Core::Instance * instance;
 
 	public:
-		vkRenderPass(API * api, VkFormat format, VkFormat depthFormat);
+		vkRenderPass(API * api, VkFormat format, VkFormat depthFormat, bool defaultPass = false);
 		~vkRenderPass();
 
 	private:

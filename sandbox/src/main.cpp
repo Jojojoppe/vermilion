@@ -9,6 +9,15 @@ struct UniformBufferObject{
 	glm::mat4 proj;
 };
 
+// Main pipeline
+VmPipeline pipeline;
+
+void resize(VmInstance * instance){
+	int width, height;
+	instance->window->getFrameBufferSize(&width, &height);
+	pipeline->setViewPort(width, height);
+}
+
 int main(int argc, char ** argv){
 	try{
 
@@ -28,6 +37,7 @@ int main(int argc, char ** argv){
 			VMCORE_LOGLEVEL_DEBUG,
 		0};
 		VmInstance vmInstance(hintType, hintValue);
+		vmInstance.window->setResizedCallback(resize);
 
 		// Create render targets
 		VmRenderTarget defaultRenderTarget = vmInstance.getDefaultRenderTarget();
@@ -79,7 +89,7 @@ int main(int argc, char ** argv){
 		VmShaderProgram shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
 
 		// Create render pipeline
-		VmPipeline pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
+		pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
 			Vermilion::Core::BufferLayoutElementFloat4("aPos"),
 			Vermilion::Core::BufferLayoutElementFloat3("aColor"),
 			Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
@@ -87,7 +97,8 @@ int main(int argc, char ** argv){
 			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
 			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 		});
-		VmPipeline pipeline2 = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
+
+		VmPipeline pipeline2 = vmInstance.createPipeline(renderTarget, shaderProgram, {
 			Vermilion::Core::BufferLayoutElementFloat4("aPos"),
 			Vermilion::Core::BufferLayoutElementFloat3("aColor"),
 			Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
@@ -153,6 +164,9 @@ int main(int argc, char ** argv){
 
 			vmInstance.endRender({renderTarget});
 		}
+
+		// Clean global objects
+		pipeline.reset();
 
 	}catch(std::exception& ex){
 		return 1;

@@ -34,6 +34,10 @@ Vermilion::Core::Vulkan::API::~API(){
 		pipelines[i].reset();
 	}
 
+	for(int i=0; i<renderTargets.size(); i++){
+		renderTargets[i].reset();
+	}
+
 	vkFreeCommandBuffers(this->vk_device->vk_device, this->vk_commandPool->vk_commandPool, 1, &vk_commandBuffer);
 
 	for(int i=0; i<maxFramesInFlight; i++){
@@ -144,7 +148,22 @@ void Vermilion::Core::Vulkan::API::resize(){
 	for(const auto& pipeline : pipelines){
 		pipeline->create();
 	}
+	for(const auto& renderTarget : renderTargets){
+		renderTarget->reset();
+	}
+
+	// Allocate one time use command buffer
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = this->vk_commandPool->vk_commandPool;
+	allocInfo.commandBufferCount = 1;
+	vkAllocateCommandBuffers(this->vk_device->vk_device, &allocInfo, &vk_commandBuffer);
+
 	vkDeviceWaitIdle(vk_device->vk_device);
+
+	// resize callback
+	this->instance->window->resized();
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){
@@ -218,7 +237,9 @@ std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Vulkan::API::get
 };
 
 std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Vulkan::API::createRenderTarget(std::shared_ptr<Vermilion::Core::Texture> texture){
-	return std::static_pointer_cast<Vermilion::Core::RenderTarget>(std::make_shared<Vermilion::Core::Vulkan::RenderTarget>(this, texture));
+	auto n = std::make_shared<Vermilion::Core::Vulkan::RenderTarget>(this, texture);
+	renderTargets.push_back(n);
+	return std::static_pointer_cast<Vermilion::Core::RenderTarget>(n);
 }
 
 std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Vulkan::API::createShader(const std::string& source, Vermilion::Core::ShaderType type){

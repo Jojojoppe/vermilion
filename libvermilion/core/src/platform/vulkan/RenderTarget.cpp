@@ -72,6 +72,19 @@ Vermilion::Core::Vulkan::RenderTarget::~RenderTarget(){
 	vmaDestroyImage(api->vma_allocator, this->depthImage, this->depthImageMemory);
 }
 
+void Vermilion::Core::Vulkan::RenderTarget::reset(){
+	// Create command buffers for render target
+	VkCommandBufferAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = api->vk_commandPool->vk_commandPool;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = 1;
+	if(vkAllocateCommandBuffers(api->vk_device->vk_device, &allocInfo, &vk_commandBuffer) != VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to create command buffer for render target");
+		throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarget::RenderTarget() - Failed to create command buffer for render target");
+	}
+}
+
 void Vermilion::Core::Vulkan::RenderTarget::start(){
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -152,6 +165,7 @@ Vermilion::Core::Vulkan::DefaultRenderTarget::DefaultRenderTarget(Vermilion::Cor
 }
 
 Vermilion::Core::Vulkan::DefaultRenderTarget::~DefaultRenderTarget(){	
+	this->reset();
 }
 
 void Vermilion::Core::Vulkan::DefaultRenderTarget::start(){
@@ -244,7 +258,7 @@ void Vermilion::Core::Vulkan::DefaultRenderTarget::create(){
 	// Create image view
 	depthImageView.reset(new Vermilion::Core::Vulkan::vkImageView2D(this->api, this->depthImage, imageInfo.format, VK_IMAGE_ASPECT_DEPTH_BIT));
 
-	this->renderpass.reset(new vkRenderPass(api, api->vk_swapchain->swapChainImageFormat, imageInfo.format));
+	this->renderpass.reset(new vkRenderPass(api, api->vk_swapchain->swapChainImageFormat, imageInfo.format, true));
 
 
 	int swapchainsize = api->vk_swapchain->swapChainImages.size();

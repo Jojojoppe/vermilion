@@ -39,6 +39,9 @@ class Window{
 
 		virtual bool shouldClose(){return true;};
 
+		virtual void setResizedCallback(void (*resized)(Instance * instance)){};
+		virtual void resized(){};
+
 		virtual void getFrameBufferSize(int * width, int * height){};
 
 #ifdef VMCORE_OPENGL

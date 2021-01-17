@@ -55,6 +55,7 @@ class API : public Vermilion::Core::API{
 
 		std::vector<std::shared_ptr<Pipeline>> pipelines;
 		std::vector<std::shared_ptr<UniformBuffer>> uniformBuffers;
+		std::vector<std::shared_ptr<RenderTarget>> renderTargets;
 
 	private:
 
