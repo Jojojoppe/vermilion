@@ -86,7 +86,7 @@ void Vermilion::Core::Vulkan::API::init(){
 	this->vk_commandPool.reset(new Vermilion::Core::Vulkan::vkCommandPool(this));
 
 	// Create render target
-	this->default_renderTarget.reset(new Vermilion::Core::Vulkan::RenderTarget(this));
+	this->default_renderTarget.reset(new Vermilion::Core::Vulkan::DefaultRenderTarget(this));
 
 	maxFramesInFlight = vk_swapchain->swapChainImages.size()-1;
 	imageAvailableSemaphore.resize(maxFramesInFlight);
@@ -164,18 +164,24 @@ void Vermilion::Core::Vulkan::API::startRender(){
 	imagesInFlight[imageIndex] = inFlightFences[currentFrame];
 }
 
-void Vermilion::Core::Vulkan::API::endRender(){
+void Vermilion::Core::Vulkan::API::endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets){
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	
+	std::vector<VkCommandBuffer> commandBuffers;
+	for(const auto& t : extraRenderTargets){
+		commandBuffers.push_back(std::static_pointer_cast<Vermilion::Core::Vulkan::RenderTarget>(t)->vk_commandBuffer);
+	}
+	commandBuffers.push_back(default_renderTarget->vk_commandBuffers[imageIndex]);
+
 	VkSemaphore waitSemaphores[] = {imageAvailableSemaphore[currentFrame]};
 	VkSemaphore signalSemaphores[] = {renderFinishedSemaphore[currentFrame]};
 	VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &default_renderTarget->vk_commandBuffers[imageIndex];
+	submitInfo.commandBufferCount = commandBuffers.size();
+	submitInfo.pCommandBuffers = commandBuffers.data();
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
@@ -210,6 +216,10 @@ void Vermilion::Core::Vulkan::API::endRender(){
 std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Vulkan::API::getDefaultRenderTarget(){
 	return std::static_pointer_cast<Vermilion::Core::RenderTarget>(default_renderTarget);
 };
+
+std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Vulkan::API::createRenderTarget(std::shared_ptr<Vermilion::Core::Texture> texture){
+	return std::static_pointer_cast<Vermilion::Core::RenderTarget>(std::make_shared<Vermilion::Core::Vulkan::RenderTarget>(this, texture));
+}
 
 std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Vulkan::API::createShader(const std::string& source, Vermilion::Core::ShaderType type){
 	return std::static_pointer_cast<Vermilion::Core::Shader>(std::make_shared<Vermilion::Core::Vulkan::Shader>(this, source, type));

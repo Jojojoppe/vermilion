@@ -27,7 +27,7 @@ class Window : public Vermilion::Core::Window{
 
 		virtual void createWindow(int width, int height) override;
 		virtual void startRender() override;
-		virtual void endRender() override;
+		virtual void endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets) override;
 
 		virtual bool shouldClose() override;
 

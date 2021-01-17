@@ -42,7 +42,7 @@ class API : public Vermilion::Core::API{
 		VmaAllocator vma_allocator;
 		VkCommandBuffer vk_commandBuffer;
 
-		std::shared_ptr<RenderTarget> default_renderTarget;
+		std::shared_ptr<DefaultRenderTarget> default_renderTarget;
 
 		std::vector<VkSemaphore> imageAvailableSemaphore;
 		std::vector<VkSemaphore> renderFinishedSemaphore;
@@ -64,9 +64,10 @@ class API : public Vermilion::Core::API{
 
 		virtual void init() override;
 		virtual void startRender() override;
-		virtual void endRender() override;
+		virtual void endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets) override;
 
 		virtual std::shared_ptr<Vermilion::Core::RenderTarget> getDefaultRenderTarget() override;
+		virtual std::shared_ptr<Vermilion::Core::RenderTarget> createRenderTarget(std::shared_ptr<Vermilion::Core::Texture> texture) override;
 
 		virtual std::shared_ptr<Vermilion::Core::Shader> createShader(const std::string& source, Vermilion::Core::ShaderType type) override;
 		virtual std::shared_ptr<Vermilion::Core::ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders) override;

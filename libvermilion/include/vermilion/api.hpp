@@ -29,6 +29,8 @@ const std::string RenderPlatformString[] = {
 
 extern const int renderPlatform[];
 class RenderTarget;
+class Instance;
+class Window;
 
 class API{
 	public:
@@ -41,9 +43,10 @@ class API{
 
 		virtual void init(){};
 		virtual void startRender(){};
-		virtual void endRender(){};
+		virtual void endRender(std::initializer_list<std::shared_ptr<RenderTarget>> extraRenderTargets){};
 
 		virtual std::shared_ptr<RenderTarget> getDefaultRenderTarget(){return nullptr;};
+		virtual std::shared_ptr<RenderTarget> createRenderTarget(std::shared_ptr<Texture> texture){return nullptr;};
 
 		virtual std::shared_ptr<Shader> createShader(const std::string& source, ShaderType type){return nullptr;};
 		virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders){return nullptr;};

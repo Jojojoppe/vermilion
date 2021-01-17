@@ -33,7 +33,7 @@ void Vermilion::Core::OpenGL::API::init(){
 void Vermilion::Core::OpenGL::API::startRender(){
 }
 
-void Vermilion::Core::OpenGL::API::endRender(){
+void Vermilion::Core::OpenGL::API::endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets){
 }
 
 std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::OpenGL::API::getDefaultRenderTarget(){

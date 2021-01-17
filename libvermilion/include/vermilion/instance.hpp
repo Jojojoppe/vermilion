@@ -56,9 +56,10 @@ class Instance{
 		~Instance();
 
 		void startRender();
-		void endRender();
+		void endRender(std::initializer_list<std::shared_ptr<RenderTarget>> extraRenderTargets = {});
 
 		std::shared_ptr<RenderTarget> getDefaultRenderTarget();
+		std::shared_ptr<RenderTarget> createRenderTarget(std::shared_ptr<Texture> texture);
 
 		std::shared_ptr<Shader> createShader(const std::string& source, ShaderType type);
 		std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders);

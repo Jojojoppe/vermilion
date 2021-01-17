@@ -54,8 +54,8 @@ void Vermilion::Core::GLFW::Window::startRender(){
 	this->instance->api->startRender();
 }
 
-void Vermilion::Core::GLFW::Window::endRender(){
-	this->instance->api->endRender();
+void Vermilion::Core::GLFW::Window::endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets){
+	this->instance->api->endRender(extraRenderTargets);
 	if(this->renderPlatform==Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL){
 		glfwSwapBuffers(this->window);
 	}

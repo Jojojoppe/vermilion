@@ -29,6 +29,7 @@ class Texture : public Vermilion::Core::Texture{
 		VkImage vk_image;
 		VmaAllocation vma_allocation;
 		std::unique_ptr<vkImageView2D> vk_imageView;
+		VkFormat format;
 
 		Texture(API * api, const std::string& path, size_t width, size_t height, unsigned int channels);
 		~Texture();

@@ -34,12 +34,16 @@ void Vermilion::Core::Instance::startRender(){
 	this->window->startRender();
 }
 
-void Vermilion::Core::Instance::endRender(){
-	this->window->endRender();
+void Vermilion::Core::Instance::endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets){
+	this->window->endRender(extraRenderTargets);
 }
 
 std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Instance::getDefaultRenderTarget(){
 	return this->api->getDefaultRenderTarget();
+}
+
+std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::Instance::createRenderTarget(std::shared_ptr<Vermilion::Core::Texture> texture){
+	return this->api->createRenderTarget(texture);
 }
 
 std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Instance::createShader(const std::string& source, Vermilion::Core::ShaderType type){

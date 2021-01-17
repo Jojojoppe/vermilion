@@ -28,7 +28,31 @@ Vermilion::Core::Vulkan::Texture::Texture(Vermilion::Core::Vulkan::API * api, co
         this->height = height;
         this->channels = channels;
 
-        // TODO not supported yet
+        // Create vulkan image
+        VkImageCreateInfo imageInfo = {};
+        imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageInfo.extent.width = static_cast<uint32_t>(this->width);
+        imageInfo.extent.height = static_cast<uint32_t>(this->height);
+        imageInfo.extent.depth = 1;
+        imageInfo.mipLevels = 1;
+        imageInfo.arrayLayers = 1;
+        imageInfo.format = VulkanChannelFormatField[this->channels];
+        imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;         // TODO use LINEAIR for direct access
+        imageInfo.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        imageInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+        imageInfo.flags = 0; // Optional
+        VmaAllocationCreateInfo allocInfo = {};
+        allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        if(vmaCreateImage(api->vma_allocator, &imageInfo, &allocInfo, &this->vk_image, &this->vma_allocation, nullptr)!=VK_SUCCESS){
+            this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create image");
+            throw std::runtime_error("Vermilion::Core::Vulkan::Texture::Texture() - Could not create image");
+        }
+
+        vk_imageView.reset(new Vermilion::Core::Vulkan::vkImageView2D(this->api, this->vk_image, VulkanChannelFormatField[this->channels]));
+
     }else{
         // Create texture with pixel data
         this->width = 0;
@@ -71,6 +95,8 @@ Vermilion::Core::Vulkan::Texture::Texture(Vermilion::Core::Vulkan::API * api, co
             this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create image");
             throw std::runtime_error("Vermilion::Core::Vulkan::Texture::Texture() - Could not create image");
         }
+
+        this->format = imageInfo.format;
 
         // Transition image to right layout
         api->beginSingleTimeCommands();

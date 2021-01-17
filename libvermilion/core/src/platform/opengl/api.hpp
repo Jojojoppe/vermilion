@@ -19,7 +19,7 @@ class API : public Vermilion::Core::API{
 
 		virtual void init() override;
 		virtual void startRender() override;
-		virtual void endRender() override;
+		virtual void endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets) override;
 
 		virtual std::shared_ptr<Vermilion::Core::RenderTarget> getDefaultRenderTarget() override;
 

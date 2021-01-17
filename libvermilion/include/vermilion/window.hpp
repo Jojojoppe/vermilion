@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 namespace Vermilion{
 namespace Core{
@@ -17,10 +18,10 @@ const std::string WindowPlatformString[] = {
 	"GLFW"
 };
 
-
 extern const int windowPlatform[];
 
 class Instance;
+class RenderTarget;
 
 class Window{
 	public:
@@ -34,7 +35,7 @@ class Window{
 
 		virtual void createWindow(int width, int height){};
 		virtual void startRender(){};
-		virtual void endRender(){};
+		virtual void endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets){};
 
 		virtual bool shouldClose(){return true;};
 

@@ -29,7 +29,11 @@ int main(int argc, char ** argv){
 		0};
 		VmInstance vmInstance(hintType, hintValue);
 
+		// Create render targets
 		VmRenderTarget defaultRenderTarget = vmInstance.getDefaultRenderTarget();
+		VmTexture renderTargetTexture = vmInstance.createTexture("", 512, 512, 4);
+		VmRenderTarget renderTarget = vmInstance.createRenderTarget(renderTargetTexture);
+		VmSampler renderTargetSampler = vmInstance.createSampler(renderTargetTexture);
 
 		// Create shaders
 		VmShader vertexShader = vmInstance.createShader(
@@ -119,6 +123,7 @@ int main(int argc, char ** argv){
 
 		// Create binding (Must be in the format as the pipeline layoutBinding)
 		VmBinding binding1 = vmInstance.createBinding({uniformBuffer1}, {sampler});
+		VmBinding binding2 = vmInstance.createBinding({uniformBuffer1}, {renderTargetSampler});
 
 		float time = 0.0f;
 
@@ -127,15 +132,18 @@ int main(int argc, char ** argv){
 
 			vmInstance.startRender();
 
+				uboData1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+				vmInstance.streamData(uniformBuffer1, &uboData1);		// TODO move function to uniformBuffer->streamData(&uboData); ....
+
+				renderTarget->start();
+					renderTarget->draw(pipeline, binding1, renderObject);
+				renderTarget->end();
+
 				defaultRenderTarget->start();
-
-					uboData1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-					vmInstance.streamData(uniformBuffer1, &uboData1);		// TODO move function to uniformBuffer->streamData(&uboData); ....
-				defaultRenderTarget->draw(pipeline, binding1, renderObject);
-
+					defaultRenderTarget->draw(pipeline, binding2, renderObject);
 				defaultRenderTarget->end();
 
-			vmInstance.endRender();
+			vmInstance.endRender({renderTarget});
 		}
 
 	}catch(std::exception& ex){
