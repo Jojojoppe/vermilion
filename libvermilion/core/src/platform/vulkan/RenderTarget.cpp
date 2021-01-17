@@ -8,10 +8,12 @@
 #include "vkPhysicalDevice.hpp"
 #include "Pipeline.hpp"
 #include "Buffer.hpp"
+#include "vk_mem_alloc.h"
 
 #include <string.h>
 #include <stdexcept>
 #include <cstdint>
+#include <array>
 
 Vermilion::Core::Vulkan::RenderTarget::RenderTarget(Vermilion::Core::Instance * instance, int width, int height){
 	this->instance = instance;
@@ -50,9 +52,11 @@ void Vermilion::Core::Vulkan::RenderTarget::start(){
 		renderPassInfo.framebuffer = this->framebuffers[i]->vk_frameBuffer;
 		renderPassInfo.renderArea.offset = {0, 0};
 		renderPassInfo.renderArea.extent = this->extent;
-		VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
-		renderPassInfo.clearValueCount = 1;
-		renderPassInfo.pClearValues = &clearColor;
+		std::array<VkClearValue, 2> clearValues{};
+		clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+		clearValues[1].depthStencil = {1.0f, 0};
+		renderPassInfo.clearValueCount = 2;
+		renderPassInfo.pClearValues = clearValues.data();
 		vkCmdBeginRenderPass(vk_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	// }
 }
@@ -90,13 +94,42 @@ void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core
 }
 
 void Vermilion::Core::Vulkan::RenderTarget::create(){
-	this->renderpass.reset(new vkRenderPass(api, api->vk_swapchain->swapChainImageFormat));
+
+	// Create depth image
+	VkImageCreateInfo imageInfo = {};
+	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageInfo.imageType = VK_IMAGE_TYPE_2D;
+	imageInfo.extent.width = api->vk_swapchain->swapChainExtent.width;
+	imageInfo.extent.height = api->vk_swapchain->swapChainExtent.height;
+	imageInfo.extent.depth = 1;
+	imageInfo.mipLevels = 1;
+	imageInfo.arrayLayers = 1;
+	imageInfo.format = findSupportedFormat({VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT}, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;         // TODO use LINEAIR for direct access
+	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageInfo.flags = 0; // Optional
+	VmaAllocationCreateInfo IallocInfo = {};
+	IallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+	if(vmaCreateImage(api->vma_allocator, &imageInfo, &IallocInfo, &this->depthImage, &this->depthImageMemory, nullptr)!=VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create depth image");
+		throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarger::create() - Could not create depth image");
+	}
+
+	// Create image view
+	depthImageView.reset(new Vermilion::Core::Vulkan::vkImageView2D(this->api, this->depthImage, imageInfo.format, VK_IMAGE_ASPECT_DEPTH_BIT));
+
+	this->renderpass.reset(new vkRenderPass(api, api->vk_swapchain->swapChainImageFormat, imageInfo.format));
+
+
 	int swapchainsize = api->vk_swapchain->swapChainImages.size();
 	this->framebuffers.resize(swapchainsize);
 	for(int i=0; i<swapchainsize; i++){
 		this->framebuffers[i].reset(new Vermilion::Core::Vulkan::vkFrameBuffer(api, 
 					api->vk_swapchain->swapChainExtent.width, api->vk_swapchain->swapChainExtent.height, 
-					api->vk_swapchain->swapChainImageViews[i]->imageView, this->renderpass->vk_renderPass));
+					api->vk_swapchain->swapChainImageViews[i]->imageView, this->depthImageView->imageView, this->renderpass->vk_renderPass));
 	}
 	this->extent = api->vk_swapchain->swapChainExtent;
 
@@ -111,10 +144,27 @@ void Vermilion::Core::Vulkan::RenderTarget::create(){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to create command buffers for swapchain images");
 		throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarget::RenderTarget() - Failed to create command buffers for swapchain images");
 	}
+
 }
 
 void Vermilion::Core::Vulkan::RenderTarget::reset(){
+	depthImageView.reset();
+	vmaDestroyImage(api->vma_allocator, this->depthImage, this->depthImageMemory);
+}
 
+VkFormat Vermilion::Core::Vulkan::RenderTarget::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
+    for (VkFormat format : candidates) {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(api->vk_physicaldevice->vk_physicaldevice, format, &props);
+
+        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+            return format;
+        } else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+            return format;
+        }
+    }
+
+    throw std::runtime_error("failed to find supported format!");
 }
 
 #endif

@@ -11,18 +11,19 @@
 #include <stdexcept>
 #include <cstdint>
 
-Vermilion::Core::Vulkan::vkFrameBuffer::vkFrameBuffer(API * api, int width, int height, VkImageView imageview, VkRenderPass renderpass){
+Vermilion::Core::Vulkan::vkFrameBuffer::vkFrameBuffer(API * api, int width, int height, VkImageView imageview, VkImageView depthImageView, VkRenderPass renderpass){
 	this->api = api;
 	this->instance = api->instance;
 
 	VkImageView attachments[] = {
-		imageview
+		imageview,
+		depthImageView
 	};
 
 	VkFramebufferCreateInfo framebufferInfo = {};
 	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 	framebufferInfo.renderPass = renderpass;
-	framebufferInfo.attachmentCount = 1;
+	framebufferInfo.attachmentCount = 2;
 	framebufferInfo.pAttachments = attachments;
 	framebufferInfo.width = width;
 	framebufferInfo.height = height;

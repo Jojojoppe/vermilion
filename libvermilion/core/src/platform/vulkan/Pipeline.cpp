@@ -186,6 +186,19 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	rasterizer.depthBiasClamp = 0.0f; // Optional
 	rasterizer.depthBiasSlopeFactor = 0.0f; // Optional
 
+	// Depth buffer
+	VkPipelineDepthStencilStateCreateInfo depthStencil = {};
+	depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+	depthStencil.depthTestEnable = VK_TRUE;
+	depthStencil.depthWriteEnable = VK_TRUE;
+	depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+	depthStencil.depthBoundsTestEnable = VK_FALSE;
+	depthStencil.minDepthBounds = -1.0f; // Optional
+	depthStencil.maxDepthBounds = 1.0f; // Optional
+	depthStencil.stencilTestEnable = VK_FALSE;
+	depthStencil.front = {}; // Optional
+	depthStencil.back = {}; // Optional
+
 	// Multisampling
 	VkPipelineMultisampleStateCreateInfo multisampling = {};
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -235,7 +248,7 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	pipelineInfo.pViewportState = &viewportState;
 	pipelineInfo.pRasterizationState = &rasterizer;
 	pipelineInfo.pMultisampleState = &multisampling;
-	pipelineInfo.pDepthStencilState = nullptr; // Optional
+	pipelineInfo.pDepthStencilState = &depthStencil; // Optional
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = nullptr; // Optional
 	pipelineInfo.layout = vk_pipelineLayout;

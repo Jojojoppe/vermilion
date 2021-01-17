@@ -10,6 +10,8 @@
 #include <vermilion/RenderTarget.hpp>
 #include <vermilion/Buffer.hpp>
 #include <vermilion/Renderable.hpp>
+#include "vk_mem_alloc.h"
+#include "vkImageView.hpp"
 
 namespace Vermilion{
 namespace Core{
@@ -27,6 +29,10 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 
 		std::vector<VkCommandBuffer> vk_commandBuffers;
 		VkExtent2D extent;
+
+		VkImage depthImage;
+		VmaAllocation depthImageMemory;
+		std::unique_ptr<vkImageView2D> depthImageView;
 
 	private:
 		Vermilion::Core::Instance * instance;
@@ -46,6 +52,7 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 		void reset();
 
 	private:
+		VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 };
 
 }}}

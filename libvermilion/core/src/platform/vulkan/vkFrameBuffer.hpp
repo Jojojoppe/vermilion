@@ -25,7 +25,7 @@ class vkFrameBuffer{
 		Vermilion::Core::Instance * instance;
 
 	public:
-		vkFrameBuffer(API * api, int width, int height, VkImageView imageview, VkRenderPass renderpass);
+		vkFrameBuffer(API * api, int width, int height, VkImageView imageview, VkImageView depthImageView, VkRenderPass renderpass);
 		~vkFrameBuffer();
 
 	private:

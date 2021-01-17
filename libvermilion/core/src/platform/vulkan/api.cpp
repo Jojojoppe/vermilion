@@ -73,6 +73,15 @@ void Vermilion::Core::Vulkan::API::init(){
 
 	this->vk_physicaldevice.reset(new Vermilion::Core::Vulkan::vkPhysicalDevice(this));
 	this->vk_device.reset(new Vermilion::Core::Vulkan::vkDevice(this));
+
+	// Create memory allocator
+	VmaAllocatorCreateInfo allocatorInfo = {};
+	allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_0;
+	allocatorInfo.physicalDevice = vk_physicaldevice->vk_physicaldevice;
+	allocatorInfo.device = vk_device->vk_device;
+	allocatorInfo.instance = vk_instance->vk_instance;
+	vmaCreateAllocator(&allocatorInfo, &vma_allocator);
+
 	this->vk_swapchain.reset(new Vermilion::Core::Vulkan::vkSwapChain(this));
 	this->vk_commandPool.reset(new Vermilion::Core::Vulkan::vkCommandPool(this));
 
@@ -105,14 +114,6 @@ void Vermilion::Core::Vulkan::API::init(){
 			throw std::runtime_error("Vermilion::Core::Vulkan::API::API() - Could not create fence");
 		}
 	}
-
-	// Create memory allocator
-	VmaAllocatorCreateInfo allocatorInfo = {};
-	allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_0;
-	allocatorInfo.physicalDevice = vk_physicaldevice->vk_physicaldevice;
-	allocatorInfo.device = vk_device->vk_device;
-	allocatorInfo.instance = vk_instance->vk_instance;
-	vmaCreateAllocator(&allocatorInfo, &vma_allocator);
 
 	// Allocate one time use command buffer
 	VkCommandBufferAllocateInfo allocInfo{};

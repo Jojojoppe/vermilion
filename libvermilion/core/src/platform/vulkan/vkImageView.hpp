@@ -24,7 +24,7 @@ class vkImageView2D{
 		Vermilion::Core::Instance * instance;
 
 	public:
-		vkImageView2D(API * api, VkImage image, VkFormat format);
+		vkImageView2D(API * api, VkImage image, VkFormat format, VkImageAspectFlags aspect = VK_IMAGE_ASPECT_COLOR_BIT);
 		~vkImageView2D();
 
 	private:

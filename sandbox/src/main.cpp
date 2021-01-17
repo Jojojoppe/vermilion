@@ -69,7 +69,7 @@ int main(int argc, char ** argv){
 				layout(binding = 1) uniform sampler2D s_tex;
 
 				void main() {
-					outColor = vec4(fColor, 1.0) * texture(s_tex, fTexCoord);
+					outColor = texture(s_tex, fTexCoord);
 				}
 			)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
 		VmShaderProgram shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
@@ -90,10 +90,17 @@ int main(int argc, char ** argv){
 			0.5	,	-0.5,	0.0,	1.0,		0.0,	1.0,	0.0,		0.0,	0.0,
 			0.5,	0.5,	0.0,	1.0,		0.0,	0.0,	1.0,		0.0,	1.0,
 			-0.5,	0.5,	0.0,	1.0,		1.0,	1.0,	1.0,		1.0,	1.0,
+
+			-0.5,	-0.5,	-0.5,	1.0,		1.0,	0.0,	0.0,		1.0, 	0.0,
+			0.5	,	-0.5,	-0.5,	1.0,		0.0,	1.0,	0.0,		0.0,	0.0,
+			0.5,	0.5,	-0.5,	1.0,		0.0,	0.0,	1.0,		0.0,	1.0,
+			-0.5,	0.5,	-0.5,	1.0,		1.0,	1.0,	1.0,		1.0,	1.0,
 		});
 		std::vector<unsigned int> indices({
 			0, 1, 2,
 			2, 3, 0,
+			4, 5, 6,
+			6, 7, 4,
 		});
 		// Create vertex and index buffers
 		VmVertexBuffer vertexBuffer = vmInstance.createVertexBuffer(vertices);
@@ -122,7 +129,7 @@ int main(int argc, char ** argv){
 
 				defaultRenderTarget->start();
 
-					uboData1.model = glm::translate(glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(0.0f, 0.5f, 0.0f));
+					uboData1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 					vmInstance.streamData(uniformBuffer1, &uboData1);		// TODO move function to uniformBuffer->streamData(&uboData); ....
 				defaultRenderTarget->draw(pipeline, binding1, renderObject);
 
