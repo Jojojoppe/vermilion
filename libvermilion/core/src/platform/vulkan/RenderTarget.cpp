@@ -32,7 +32,8 @@ Vermilion::Core::Vulkan::RenderTarget::~RenderTarget(){
 }
 
 void Vermilion::Core::Vulkan::RenderTarget::start(){
-	for (size_t i = 0; i < vk_commandBuffers.size(); i++) {
+	int i = this->api->imageIndex;
+	// for (size_t i = 0; i < vk_commandBuffers.size(); i++) {
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		beginInfo.flags = 0; // Optional
@@ -53,17 +54,18 @@ void Vermilion::Core::Vulkan::RenderTarget::start(){
 		renderPassInfo.clearValueCount = 1;
 		renderPassInfo.pClearValues = &clearColor;
 		vkCmdBeginRenderPass(vk_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	}
+	// }
 }
 
 void Vermilion::Core::Vulkan::RenderTarget::end(){
-	for(int i=0; i<vk_commandBuffers.size(); i++){
+	int i = this->api->imageIndex;
+	// for(int i=0; i<vk_commandBuffers.size(); i++){
 		vkCmdEndRenderPass(vk_commandBuffers[i]);
 		if(vkEndCommandBuffer(vk_commandBuffers[i]) != VK_SUCCESS){
 			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Failed to end command buffer recording");
 			throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarget::end() - Failed to end command buffer recording");
 		}
-	}
+	// }
 }
 
 void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance){
@@ -77,13 +79,14 @@ void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core
 
 	vkPipeline->bind(binding);
 
-	for(int i=0; i<vk_commandBuffers.size(); i++){
+	int i = this->api->imageIndex;
+	// for(int i=0; i<vk_commandBuffers.size(); i++){
 		vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->vk_pipeline);
 		vkCmdBindVertexBuffers(vk_commandBuffers[i], 0, 1, vertexBuffers, offsets);
 		vkCmdBindIndexBuffer(vk_commandBuffers[i], vkIndexBuffer->vk_buffer, 0, VK_INDEX_TYPE_UINT32);
 		vkCmdBindDescriptorSets(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->vk_pipelineLayout, 0, 1, &vkPipeline->descriptorSets[vkBinding][i], 0, nullptr);
 		vkCmdDrawIndexed(vk_commandBuffers[i], renderable->length, instanceCount, renderable->indexOffset, renderable->vertexOffset, firstInstance);
-	}
+	// }
 }
 
 void Vermilion::Core::Vulkan::RenderTarget::create(){

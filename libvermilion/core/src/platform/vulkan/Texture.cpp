@@ -31,10 +31,23 @@ Vermilion::Core::Vulkan::Texture::Texture(Vermilion::Core::Vulkan::API * api, co
         // TODO not supported yet
     }else{
         // Create texture with pixel data
+        this->width = 0;
+        this->height = 0;
         pixels = stbi_load(path.c_str(), (int*)&this->width, (int*)&this->height, (int*)&this->channels, STBI_rgb_alpha);
         this->channels = 4;
 
-        this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Create texture of size %d", this->width*this->height*this->channels);
+        // Create staging buffer
+        VkBuffer stagingBuffer;
+        VmaAllocation stagingBufferMemory;
+        size_t size = this->width*this->height*this->channels;
+        Vermilion::Core::Vulkan::createBuffer(api, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, stagingBuffer, stagingBufferMemory);
+
+        // Fill buffer
+        void * gpudata;
+        vmaMapMemory(this->api->vma_allocator, stagingBufferMemory, &gpudata);
+        memcpy(gpudata, pixels, size);
+        vmaUnmapMemory(this->api->vma_allocator, stagingBufferMemory);
+        stbi_image_free(pixels);
 
         // Create vulkan image
         VkImageCreateInfo imageInfo = {};
@@ -53,24 +66,11 @@ Vermilion::Core::Vulkan::Texture::Texture(Vermilion::Core::Vulkan::API * api, co
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
         imageInfo.flags = 0; // Optional
         VmaAllocationCreateInfo allocInfo = {};
-        allocInfo.flags = VMA_MEMORY_USAGE_GPU_ONLY;
+        allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
         if(vmaCreateImage(api->vma_allocator, &imageInfo, &allocInfo, &this->vk_image, &this->vma_allocation, nullptr)!=VK_SUCCESS){
             this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create image");
             throw std::runtime_error("Vermilion::Core::Vulkan::Texture::Texture() - Could not create image");
         }
-
-        // Create staging buffer
-        VkBuffer stagingBuffer;
-        VmaAllocation stagingBufferMemory;
-        size_t size = this->width*this->height*this->channels;
-        Vermilion::Core::Vulkan::createBuffer(api, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, stagingBuffer, stagingBufferMemory);
-
-        // Fill buffer
-        void * gpudata;
-        vmaMapMemory(this->api->vma_allocator, stagingBufferMemory, &gpudata);
-        memcpy(gpudata, pixels, size);
-        vmaUnmapMemory(this->api->vma_allocator, stagingBufferMemory);
-        stbi_image_free(pixels);
 
         // Transition image to right layout
         api->beginSingleTimeCommands();

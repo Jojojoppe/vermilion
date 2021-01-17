@@ -114,11 +114,6 @@ void Vermilion::Core::Vulkan::API::init(){
 	allocatorInfo.instance = vk_instance->vk_instance;
 	vmaCreateAllocator(&allocatorInfo, &vma_allocator);
 
-	VmaBudget budget;
-	vmaGetBudget(vma_allocator, &budget);
-	instance->logger.log(VMCORE_LOGLEVEL_INFO, "Memory available:    %d", budget.budget);
-	instance->logger.log(VMCORE_LOGLEVEL_INFO, "Memory used:         %d", budget.usage);
-
 	// Allocate one time use command buffer
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -152,9 +147,6 @@ void Vermilion::Core::Vulkan::API::resize(){
 }
 
 void Vermilion::Core::Vulkan::API::startRender(){
-}
-
-void Vermilion::Core::Vulkan::API::endRender(){
 	vkWaitForFences(vk_device->vk_device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     VkResult res = vkAcquireNextImageKHR(vk_device->vk_device, vk_swapchain->swapChain, UINT64_MAX, imageAvailableSemaphore[currentFrame], VK_NULL_HANDLE, &imageIndex);
@@ -169,7 +161,9 @@ void Vermilion::Core::Vulkan::API::endRender(){
 		vkWaitForFences(vk_device->vk_device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
 	}
 	imagesInFlight[imageIndex] = inFlightFences[currentFrame];
+}
 
+void Vermilion::Core::Vulkan::API::endRender(){
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	
@@ -199,7 +193,7 @@ void Vermilion::Core::Vulkan::API::endRender(){
 	presentInfo.pSwapchains = swapChains;
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr; // Optional
-	res = vkQueuePresentKHR(vk_device->vk_presentQueue, &presentInfo);
+	VkResult res = vkQueuePresentKHR(vk_device->vk_presentQueue, &presentInfo);
 	if(res==VK_ERROR_OUT_OF_DATE_KHR || res==VK_SUBOPTIMAL_KHR){
 		this->resize();
 		return;
@@ -284,9 +278,11 @@ void Vermilion::Core::Vulkan::API::endSingleTimeCommands(){
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &vk_commandBuffer;
-	vkQueueSubmit(this->vk_device->vk_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	if(vkQueueSubmit(this->vk_device->vk_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE)!=VK_SUCCESS){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not submit single time command buffer");
+		throw std::runtime_error("Vermilion::Core::Vulkan::API::endSingleTimeCommands() - Could not submit single time command buffer");
+	}
 	vkQueueWaitIdle(this->vk_device->vk_graphicsQueue);
-	
 }
 
 // DEBUG STUFF

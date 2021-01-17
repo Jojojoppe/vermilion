@@ -32,12 +32,10 @@ Vermilion::Core::Vulkan::VertexBuffer::VertexBuffer(Vermilion::Core::Vulkan::API
 	this->count = vertices.size();
 	this->size = this->element_size*this->count;
 
-	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Create vertex buffer of size %d", this->size);
-
 	// Create staging buffer
 	VkBuffer stagingBuffer;
 	VmaAllocation stagingBufferMemory;
-	Vermilion::Core::Vulkan::createBuffer(api, this->size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, stagingBuffer, stagingBufferMemory);
+	Vermilion::Core::Vulkan::createBuffer(api, this->size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, stagingBuffer, stagingBufferMemory);
 
 	// Fill buffer
 	void * gpudata;
@@ -70,12 +68,10 @@ Vermilion::Core::Vulkan::IndexBuffer::IndexBuffer(Vermilion::Core::Vulkan::API* 
 	this->count = indices.size();
 	this->size = this->element_size*this->count;
 
-	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Create index buffer of size %d", this->size);
-
 	// Create staging buffer
 	VkBuffer stagingBuffer;
 	VmaAllocation stagingBufferMemory;
-	Vermilion::Core::Vulkan::createBuffer(api, this->size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, stagingBuffer, stagingBufferMemory);
+	Vermilion::Core::Vulkan::createBuffer(api, this->size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, stagingBuffer, stagingBufferMemory);
 
 	// Fill buffer
 	void * gpudata;
@@ -104,8 +100,6 @@ Vermilion::Core::Vulkan::UniformBuffer::UniformBuffer(Vermilion::Core::Vulkan::A
 	this->api = api;
 	this->instance = api->instance;
 	this->size = length;
-
-	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Create uniform buffer of size %d", this->size);
 
 	vk_buffer.resize(api->vk_swapchain->swapChainImages.size());
 	vk_allocation.resize(api->vk_swapchain->swapChainImages.size());

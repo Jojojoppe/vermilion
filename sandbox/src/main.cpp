@@ -25,7 +25,7 @@ int main(int argc, char ** argv){
 			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
 			400,
 			400,
-			VMCORE_LOGLEVEL_TRACE,
+			VMCORE_LOGLEVEL_DEBUG,
 		0};
 		Vermilion::Core::Instance vmInstance(hintType, hintValue);
 
@@ -102,8 +102,6 @@ int main(int argc, char ** argv){
 
 		// Create texture
 		std::shared_ptr<Vermilion::Core::Texture> texture = vmInstance.createTexture("/home/joppe/Pictures/texture.jpg");
-		// std::shared_ptr<Vermilion::Core::Texture> texture2 = vmInstance.createTexture("/home/joppe/Pictures/texture2.jpg");
-		// Create sampler to use texture
 		std::shared_ptr<Vermilion::Core::Sampler> sampler = vmInstance.createSampler(texture);
 
 		// Create uniform buffer
