@@ -117,6 +117,8 @@ void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core
 	vkPipeline->bind(binding);
 
 	vkCmdBindPipeline(vk_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->vk_pipeline);
+	vkCmdSetViewport(vk_commandBuffer, 0, 1, &vkPipeline->viewport);
+	vkCmdSetScissor(vk_commandBuffer, 0, 1, &vkPipeline->scissor);
 	vkCmdBindVertexBuffers(vk_commandBuffer, 0, 1, vertexBuffers, offsets);
 	vkCmdBindIndexBuffer(vk_commandBuffer, vkIndexBuffer->vk_buffer, 0, VK_INDEX_TYPE_UINT32);
 	// TODO fix the array in descriptorSets[vkBinding]
@@ -205,6 +207,8 @@ void Vermilion::Core::Vulkan::DefaultRenderTarget::draw(std::shared_ptr<Vermilio
 	int i = this->api->imageIndex;
 	// for(int i=0; i<vk_commandBuffers.size(); i++){
 		vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->vk_pipeline);
+	vkCmdSetViewport(vk_commandBuffers[i], 0, 1, &vkPipeline->viewport);
+	vkCmdSetScissor(vk_commandBuffers[i], 0, 1, &vkPipeline->scissor);
 		vkCmdBindVertexBuffers(vk_commandBuffers[i], 0, 1, vertexBuffers, offsets);
 		vkCmdBindIndexBuffer(vk_commandBuffers[i], vkIndexBuffer->vk_buffer, 0, VK_INDEX_TYPE_UINT32);
 		vkCmdBindDescriptorSets(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->vk_pipelineLayout, 0, 1, &vkPipeline->descriptorSets[vkBinding][i], 0, nullptr);

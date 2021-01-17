@@ -171,6 +171,9 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	viewportState.pViewports = &viewport;
 	viewportState.scissorCount = 1;
 	viewportState.pScissors = &scissor;
+	
+	this->viewport = viewport;
+	this->scissor = scissor;
 
 	// Rasterizer
 	VkPipelineRasterizationStateCreateInfo rasterizer = {};
@@ -220,11 +223,11 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	colorBlending.pAttachments = &colorBlendAttachment;
 
 	// Dynamic states
-	// std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT};
-	// VkPipelineDynamicStateCreateInfo dynamicCreateInfo = {};
-	// dynamicCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	// dynamicCreateInfo.pDynamicStates = dynamicStateEnables.data();
-	// dynamicCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
+	std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+	VkPipelineDynamicStateCreateInfo dynamicCreateInfo = {};
+	dynamicCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamicCreateInfo.pDynamicStates = dynamicStateEnables.data();
+	dynamicCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
 
 	// Pipeline layout
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
@@ -250,7 +253,7 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	pipelineInfo.pMultisampleState = &multisampling;
 	pipelineInfo.pDepthStencilState = &depthStencil; // Optional
 	pipelineInfo.pColorBlendState = &colorBlending;
-	pipelineInfo.pDynamicState = nullptr; // Optional
+	pipelineInfo.pDynamicState = &dynamicCreateInfo; // Optional
 	pipelineInfo.layout = vk_pipelineLayout;
 	pipelineInfo.renderPass = std::static_pointer_cast<Vermilion::Core::Vulkan::RenderTarget>(renderTarget)->renderpass->vk_renderPass;
 	pipelineInfo.subpass = 0;
@@ -267,6 +270,14 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 void Vermilion::Core::Vulkan::Pipeline::destroy(){
 	vkDestroyPipeline(api->vk_device->vk_device, vk_pipeline, nullptr);
 	vkDestroyPipelineLayout(api->vk_device->vk_device, vk_pipelineLayout, nullptr);
+}
+
+void Vermilion::Core::Vulkan::Pipeline::setViewPort(unsigned int width, unsigned int height, unsigned int x, unsigned int y){
+	this->viewport.width = (float)width;
+	this->viewport.height = -1.0f*(float)height;
+	this->viewport.x = (float)x;
+	this->viewport.y = (float)height-(float)y;
+	this->scissor.extent = {width, height};
 }
 
 void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Binding> binding){

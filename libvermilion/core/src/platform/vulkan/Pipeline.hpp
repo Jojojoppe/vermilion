@@ -60,12 +60,18 @@ class Pipeline : public Vermilion::Core::Pipeline{
 
 		std::unordered_map<std::shared_ptr<Vermilion::Core::Vulkan::Binding>, std::vector<VkDescriptorSet>> descriptorSets;
 
+		// Viewport and sciccors
+		VkViewport viewport;
+		VkRect2D scissor;
+
 		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, 
 			std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings);
 		~Pipeline();
 
 		void destroy();
 		void create();
+
+		virtual void setViewPort(unsigned int width, unsigned height, unsigned int x, unsigned int y) override;
 
 		void bind(std::shared_ptr<Vermilion::Core::Binding> binding);
 

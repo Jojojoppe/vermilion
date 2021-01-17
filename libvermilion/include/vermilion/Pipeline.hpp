@@ -16,6 +16,7 @@ enum PipelineLayoutBinding{
 class Pipeline{
 	public:
 		~Pipeline() = default;
+		virtual void setViewPort(unsigned int width, unsigned int height, unsigned int x=0, unsigned int y=0){};
 };
 
 class Binding{

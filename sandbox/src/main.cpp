@@ -87,6 +87,15 @@ int main(int argc, char ** argv){
 			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
 			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 		});
+		VmPipeline pipeline2 = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
+			Vermilion::Core::BufferLayoutElementFloat4("aPos"),
+			Vermilion::Core::BufferLayoutElementFloat3("aColor"),
+			Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
+		},{
+			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
+			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
+		});
+		pipeline2->setViewPort(renderTargetTexture->width, renderTargetTexture->height);
 
 		// Render object
 		std::vector<float> vertices({
@@ -94,17 +103,10 @@ int main(int argc, char ** argv){
 			0.5	,	-0.5,	0.0,	1.0,		0.0,	1.0,	0.0,		0.0,	0.0,
 			0.5,	0.5,	0.0,	1.0,		0.0,	0.0,	1.0,		0.0,	1.0,
 			-0.5,	0.5,	0.0,	1.0,		1.0,	1.0,	1.0,		1.0,	1.0,
-
-			-0.5,	-0.5,	-0.5,	1.0,		1.0,	0.0,	0.0,		1.0, 	0.0,
-			0.5	,	-0.5,	-0.5,	1.0,		0.0,	1.0,	0.0,		0.0,	0.0,
-			0.5,	0.5,	-0.5,	1.0,		0.0,	0.0,	1.0,		0.0,	1.0,
-			-0.5,	0.5,	-0.5,	1.0,		1.0,	1.0,	1.0,		1.0,	1.0,
 		});
 		std::vector<unsigned int> indices({
 			0, 1, 2,
 			2, 3, 0,
-			4, 5, 6,
-			6, 7, 4,
 		});
 		// Create vertex and index buffers
 		VmVertexBuffer vertexBuffer = vmInstance.createVertexBuffer(vertices);
@@ -119,11 +121,16 @@ int main(int argc, char ** argv){
 		VmUniformBuffer uniformBuffer1 = vmInstance.createUniformBuffer(sizeof(UniformBufferObject));
 		UniformBufferObject uboData1;
 		uboData1.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		uboData1.proj = glm::perspective(glm::radians(45.0f), vmInstance.window->width / (float) vmInstance.window->height, 0.1f, 10.0f); // TODO get window data
+		uboData1.proj = glm::perspective(glm::radians(45.0f), vmInstance.window->width/(float)vmInstance.window->height, 0.1f, 10.0f); // TODO get window data
+		VmUniformBuffer uniformBuffer2 = vmInstance.createUniformBuffer(sizeof(UniformBufferObject));
+		UniformBufferObject uboData2;
+		uboData2.model = glm::mat4(1.0f);
+		uboData2.view = glm::mat4(1.0f);
+		uboData2.proj = glm::mat4(1.0f);
 
 		// Create binding (Must be in the format as the pipeline layoutBinding)
-		VmBinding binding1 = vmInstance.createBinding({uniformBuffer1}, {sampler});
-		VmBinding binding2 = vmInstance.createBinding({uniformBuffer1}, {renderTargetSampler});
+		VmBinding binding2 = vmInstance.createBinding({uniformBuffer2}, {sampler});
+		VmBinding binding1 = vmInstance.createBinding({uniformBuffer1}, {renderTargetSampler});
 
 		float time = 0.0f;
 
@@ -133,14 +140,15 @@ int main(int argc, char ** argv){
 			vmInstance.startRender();
 
 				uboData1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-				vmInstance.streamData(uniformBuffer1, &uboData1);		// TODO move function to uniformBuffer->streamData(&uboData); ....
+				vmInstance.streamData(uniformBuffer1, &uboData1);
+				vmInstance.streamData(uniformBuffer2, &uboData2);
 
 				renderTarget->start();
-					renderTarget->draw(pipeline, binding1, renderObject);
+					renderTarget->draw(pipeline2, binding2, renderObject);
 				renderTarget->end();
 
 				defaultRenderTarget->start();
-					defaultRenderTarget->draw(pipeline, binding2, renderObject);
+					defaultRenderTarget->draw(pipeline, binding1, renderObject);
 				defaultRenderTarget->end();
 
 			vmInstance.endRender({renderTarget});
