@@ -25,14 +25,14 @@ VkFormat VulkanBufferLayoutElementTypeToVulkanBaseType[] = {
 	VK_FORMAT_R8G8B8A8_UNORM,
 };
 
-Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan::API * api, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings){
+Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan::API * api, std::initializer_list<Vermilion::Core::BufferLayoutElement> _vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings){
 	this->api = api;
 	this->instance = api->instance;
 
 	// Vertex data layout
 	// Calculate stride and offset
 	unsigned int offset = 0;
-	for(auto& element : vertexLayout){
+	for(auto& element : _vertexLayout){
 		auto e = element;
 		e.offset = offset;
 		offset += e.size;
@@ -178,7 +178,7 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	// Create descriptors
 	VkVertexInputBindingDescription bindingDescription = {};
 	bindingDescription.binding = 0;
-	bindingDescription.stride = stride;
+	bindingDescription.stride = this->pipelineLayout->stride;
 	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 	int i = 0;
@@ -342,7 +342,6 @@ void Vermilion::Core::Vulkan::Pipeline::setScissor(unsigned int width, unsigned 
 void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Binding> binding){
 	std::shared_ptr<Vermilion::Core::Vulkan::Binding> vkBinding = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding);
 	if(this->descriptorSets.find(vkBinding)==this->descriptorSets.end()){
-		instance->logger.log(VMCORE_LOGLEVEL_INFO, "Creating new binding descriptor set");
 		// Descriptor set not yet created
 		this->descriptorSets[vkBinding] = std::vector<VkDescriptorSet>();
 		std::vector<VkDescriptorSetLayout> layouts(api->vk_swapchain->swapChainImages.size(), this->pipelineLayout->vk_descriptorSetLayout);
@@ -359,14 +358,12 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 		}
 
 		for(int i = 0; i<api->vk_swapchain->swapChainImages.size(); i++){
-			instance->logger.log(VMCORE_LOGLEVEL_INFO, "* swapchain image %d", i);
 			int bo_i = 0;
 			int sam_i = 0;
 			int offset = 0;
 			for(const auto& b : this->pipelineLayout->bindings){
 				switch(b){
 					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
-						instance->logger.log(VMCORE_LOGLEVEL_INFO, " - Uniform buffer");
 						std::shared_ptr<Vermilion::Core::Vulkan::Buffer> bo = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->buffers[bo_i++];
 						VkDescriptorBufferInfo bufferInfo = {};
 						bufferInfo.buffer = bo->vk_buffer;
@@ -391,7 +388,6 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 					} break;
 
 					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER:{
-						instance->logger.log(VMCORE_LOGLEVEL_INFO, " - Storage buffer");
 						std::shared_ptr<Vermilion::Core::Vulkan::Buffer> bo = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->buffers[bo_i++];
 						VkDescriptorBufferInfo bufferInfo = {};
 						bufferInfo.buffer = bo->vk_buffer;
@@ -416,7 +412,6 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 					} break;
 
 					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER:{
-						instance->logger.log(VMCORE_LOGLEVEL_INFO, " - Sampler");
 						std::shared_ptr<Vermilion::Core::Vulkan::Sampler> sam = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->samplers[sam_i++];
 						VkDescriptorImageInfo imageInfo = {};
 						imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
