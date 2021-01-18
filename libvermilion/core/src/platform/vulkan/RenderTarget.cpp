@@ -85,7 +85,7 @@ void Vermilion::Core::Vulkan::RenderTarget::reset(){
 	}
 }
 
-void Vermilion::Core::Vulkan::RenderTarget::start(){
+void Vermilion::Core::Vulkan::RenderTarget::start(float r, float g, float b, float a){
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	beginInfo.flags = 0; // Optional
@@ -103,7 +103,7 @@ void Vermilion::Core::Vulkan::RenderTarget::start(){
 	renderPassInfo.renderArea.offset = {0, 0};
 	renderPassInfo.renderArea.extent = {(uint32_t)this->texture->width, (uint32_t)this->texture->height};
 	std::array<VkClearValue, 2> clearValues{};
-	clearValues[0].color = {1.0f, 0.0f, 0.0f, 1.0f};
+	clearValues[0].color = {r, g, b, a};
 	clearValues[1].depthStencil = {1.0f, 0};
 	renderPassInfo.clearValueCount = 2;
 	renderPassInfo.pClearValues = clearValues.data();
@@ -168,7 +168,7 @@ Vermilion::Core::Vulkan::DefaultRenderTarget::~DefaultRenderTarget(){
 	this->reset();
 }
 
-void Vermilion::Core::Vulkan::DefaultRenderTarget::start(){
+void Vermilion::Core::Vulkan::DefaultRenderTarget::start(float r, float g, float b, float a){
 	int i = this->api->imageIndex;
 	// for (size_t i = 0; i < vk_commandBuffers.size(); i++) {
 		VkCommandBufferBeginInfo beginInfo{};
@@ -188,7 +188,7 @@ void Vermilion::Core::Vulkan::DefaultRenderTarget::start(){
 		renderPassInfo.renderArea.offset = {0, 0};
 		renderPassInfo.renderArea.extent = this->extent;
 		std::array<VkClearValue, 2> clearValues{};
-		clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+		clearValues[0].color = {r, g, b, a};
 		clearValues[1].depthStencil = {1.0f, 0};
 		renderPassInfo.clearValueCount = 2;
 		renderPassInfo.pClearValues = clearValues.data();

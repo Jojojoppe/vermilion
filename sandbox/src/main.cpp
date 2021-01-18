@@ -175,12 +175,14 @@ struct Application{
 
 			ubo1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 			vmInstance->streamData(uniformBuffer1, &ubo1);
+			ubo2.model = glm::rotate(glm::mat4(1.0f), -1*time*glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			vmInstance->streamData(uniformBuffer2, &ubo2);
 
-			textureRenderTarget->start();
+			textureRenderTarget->start(1.0, 0.0, 0.0, 1.0);
 			textureRenderTarget->draw(pipeline2, binding2, object);
 			textureRenderTarget->end();
 
-			defaultRenderTarget->start();
+			defaultRenderTarget->start(0.05, 0.05, 0.05, 1.0);
 			defaultRenderTarget->draw(pipeline1, binding1, object);
 			defaultRenderTarget->end();
 
