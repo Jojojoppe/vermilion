@@ -66,6 +66,7 @@ class API : public Vermilion::Core::API{
 		virtual void init() override;
 		virtual void startRender() override;
 		virtual void endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets) override;
+		virtual void resize() override;
 
 		virtual std::shared_ptr<Vermilion::Core::RenderTarget> getDefaultRenderTarget() override;
 		virtual std::shared_ptr<Vermilion::Core::RenderTarget> createRenderTarget(std::shared_ptr<Vermilion::Core::Texture> texture) override;
@@ -94,7 +95,6 @@ class API : public Vermilion::Core::API{
 
 	private:
 
-		void resize();
 
 		// DEBUG STUFF
 		// -----------

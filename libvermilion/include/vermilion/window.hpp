@@ -33,13 +33,15 @@ class Window{
 		static Window * create(int platform, int renderPlatform, Instance * instance);
 		virtual ~Window() = default;
 
+		virtual void setUserPointer(void * p){};
+
 		virtual void createWindow(int width, int height){};
 		virtual void startRender(){};
 		virtual void endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets){};
 
 		virtual bool shouldClose(){return true;};
 
-		virtual void setResizedCallback(void (*resized)(Instance * instance)){};
+		virtual void setResizedCallback(void (*resized)(Instance * instance, void * userPointer)){};
 		virtual void resized(){};
 
 		virtual void getFrameBufferSize(int * width, int * height){};

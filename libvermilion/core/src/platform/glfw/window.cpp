@@ -36,6 +36,11 @@ void Vermilion::Core::GLFW::Window::createWindow(int width, int height){
 
 	this->window = glfwCreateWindow(this->width, this->height, "floatme", nullptr, nullptr);
 
+	glfwSetWindowUserPointer(this->window, this);
+	glfwSetFramebufferSizeCallback(this->window, [](GLFWwindow * window, int width, int height){
+		((Vermilion::Core::GLFW::Window*)(glfwGetWindowUserPointer(window)))->instance->api->resize();
+	});
+
 	// Initialize render context
 	this->instance->api->init();
 }
@@ -65,12 +70,16 @@ bool Vermilion::Core::GLFW::Window::shouldClose(){
 	return !glfwWindowShouldClose(this->window);
 }
 
-void Vermilion::Core::GLFW::Window::setResizedCallback(void (*resize)(Vermilion::Core::Instance * instance)){
+void Vermilion::Core::GLFW::Window::setUserPointer(void * userPointer){
+	this->userPointer = userPointer;
+}
+
+void Vermilion::Core::GLFW::Window::setResizedCallback(void (*resize)(Vermilion::Core::Instance * instance, void * userPointer)){
 	this->resize = resize;
 }
 void Vermilion::Core::GLFW::Window::resized(){
 	if(this->resize){
-		this->resize(this->instance);
+		this->resize(this->instance, userPointer);
 	}
 }
 

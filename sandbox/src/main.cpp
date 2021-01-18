@@ -9,13 +9,10 @@ struct UniformBufferObject{
 	glm::mat4 proj;
 };
 
-// Main pipeline
-VmPipeline pipeline;
-
-void resize(VmInstance * instance){
+void resize(VmInstance * instance, void * userPointer){
 	int width, height;
 	instance->window->getFrameBufferSize(&width, &height);
-	pipeline->setViewPort(width, height);
+	(*((VmPipeline*)userPointer))->setViewPort(width, height);
 }
 
 int main(int argc, char ** argv){
@@ -37,7 +34,7 @@ int main(int argc, char ** argv){
 			VMCORE_LOGLEVEL_DEBUG,
 		0};
 		VmInstance vmInstance(hintType, hintValue);
-		vmInstance.window->setResizedCallback(resize);
+
 
 		// Create render targets
 		VmRenderTarget defaultRenderTarget = vmInstance.getDefaultRenderTarget();
@@ -89,7 +86,7 @@ int main(int argc, char ** argv){
 		VmShaderProgram shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
 
 		// Create render pipeline
-		pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
+		VmPipeline pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
 			Vermilion::Core::BufferLayoutElementFloat4("aPos"),
 			Vermilion::Core::BufferLayoutElementFloat3("aColor"),
 			Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
@@ -145,6 +142,9 @@ int main(int argc, char ** argv){
 
 		float time = 0.0f;
 
+		vmInstance.window->setResizedCallback(resize);
+		vmInstance.window->setUserPointer(&pipeline);
+
 		while(vmInstance.window->shouldClose()){
 			time += 0.01f;
 
@@ -164,9 +164,6 @@ int main(int argc, char ** argv){
 
 			vmInstance.endRender({renderTarget});
 		}
-
-		// Clean global objects
-		pipeline.reset();
 
 	}catch(std::exception& ex){
 		return 1;

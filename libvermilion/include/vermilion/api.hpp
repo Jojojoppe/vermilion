@@ -44,6 +44,7 @@ class API{
 		virtual void init(){};
 		virtual void startRender(){};
 		virtual void endRender(std::initializer_list<std::shared_ptr<RenderTarget>> extraRenderTargets){};
+		virtual void resize(){};
 
 		virtual std::shared_ptr<RenderTarget> getDefaultRenderTarget(){return nullptr;};
 		virtual std::shared_ptr<RenderTarget> createRenderTarget(std::shared_ptr<Texture> texture){return nullptr;};
