@@ -64,8 +64,8 @@ class Instance{
 		std::shared_ptr<Shader> createShader(const std::string& source, ShaderType type);
 		std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders);
 
-		std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, PipelineSettings settings, 
-			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> layoutBindings);
+		std::shared_ptr<PipelineLayout> createPipelineLayout(std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> bindings);
+		std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, std::shared_ptr<PipelineLayout> pipelineLayout, PipelineSettings settings);
 		std::shared_ptr<Binding> createBinding(std::initializer_list<std::shared_ptr<Buffer>> buffers, std::initializer_list<std::shared_ptr<Sampler>> samplers);
 
 		std::shared_ptr<Buffer> createBuffer(size_t size, BufferType type, BufferUsage usage, BufferDataUsage dataUsage);

@@ -39,6 +39,22 @@ class Binding : public Vermilion::Core::Binding{
 		~Binding();
 };
 
+class PipelineLayout : public Vermilion::Core::PipelineLayout{
+	private:
+		Vermilion::Core::Instance * instance;
+		API * api;
+
+	public:
+		VkPipelineLayout vk_pipelineLayout;
+		VkDescriptorSetLayout vk_descriptorSetLayout;
+		unsigned int stride = 0;
+		std::vector<Vermilion::Core::BufferLayoutElement> vertexLayout;
+		std::vector<Vermilion::Core::PipelineLayoutBinding> bindings;
+
+		PipelineLayout(API * api, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings);
+		~PipelineLayout();
+};
+
 class Pipeline : public Vermilion::Core::Pipeline{
 	private:
 		Vermilion::Core::Instance * instance;
@@ -46,11 +62,8 @@ class Pipeline : public Vermilion::Core::Pipeline{
 
 		std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget;
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram;
-		std::vector<Vermilion::Core::BufferLayoutElement> vertexLayout;
-		std::vector<Vermilion::Core::PipelineLayoutBinding> layoutBindings;
 
 		std::vector<VkDescriptorPool> vk_descriptorPool;
-		VkDescriptorSetLayout vk_descriptorSetLayout;
 
 		unsigned int stride = 0;
 
@@ -58,8 +71,8 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		
 	public:
 		VkPipeline vk_pipeline;
-		VkPipelineLayout vk_pipelineLayout;
 
+		std::shared_ptr<PipelineLayout> pipelineLayout;
 		std::unordered_map<std::shared_ptr<Vermilion::Core::Vulkan::Binding>, std::vector<VkDescriptorSet>> descriptorSets;
 
 		// Viewport and sciccors
@@ -67,7 +80,7 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		VkRect2D scissor;
 
 		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, Vermilion::Core::PipelineSettings settings,
-			std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings);
+			std::shared_ptr<Vermilion::Core::PipelineLayout> pipelineLayout);
 		~Pipeline();
 
 		void destroy();

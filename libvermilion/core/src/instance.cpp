@@ -55,10 +55,13 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Instance::creat
 	return this->api->createShaderProgram(shaders);
 }
 
+std::shared_ptr<Vermilion::Core::PipelineLayout> Vermilion::Core::Instance::createPipelineLayout(std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings){
+	return this->api->createPipelineLayout(vertexLayout, bindings);
+}
+
 std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Instance::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
-		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, Vermilion::Core::PipelineSettings settings, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-		std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings){
-	return this->api->createPipeline(renderTarget, shaderProgram, settings, vertexLayout, layoutBindings);
+		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::shared_ptr<Vermilion::Core::PipelineLayout> pipelineLayout, Vermilion::Core::PipelineSettings settings){
+	return this->api->createPipeline(renderTarget, shaderProgram, pipelineLayout, settings);
 }
 
 std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Instance::createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::Buffer>> buffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){

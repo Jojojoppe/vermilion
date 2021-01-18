@@ -23,6 +23,7 @@ class GUI{
         VmShader fragmentShader;
         VmShaderProgram shaderProgram;
 
+        VmPipelineLayout pipelineLayout;
         VmPipeline pipeline;
         VmBinding binding;
 

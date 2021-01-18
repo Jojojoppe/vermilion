@@ -22,6 +22,7 @@ typedef Vermilion::Core::Instance VmInstance;
 typedef std::shared_ptr<Vermilion::Core::RenderTarget> VmRenderTarget;
 typedef std::shared_ptr<Vermilion::Core::Shader> VmShader;
 typedef std::shared_ptr<Vermilion::Core::ShaderProgram> VmShaderProgram;
+typedef std::shared_ptr<Vermilion::Core::PipelineLayout> VmPipelineLayout;
 typedef std::shared_ptr<Vermilion::Core::Pipeline> VmPipeline;
 typedef std::shared_ptr<Vermilion::Core::Buffer> VmBuffer;
 typedef std::shared_ptr<Vermilion::Core::Renderable> VmRenderable;

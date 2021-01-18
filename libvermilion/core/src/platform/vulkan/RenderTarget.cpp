@@ -135,7 +135,7 @@ void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core
 	vkCmdBindVertexBuffers(vk_commandBuffer, 0, 1, vertexBuffers, offsets);
 	vkCmdBindIndexBuffer(vk_commandBuffer, vkIndexBuffer->vk_buffer, 0, VK_INDEX_TYPE_UINT32);
 	// TODO fix the array in descriptorSets[vkBinding]
-	vkCmdBindDescriptorSets(vk_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->vk_pipelineLayout, 0, 1, &vkPipeline->descriptorSets[vkBinding][0], 0, nullptr);
+	vkCmdBindDescriptorSets(vk_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->pipelineLayout->vk_pipelineLayout, 0, 1, &vkPipeline->descriptorSets[vkBinding][0], 0, nullptr);
 	vkCmdDrawIndexed(vk_commandBuffer, renderable->length, instanceCount, renderable->indexOffset, renderable->vertexOffset, firstInstance);
 }
 
@@ -225,7 +225,7 @@ void Vermilion::Core::Vulkan::DefaultRenderTarget::draw(std::shared_ptr<Vermilio
 	vkCmdSetScissor(vk_commandBuffers[i], 0, 1, &vkPipeline->scissor);
 		vkCmdBindVertexBuffers(vk_commandBuffers[i], 0, 1, vertexBuffers, offsets);
 		vkCmdBindIndexBuffer(vk_commandBuffers[i], vkIndexBuffer->vk_buffer, 0, VK_INDEX_TYPE_UINT32);
-		vkCmdBindDescriptorSets(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->vk_pipelineLayout, 0, 1, &vkPipeline->descriptorSets[vkBinding][i], 0, nullptr);
+		vkCmdBindDescriptorSets(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline->pipelineLayout->vk_pipelineLayout, 0, 1, &vkPipeline->descriptorSets[vkBinding][i], 0, nullptr);
 		vkCmdDrawIndexed(vk_commandBuffers[i], renderable->length, instanceCount, renderable->indexOffset, renderable->vertexOffset, firstInstance);
 	// }
 }

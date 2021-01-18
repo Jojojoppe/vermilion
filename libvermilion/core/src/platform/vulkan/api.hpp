@@ -73,9 +73,9 @@ class API : public Vermilion::Core::API{
 		virtual std::shared_ptr<Vermilion::Core::Shader> createShader(const std::string& source, Vermilion::Core::ShaderType type) override;
 		virtual std::shared_ptr<Vermilion::Core::ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders) override;
 
+		virtual std::shared_ptr<Vermilion::Core::PipelineLayout> createPipelineLayout(std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings) override;
 		virtual std::shared_ptr<Vermilion::Core::Pipeline> createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
-			std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, Vermilion::Core::PipelineSettings settings, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
-			std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings) override;
+			std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::shared_ptr<Vermilion::Core::PipelineLayout> pipelineLayout, Vermilion::Core::PipelineSettings settings) override;
 		virtual std::shared_ptr<Vermilion::Core::Binding> createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::Buffer>> buffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers)override;
 
 		virtual std::shared_ptr<Vermilion::Core::Buffer> createBuffer(size_t size, Vermilion::Core::BufferType type, Vermilion::Core::BufferUsage usage, Vermilion::Core::BufferDataUsage dataUsage) override;

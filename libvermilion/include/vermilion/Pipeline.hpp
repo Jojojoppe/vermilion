@@ -38,6 +38,11 @@ struct PipelineSettings{
 	PipelineSettingsPolygonMode poygonmode = PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE;
 };
 
+class PipelineLayout{
+	public:
+		~PipelineLayout() = default;
+};
+
 class Pipeline{
 	public:
 		~Pipeline() = default;
