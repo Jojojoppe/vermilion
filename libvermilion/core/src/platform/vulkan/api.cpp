@@ -26,10 +26,6 @@ Vermilion::Core::Vulkan::API::~API(){
 
 	vkDeviceWaitIdle(vk_device->vk_device);
 
-	for(int i=0; i<uniformBuffers.size(); i++){
-		uniformBuffers[i].reset();
-	}
-
 	for(int i=0; i<pipelines.size(); i++){
 		pipelines[i].reset();
 	}
@@ -258,37 +254,20 @@ std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createP
 	return std::static_pointer_cast<Vermilion::Core::Pipeline>(newpipeline);
 }
 
-std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Vulkan::API::createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
-	return std::static_pointer_cast<Vermilion::Core::Binding>(std::make_shared<Vermilion::Core::Vulkan::Binding>(this, uniformBuffers, samplers));
+std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Vulkan::API::createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::Buffer>> buffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+	return std::static_pointer_cast<Vermilion::Core::Binding>(std::make_shared<Vermilion::Core::Vulkan::Binding>(this, buffers, samplers));
 }
 
-std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Vulkan::API::createVertexBuffer(size_t size, Vermilion::Core::BufferType type){
-	return std::static_pointer_cast<Vermilion::Core::VertexBuffer>(std::make_shared<Vermilion::Core::Vulkan::VertexBuffer>(this, size, type));
+std::shared_ptr<Vermilion::Core::Buffer> Vermilion::Core::Vulkan::API::createBuffer(size_t size, Vermilion::Core::BufferType type, Vermilion::Core::BufferUsage usage, Vermilion::Core::BufferDataUsage dataUsage){
+	return std::static_pointer_cast<Vermilion::Core::Buffer>(std::make_shared<Vermilion::Core::Vulkan::Buffer>(this, size, type, usage, dataUsage));
 }
 
-std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Vulkan::API::createIndexBuffer(size_t size, Vermilion::Core::BufferType type){
-	return std::static_pointer_cast<Vermilion::Core::IndexBuffer>(std::make_shared<Vermilion::Core::Vulkan::IndexBuffer>(this, size, type));
-}
-
-std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Vulkan::API::createUniformBuffer(size_t length, Vermilion::Core::BufferType type){
-	auto n = std::make_shared<Vermilion::Core::Vulkan::UniformBuffer>(this, length, type);
-	uniformBuffers.push_back(n);
-	return std::static_pointer_cast<Vermilion::Core::UniformBuffer>(n);
-}
-
-std::shared_ptr<Vermilion::Core::StorageBuffer> Vermilion::Core::Vulkan::API::createStorageBuffer(size_t size, Vermilion::Core::BufferType type){
-	return std::static_pointer_cast<Vermilion::Core::StorageBuffer>(std::make_shared<Vermilion::Core::Vulkan::StorageBuffer>(this, size, type));
-}
-
-std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Vulkan::API::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
+std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Vulkan::API::createRenderable(std::shared_ptr<Vermilion::Core::Buffer> vertexBuffer, std::shared_ptr<Vermilion::Core::Buffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
 	return std::static_pointer_cast<Vermilion::Core::Renderable>(std::make_shared<Vermilion::Core::Vulkan::Renderable>(this, vertexBuffer, indexBuffer, vertexOffset, indexOffset, length));
 }
 
-std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Vulkan::API::createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){
-	return std::static_pointer_cast<Vermilion::Core::Texture>(std::make_shared<Vermilion::Core::Vulkan::Texture>(this, path, width, height, channels));
-}
-std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Vulkan::API::createTexture(void * data, size_t width, size_t height, unsigned int channels){
-	return std::static_pointer_cast<Vermilion::Core::Texture>(std::make_shared<Vermilion::Core::Vulkan::Texture>(this, data, width, height, channels));
+std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Vulkan::API::createTexture(size_t width, size_t height, unsigned int channels){
+	return std::static_pointer_cast<Vermilion::Core::Texture>(std::make_shared<Vermilion::Core::Vulkan::Texture>(this, width, height, channels));
 }
 
 std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Vulkan::API::createSampler(std::shared_ptr<Vermilion::Core::Texture> texture){

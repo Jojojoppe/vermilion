@@ -10,9 +10,36 @@ namespace Vermilion{
 namespace Core{
 
 enum BufferType{
-	BUFFER_TYPE_STATIC = 0,
-	BUFFER_TYPE_STREAMING
+	BUFFER_TYPE_VERTEX,
+	BUFFER_TYPE_INDEX,
+	BUFFER_TYPE_UNIFORM,
+	BUFFER_TYPE_STORAGE
 };
+
+enum BufferUsage{
+	BUFFER_USAGE_READ_WRITE,
+	BUFFER_USAGE_WRITE_ONLY,
+	BUFFER_USAGE_READ_ONLY
+};
+
+enum BufferDataUsage{
+	BUFFER_DATA_USAGE_STATIC,
+	BUFFER_DATA_USAGE_DYNAMIC
+};
+
+class Buffer{
+	public:
+		BufferType type;
+		BufferUsage usage;
+		BufferDataUsage dataUsage;
+		size_t size;
+
+		~Buffer() = default;
+		virtual void setData(void * data, size_t size=0){};
+		virtual void getData(void * data, size_t size){};
+};
+
+// --------------------------------------------------
 
 enum BufferLayoutElementType{
 	BUFFER_LAYOUT_ELEMENT_TYPE_NONE = 0,
@@ -66,37 +93,6 @@ struct BufferLayoutElementByte4 : public BufferLayoutElement{
 		BufferLayoutElement(name, 4, sizeof(char), normalized){
 			type = BUFFER_LAYOUT_ELEMENT_TYPE_BYTE4;
 		}
-};
-
-class Buffer{
-	public:
-		size_t size;
-		unsigned int count;
-		size_t element_size;
-		BufferType type;
-		~Buffer() = default;
-
-		virtual void setData(void * data, size_t size=0){};
-};
-
-class VertexBuffer : public Buffer{
-	public:
-		~VertexBuffer() = default;
-};
-
-class IndexBuffer : public Buffer{
-	public:
-		~IndexBuffer() = default;
-};
-
-class UniformBuffer : public Buffer{
-	public:
-		~UniformBuffer() = default;
-};
-
-class StorageBuffer : public Buffer{
-	public:
-		~StorageBuffer() = default;
 };
 
 }}

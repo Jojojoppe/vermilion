@@ -64,6 +64,16 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 				layoutBindingsVector.push_back(uboLayoutBinding);
 			} break;
 
+			case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER:{
+				VkDescriptorSetLayoutBinding uboLayoutBinding = {};
+				uboLayoutBinding.binding = binding++;
+				uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+				uboLayoutBinding.descriptorCount = 1;
+				uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+				uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+				layoutBindingsVector.push_back(uboLayoutBinding);
+			} break;
+
 			case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER:{
 				VkDescriptorSetLayoutBinding texLayoutBinding = {};
 				texLayoutBinding.binding = binding++;
@@ -339,17 +349,17 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 		}
 
 		for(int i = 0; i<api->vk_swapchain->swapChainImages.size(); i++){
-			int ubo_i = 0;
+			int bo_i = 0;
 			int sam_i = 0;
 			int offset = 0;
 			for(const auto& b : this->layoutBindings){
 				switch(b){
 					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
-						std::shared_ptr<Vermilion::Core::Vulkan::UniformBuffer> ubo = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->uniformBuffers[ubo_i++];
+						std::shared_ptr<Vermilion::Core::Vulkan::Buffer> bo = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->buffers[bo_i++];
 						VkDescriptorBufferInfo bufferInfo = {};
-						bufferInfo.buffer = ubo->vk_buffer;
+						bufferInfo.buffer = bo->vk_buffer;
 						bufferInfo.offset = 0;
-						bufferInfo.range = ubo->size;
+						bufferInfo.range = bo->size;
 						
 						VkWriteDescriptorSet descriptorWrite = {};
 						descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -357,6 +367,34 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 						descriptorWrite.dstBinding = offset++;
 						descriptorWrite.dstArrayElement = 0;
 						descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+						if(bo->type!=BUFFER_TYPE_UNIFORM){
+							this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Buffer in binding %d is not uniform buffer", offset-1);
+							throw std::runtime_error("Vermilion::Core::Vulkan::Binding::Binding() - Buffer is not uniform buffer");
+						}
+						descriptorWrite.descriptorCount = 1;
+						descriptorWrite.pBufferInfo = &bufferInfo;
+						descriptorWrite.pImageInfo = nullptr;
+						descriptorWrite.pTexelBufferView = nullptr;
+						vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
+					} break;
+
+					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER:{
+						std::shared_ptr<Vermilion::Core::Vulkan::Buffer> bo = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->buffers[bo_i++];
+						VkDescriptorBufferInfo bufferInfo = {};
+						bufferInfo.buffer = bo->vk_buffer;
+						bufferInfo.offset = 0;
+						bufferInfo.range = bo->size;
+						
+						VkWriteDescriptorSet descriptorWrite = {};
+						descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+						descriptorWrite.dstSet = (this->descriptorSets[vkBinding])[i];
+						descriptorWrite.dstBinding = offset++;
+						descriptorWrite.dstArrayElement = 0;
+						descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+						if(bo->type!=BUFFER_TYPE_STORAGE){
+							this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Buffer in binding %d is not storage buffer", offset-1);
+							throw std::runtime_error("Vermilion::Core::Vulkan::Binding::Binding() - Buffer is not storage buffer");
+						}
 						descriptorWrite.descriptorCount = 1;
 						descriptorWrite.pBufferInfo = &bufferInfo;
 						descriptorWrite.pImageInfo = nullptr;
@@ -392,11 +430,11 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 	}
 }
 
-Vermilion::Core::Vulkan::Binding::Binding(Vermilion::Core::Vulkan::API* api, std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+Vermilion::Core::Vulkan::Binding::Binding(Vermilion::Core::Vulkan::API* api, std::initializer_list<std::shared_ptr<Vermilion::Core::Buffer>> buffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
 	this->api = api;
 	this->instance = api->instance;
-	for(const auto& u : uniformBuffers){
-		this->uniformBuffers.push_back(std::static_pointer_cast<Vermilion::Core::Vulkan::UniformBuffer>(u));
+	for(const auto& u : buffers){
+		this->buffers.push_back(std::static_pointer_cast<Vermilion::Core::Vulkan::Buffer>(u));
 	}
 	for(const auto& s : samplers){
 		this->samplers.push_back(std::static_pointer_cast<Vermilion::Core::Vulkan::Sampler>(s));

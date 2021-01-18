@@ -119,8 +119,8 @@ void Vermilion::Core::Vulkan::RenderTarget::end(){
 }
 
 void Vermilion::Core::Vulkan::RenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance){
-	std::shared_ptr<Vermilion::Core::Vulkan::VertexBuffer> vkVertexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::VertexBuffer>(renderable->vertexBuffer);	
-	std::shared_ptr<Vermilion::Core::Vulkan::IndexBuffer> vkIndexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::IndexBuffer>(renderable->indexBuffer);	
+	std::shared_ptr<Vermilion::Core::Vulkan::Buffer> vkVertexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::Buffer>(renderable->vertexBuffer);	
+	std::shared_ptr<Vermilion::Core::Vulkan::Buffer> vkIndexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::Buffer>(renderable->indexBuffer);	
 	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> vkPipeline = std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline);
 	std::shared_ptr<Vermilion::Core::Vulkan::Binding> vkBinding = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding);
 
@@ -208,8 +208,8 @@ void Vermilion::Core::Vulkan::DefaultRenderTarget::end(){
 }
 
 void Vermilion::Core::Vulkan::DefaultRenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance){
-	std::shared_ptr<Vermilion::Core::Vulkan::VertexBuffer> vkVertexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::VertexBuffer>(renderable->vertexBuffer);	
-	std::shared_ptr<Vermilion::Core::Vulkan::IndexBuffer> vkIndexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::IndexBuffer>(renderable->indexBuffer);	
+	std::shared_ptr<Vermilion::Core::Vulkan::Buffer> vkVertexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::Buffer>(renderable->vertexBuffer);	
+	std::shared_ptr<Vermilion::Core::Vulkan::Buffer> vkIndexBuffer = std::static_pointer_cast<Vermilion::Core::Vulkan::Buffer>(renderable->indexBuffer);	
 	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> vkPipeline = std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline);
 	std::shared_ptr<Vermilion::Core::Vulkan::Binding> vkBinding = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding);
 

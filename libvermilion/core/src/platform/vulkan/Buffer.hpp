@@ -22,7 +22,7 @@ class API;
 
 void createBuffer(API * api, size_t size, VkBufferUsageFlags usage, VmaMemoryUsage properties, VkBuffer& buffer, VmaAllocation& memory);
 
-class VertexBuffer : public Vermilion::Core::VertexBuffer{
+class Buffer : public Vermilion::Core::Buffer{
 	private:
 		Vermilion::Core::Instance * instance;
 		API * api;
@@ -31,55 +31,11 @@ class VertexBuffer : public Vermilion::Core::VertexBuffer{
 		VkBuffer vk_buffer;
 		VmaAllocation vk_allocation;
 
-		VertexBuffer(API * api, size_t, Vermilion::Core::BufferType type);
-		~VertexBuffer();
+		Buffer(API * api, size_t, Vermilion::Core::BufferType type, Vermilion::Core::BufferUsage usage, Vermilion::Core::BufferDataUsage dataUsage);
+		~Buffer();
 
 		virtual void setData(void * data, size_t size) override;
-};
-
-class IndexBuffer : public Vermilion::Core::IndexBuffer{
-	private:
-		Vermilion::Core::Instance * instance;
-		API * api;
-
-	public:
-		VkBuffer vk_buffer;
-		VmaAllocation vk_allocation;
-
-		IndexBuffer(API * api, size_t, Vermilion::Core::BufferType type);
-		~IndexBuffer();
-
-		virtual void setData(void * data, size_t size) override;
-};
-
-class UniformBuffer : public Vermilion::Core::UniformBuffer{
-	private:
-		Vermilion::Core::Instance * instance;
-		API * api;
-
-	public:
-		VkBuffer vk_buffer;
-		VmaAllocation vk_allocation;
-
-		UniformBuffer(API * api, size_t size, Vermilion::Core::BufferType type);
-		~UniformBuffer();
-
-		virtual void setData(void * data, size_t size) override;
-};
-
-class StorageBuffer : public Vermilion::Core::StorageBuffer{
-	private:
-		Vermilion::Core::Instance * instance;
-		API * api;
-
-	public:
-		VkBuffer vk_buffer;
-		VmaAllocation vk_allocation;
-
-		StorageBuffer(API * api, size_t size, Vermilion::Core::BufferType type);
-		~StorageBuffer();
-
-		virtual void setData(void * data, size_t size) override;
+		virtual void getData(void * data, size_t size) override;
 };
 
 }}}

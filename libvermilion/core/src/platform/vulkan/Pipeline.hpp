@@ -23,7 +23,7 @@ class RenderTarget;
 namespace Vulkan{
 
 class API;
-class UniformBuffer;
+class Buffer;
 class Sampler;
 
 class Binding : public Vermilion::Core::Binding{
@@ -32,10 +32,10 @@ class Binding : public Vermilion::Core::Binding{
 		API * api;
 
 	public:
-		std::vector<std::shared_ptr<Vermilion::Core::Vulkan::UniformBuffer>> uniformBuffers;
+		std::vector<std::shared_ptr<Vermilion::Core::Vulkan::Buffer>> buffers;
 		std::vector<std::shared_ptr<Vermilion::Core::Vulkan::Sampler>> samplers;
 
-		Binding(API * api, std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers);
+		Binding(API * api, std::initializer_list<std::shared_ptr<Vermilion::Core::Buffer>> buffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers);
 		~Binding();
 };
 

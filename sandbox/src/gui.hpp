@@ -13,11 +13,11 @@ class GUI{
         VmTexture texture;
         VmSampler sampler;
 
-        VmVertexBuffer vertexBuffer;
-        VmIndexBuffer indexBuffer;
+        VmBuffer vertexBuffer;
+        VmBuffer indexBuffer;
         VmRenderable renderable;
         
-        VmUniformBuffer uniformBuffer;
+        VmBuffer uniformBuffer;
 
         VmShader vertexShader;
         VmShader fragmentShader;

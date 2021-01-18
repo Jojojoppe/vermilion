@@ -32,12 +32,12 @@ struct Application{
 	VmBinding binding1;
 	VmBinding binding2;
 
-	VmVertexBuffer vertexBuffer;
-	VmIndexBuffer indexBuffer;
+	VmBuffer vertexBuffer;
+	VmBuffer indexBuffer;
 	VmRenderable object;
 
-	VmUniformBuffer uniformBuffer1;
-	VmUniformBuffer uniformBuffer2;
+	VmBuffer uniformBuffer1;
+	VmBuffer uniformBuffer2;
 
 	UniformBufferObject ubo1;
 	UniformBufferObject ubo2;
@@ -77,9 +77,14 @@ struct Application{
 
 		gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
 
-		texture1 = vmInstance->createTexture("../assets/texture1.jpg");
-		texture2 = vmInstance->createTexture("", 512, 512, 4);
+		size_t width, height, channels;
+		unsigned char * texture1_pixels = Vermilion::Core::loadTextureData("../assets/texture1.jpg", &width, &height, &channels);
+		texture1 = vmInstance->createTexture(width, height, 4);
+		texture1->setData(texture1_pixels);
+		Vermilion::Core::freeTextureData(texture1_pixels);
 		sampler1 = vmInstance->createSampler(texture1);
+
+		texture2 = vmInstance->createTexture(512, 512, 4);
 		sampler2 = vmInstance->createSampler(texture2);
 
 		defaultRenderTarget = vmInstance->getDefaultRenderTarget();
@@ -162,14 +167,30 @@ struct Application{
 			0, 1, 2,
 			2, 3, 0,
 		});
-		vertexBuffer = vmInstance->createVertexBuffer(sizeof(float)*vertices.size());
-		indexBuffer = vmInstance->createIndexBuffer(sizeof(unsigned int)*indices.size());
+		vertexBuffer = vmInstance->createBuffer(sizeof(float)*vertices.size(), 
+			Vermilion::Core::BufferType::BUFFER_TYPE_VERTEX,
+			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
+			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_STATIC
+		);
+		indexBuffer = vmInstance->createBuffer(sizeof(unsigned int)*indices.size(),
+			Vermilion::Core::BufferType::BUFFER_TYPE_INDEX,
+			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
+			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_STATIC
+		);
 		vertexBuffer->setData(vertices.data());
 		indexBuffer->setData(indices.data());
 		object = vmInstance->createRenderable(vertexBuffer, indexBuffer, 0, 0, indices.size());
 
-		uniformBuffer1 = vmInstance->createUniformBuffer(sizeof(UniformBufferObject));
-		uniformBuffer2 = vmInstance->createUniformBuffer(sizeof(UniformBufferObject));
+		uniformBuffer1 = vmInstance->createBuffer(sizeof(UniformBufferObject),
+			Vermilion::Core::BufferType::BUFFER_TYPE_UNIFORM,
+			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
+			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
+		);
+		uniformBuffer2 = vmInstance->createBuffer(sizeof(UniformBufferObject),
+			Vermilion::Core::BufferType::BUFFER_TYPE_UNIFORM,
+			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
+			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
+		);
 
 		ubo1.model = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ubo1.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));

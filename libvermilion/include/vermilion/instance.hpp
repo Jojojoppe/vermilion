@@ -66,18 +66,14 @@ class Instance{
 
 		std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, PipelineSettings settings, 
 			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> layoutBindings);
-		std::shared_ptr<Binding> createBinding(std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Sampler>> samplers);
+		std::shared_ptr<Binding> createBinding(std::initializer_list<std::shared_ptr<Buffer>> buffers, std::initializer_list<std::shared_ptr<Sampler>> samplers);
 
-		std::shared_ptr<VertexBuffer> createVertexBuffer(size_t size, BufferType type = BufferType::BUFFER_TYPE_STATIC);
-		std::shared_ptr<IndexBuffer> createIndexBuffer(size_t size, BufferType type = BufferType::BUFFER_TYPE_STATIC);
-		std::shared_ptr<UniformBuffer> createUniformBuffer(size_t size, BufferType type = BufferType::BUFFER_TYPE_STREAMING);
-		std::shared_ptr<StorageBuffer> createStorageBuffer(size_t size, BufferType type = BufferType::BUFFER_TYPE_STATIC);
+		std::shared_ptr<Buffer> createBuffer(size_t size, BufferType type, BufferUsage usage, BufferDataUsage dataUsage);
 
-		std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, 
+		std::shared_ptr<Renderable> createRenderable(std::shared_ptr<Buffer> vertexBuffer, std::shared_ptr<Buffer> indexBuffer, 
 			unsigned int vertexOffset, unsigned int indexOffset, unsigned int length);
 
-		std::shared_ptr<Texture> createTexture(const std::string& path="", size_t width=0, size_t height=0, unsigned int channels=0);
-		std::shared_ptr<Texture> createTexture(void * data, size_t width=0, size_t height=0, unsigned int channels=0);
+		std::shared_ptr<Texture> createTexture(size_t width=0, size_t height=0, unsigned int channels=0);
 		std::shared_ptr<Sampler> createSampler(std::shared_ptr<Texture> texture);
 
 	private:

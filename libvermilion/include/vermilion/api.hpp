@@ -54,18 +54,14 @@ class API{
 
 		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, PipelineSettings settings,
 			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> layoutBindings){return nullptr;};
-		virtual std::shared_ptr<Binding> createBinding(std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Sampler>> samplers){return nullptr;};
+		virtual std::shared_ptr<Binding> createBinding(std::initializer_list<std::shared_ptr<Buffer>> buffers, std::initializer_list<std::shared_ptr<Sampler>> samplers){return nullptr;};
 
-		virtual std::shared_ptr<VertexBuffer> createVertexBuffer(size_t size, BufferType type){return nullptr;};
-		virtual std::shared_ptr<IndexBuffer> createIndexBuffer(size_t size, BufferType type){return nullptr;};
-		virtual std::shared_ptr<UniformBuffer> createUniformBuffer(size_t size, BufferType type){return nullptr;};
-		virtual std::shared_ptr<StorageBuffer> createStorageBuffer(size_t size, BufferType type){return nullptr;};
+		virtual std::shared_ptr<Buffer> createBuffer(size_t size, BufferType type, BufferUsage usage, BufferDataUsage dataUsage){return nullptr;};
 
-		virtual std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, 
+		virtual std::shared_ptr<Renderable> createRenderable(std::shared_ptr<Buffer> vertexBuffer, std::shared_ptr<Buffer> indexBuffer, 
 			unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){return nullptr;};
 
-		virtual std::shared_ptr<Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){return nullptr;};
-		virtual std::shared_ptr<Texture> createTexture(void * data, size_t width, size_t height, unsigned int channels){return nullptr;};
+		virtual std::shared_ptr<Texture> createTexture(size_t width, size_t height, unsigned int channels){return nullptr;};
 		virtual std::shared_ptr<Sampler> createSampler(std::shared_ptr<Texture> texture){return nullptr;};
 
 	private:

@@ -1,4 +1,5 @@
 #include <vermilion/instance.hpp>
+#include <stdexcept>
 
 Vermilion::Core::Instance::Instance(int * hintType, int * hintValue){
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "Initializing Vermilion");
@@ -60,35 +61,24 @@ std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Instance::createPipe
 	return this->api->createPipeline(renderTarget, shaderProgram, settings, vertexLayout, layoutBindings);
 }
 
-std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Instance::createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
-	return this->api->createBinding(uniformBuffers, samplers);
+std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Instance::createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::Buffer>> buffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+	return this->api->createBinding(buffers, samplers);
 }
 
-std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(size_t size, Vermilion::Core::BufferType type){
-	return this->api->createVertexBuffer(size, type);
+std::shared_ptr<Vermilion::Core::Buffer> Vermilion::Core::Instance::createBuffer(size_t size, Vermilion::Core::BufferType type, Vermilion::Core::BufferUsage usage, Vermilion::Core::BufferDataUsage dataUsage){
+	return this->api->createBuffer(size, type, usage, dataUsage);
 }
 
-std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Instance::createIndexBuffer(size_t size, Vermilion::Core::BufferType type){
-	return this->api->createIndexBuffer(size, type);
-}
-
-std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Instance::createUniformBuffer(size_t size, Vermilion::Core::BufferType type){
-	return this->api->createUniformBuffer(size, type);
-}
-
-std::shared_ptr<Vermilion::Core::StorageBuffer> Vermilion::Core::Instance::createStorageBuffer(size_t size, Vermilion::Core::BufferType type){
-	return this->api->createStorageBuffer(size, type);
-}
-
-std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Instance::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
+std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Instance::createRenderable(std::shared_ptr<Vermilion::Core::Buffer> vertexBuffer, std::shared_ptr<Vermilion::Core::Buffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
+	if(vertexBuffer->type!=BUFFER_TYPE_VERTEX || indexBuffer->type!=BUFFER_TYPE_INDEX){
+		this->logger.log(VMCORE_LOGLEVEL_FATAL, "Buffers not of right type");
+		throw std::runtime_error("Vermilion::Core::nstance::CreateRenderable() - Buffers not of right type");
+	}
 	return this->api->createRenderable(vertexBuffer, indexBuffer, vertexOffset, indexOffset, length);
 }
 
-std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Instance::createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){
-	return this->api->createTexture(path, width, height, channels);
-}
-std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Instance::createTexture(void * data, size_t width, size_t height, unsigned int channels){
-	return this->api->createTexture(data, width, height, channels);
+std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Instance::createTexture(size_t width, size_t height, unsigned int channels){
+	return this->api->createTexture(width, height, channels);
 }
 
 

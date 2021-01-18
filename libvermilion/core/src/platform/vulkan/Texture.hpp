@@ -31,9 +31,10 @@ class Texture : public Vermilion::Core::Texture{
 		std::unique_ptr<vkImageView2D> vk_imageView;
 		VkFormat format;
 
-		Texture(API * api, const std::string& path, size_t width, size_t height, unsigned int channels);
-		Texture(API * api, void * data, size_t width, size_t height, unsigned int channels);
+		Texture(API * api, size_t width, size_t height, unsigned int channels);
 		~Texture();
+
+		virtual void setData(void * data, size_t size) override;
 };
 
 class Sampler : public Vermilion::Core::Sampler{

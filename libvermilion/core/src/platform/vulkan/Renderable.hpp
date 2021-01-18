@@ -26,7 +26,7 @@ class Renderable : public Vermilion::Core::Renderable{
 		API * api;
 
 	public:
-		Renderable(API * api, std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length);
+		Renderable(API * api, std::shared_ptr<Vermilion::Core::Buffer> vertexBuffer, std::shared_ptr<Vermilion::Core::Buffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length);
 		~Renderable();
 };
 

@@ -12,8 +12,8 @@ namespace Core{
 
 class Renderable{
     public:
-        std::shared_ptr<VertexBuffer> vertexBuffer;
-        std::shared_ptr<IndexBuffer> indexBuffer;
+        std::shared_ptr<Buffer> vertexBuffer;
+        std::shared_ptr<Buffer> indexBuffer;
 
         unsigned int vertexOffset;
         unsigned int indexOffset;

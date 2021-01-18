@@ -26,7 +26,8 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
     io.Fonts->GetTexDataAsRGBA32(&pixels, &Twidth, &Theight);
 
     renderTarget = instance->getDefaultRenderTarget();
-    texture = instance->createTexture(pixels, Twidth, Theight, 4);
+    texture = instance->createTexture(Twidth, Theight, 4);
+    texture->setData(pixels);
     sampler = instance->createSampler(texture);
 
     vertexShader = instance->createShader(R"(
@@ -79,9 +80,21 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
             Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
     });
 
-    uniformBuffer = instance->createUniformBuffer(sizeof(UniformBufferType));
-    vertexBuffer = instance->createVertexBuffer(1024*1024, Vermilion::Core::BufferType::BUFFER_TYPE_STREAMING);
-    indexBuffer = instance->createIndexBuffer(1024*1024, Vermilion::Core::BufferType::BUFFER_TYPE_STREAMING);
+    uniformBuffer = instance->createBuffer(sizeof(UniformBufferType),
+        Vermilion::Core::BufferType::BUFFER_TYPE_UNIFORM,
+        Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
+        Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
+    );
+    vertexBuffer = instance->createBuffer(1024*1024, 
+        Vermilion::Core::BufferType::BUFFER_TYPE_VERTEX,
+        Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
+        Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
+    );
+    indexBuffer = instance->createBuffer(1024*1024,
+        Vermilion::Core::BufferType::BUFFER_TYPE_INDEX,
+        Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
+        Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC   
+    );
     renderable = instance->createRenderable(vertexBuffer, indexBuffer, 0, 0, 0);
 
     binding = instance->createBinding({uniformBuffer}, {sampler});
