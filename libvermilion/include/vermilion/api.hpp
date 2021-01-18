@@ -56,13 +56,11 @@ class API{
 			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> layoutBindings){return nullptr;};
 		virtual std::shared_ptr<Binding> createBinding(std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Sampler>> samplers){return nullptr;};
 
-		virtual std::shared_ptr<VertexBuffer> createVertexBuffer(std::vector<float>& vertices){return nullptr;};
-		virtual std::shared_ptr<IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices){return nullptr;};
-		virtual std::shared_ptr<UniformBuffer> createUniformBuffer(size_t length){return nullptr;};
+		virtual std::shared_ptr<VertexBuffer> createVertexBuffer(std::vector<float>& vertices, BufferType type){return nullptr;};
+		virtual std::shared_ptr<IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices, BufferType type){return nullptr;};
+		virtual std::shared_ptr<UniformBuffer> createUniformBuffer(size_t length, BufferType type){return nullptr;};
 		virtual std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, 
 			unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){return nullptr;};
-
-		virtual void streamData(std::shared_ptr<UniformBuffer> uniformBuffer, void * data){};
 
 		virtual std::shared_ptr<Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){return nullptr;};
 		virtual std::shared_ptr<Sampler> createSampler(std::shared_ptr<Texture> texture){return nullptr;};

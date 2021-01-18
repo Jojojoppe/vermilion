@@ -64,24 +64,20 @@ std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Instance::createBindi
 	return this->api->createBinding(uniformBuffers, samplers);
 }
 
-std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(std::vector<float>& vertices){
-	return this->api->createVertexBuffer(vertices);
+std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(std::vector<float>& vertices, Vermilion::Core::BufferType type){
+	return this->api->createVertexBuffer(vertices, type);
 }
 
-std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Instance::createIndexBuffer(std::vector<unsigned int>& indices){
-	return this->api->createIndexBuffer(indices);
+std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Instance::createIndexBuffer(std::vector<unsigned int>& indices, Vermilion::Core::BufferType type){
+	return this->api->createIndexBuffer(indices, type);
 }
 
-std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Instance::createUniformBuffer(size_t length){
-	return this->api->createUniformBuffer(length);
+std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Instance::createUniformBuffer(size_t length, Vermilion::Core::BufferType type){
+	return this->api->createUniformBuffer(length, type);
 }
 
 std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Instance::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
 	return this->api->createRenderable(vertexBuffer, indexBuffer, vertexOffset, indexOffset, length);
-}
-
-void Vermilion::Core::Instance::streamData(std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer, void * data){
-	this->api->streamData(uniformBuffer, data);
 }
 
 std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Instance::createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){

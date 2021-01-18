@@ -63,7 +63,7 @@ struct Application{
 			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
 			400,
 			400,
-			VMCORE_LOGLEVEL_DEBUG,
+			VMCORE_LOGLEVEL_TRACE,
 		0};
 		vmInstance.reset(new VmInstance(hintType, hintValue));
 		vmInstance->window->setUserPointer(this);
@@ -160,9 +160,6 @@ struct Application{
 		ubo2.view = glm::mat4(1.0f);
 		ubo2.proj = glm::mat4(1.0f);
 
-		vmInstance->streamData(uniformBuffer1, &ubo1);
-		vmInstance->streamData(uniformBuffer2, &ubo2);
-
 		binding1 = vmInstance->createBinding({uniformBuffer1}, {sampler2});
 		binding2 = vmInstance->createBinding({uniformBuffer2}, {sampler1});
 
@@ -174,9 +171,9 @@ struct Application{
 			vmInstance->startRender();
 
 			ubo1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			vmInstance->streamData(uniformBuffer1, &ubo1);
+			uniformBuffer1->setData(&ubo1);
 			ubo2.model = glm::rotate(glm::mat4(1.0f), -1*time*glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			vmInstance->streamData(uniformBuffer2, &ubo2);
+			uniformBuffer2->setData(&ubo2);
 
 			textureRenderTarget->start(1.0, 0.0, 0.0, 1.0);
 			textureRenderTarget->draw(pipeline2, binding2, object);

@@ -9,6 +9,11 @@
 namespace Vermilion{
 namespace Core{
 
+enum BufferType{
+	BUFFER_TYPE_STATIC = 0,
+	BUFFER_TYPE_STREAMING
+};
+
 enum BufferLayoutElementType{
 	BUFFER_LAYOUT_ELEMENT_TYPE_NONE = 0,
 	BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT1,
@@ -59,7 +64,10 @@ class Buffer{
 		size_t size;
 		unsigned int count;
 		size_t element_size;
+		BufferType type;
 		~Buffer() = default;
+
+		virtual void setData(void * data, size_t size=0){};
 };
 
 class VertexBuffer : public Buffer{

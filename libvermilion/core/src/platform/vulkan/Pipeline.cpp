@@ -308,7 +308,7 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
 						std::shared_ptr<Vermilion::Core::Vulkan::UniformBuffer> ubo = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->uniformBuffers[ubo_i++];
 						VkDescriptorBufferInfo bufferInfo = {};
-						bufferInfo.buffer = ubo->vk_buffer[i];
+						bufferInfo.buffer = ubo->vk_buffer;
 						bufferInfo.offset = 0;
 						bufferInfo.range = ubo->size;
 						

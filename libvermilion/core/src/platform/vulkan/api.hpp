@@ -79,13 +79,11 @@ class API : public Vermilion::Core::API{
 			std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings) override;
 		virtual std::shared_ptr<Vermilion::Core::Binding> createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers)override;
 
-		virtual std::shared_ptr<Vermilion::Core::VertexBuffer> createVertexBuffer(std::vector<float>& vertices) override;
-		virtual std::shared_ptr<Vermilion::Core::IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices) override;
-		virtual std::shared_ptr<Vermilion::Core::UniformBuffer> createUniformBuffer(size_t length) override;
+		virtual std::shared_ptr<Vermilion::Core::VertexBuffer> createVertexBuffer(std::vector<float>& vertices, Vermilion::Core::BufferType type) override;
+		virtual std::shared_ptr<Vermilion::Core::IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices, Vermilion::Core::BufferType type) override;
+		virtual std::shared_ptr<Vermilion::Core::UniformBuffer> createUniformBuffer(size_t length, Vermilion::Core::BufferType type) override;
 		virtual std::shared_ptr<Vermilion::Core::Renderable> createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, 
 			std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length) override;
-
-		virtual void streamData(std::shared_ptr<Vermilion::Core::UniformBuffer> uniformBuffer, void * data) override;
 
 		virtual std::shared_ptr<Vermilion::Core::Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels) override;
 		virtual std::shared_ptr<Vermilion::Core::Sampler> createSampler(std::shared_ptr<Vermilion::Core::Texture> texture) override;
