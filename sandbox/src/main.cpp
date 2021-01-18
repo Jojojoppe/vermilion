@@ -3,6 +3,8 @@
 #include <vermilion/glm/gtc/matrix_transform.hpp>
 #include <memory>
 
+#include "gui.hpp"
+
 struct UniformBufferObject{
 	glm::mat4 model;
 	glm::mat4 view;
@@ -11,7 +13,7 @@ struct UniformBufferObject{
 
 struct Application{
 
-	std::unique_ptr<VmInstance> vmInstance;
+	std::shared_ptr<VmInstance> vmInstance;
 
 	VmRenderTarget defaultRenderTarget;
 	VmRenderTarget textureRenderTarget;
@@ -40,6 +42,8 @@ struct Application{
 	UniformBufferObject ubo1;
 	UniformBufferObject ubo2;
 
+	std::unique_ptr<GUI> gui;
+
 	float time;
 
 	static void resize(VmInstance * instance, void * userPointer){
@@ -47,7 +51,9 @@ struct Application{
 		int width, height;
 		instance->window->getFrameBufferSize(&width, &height);
 		app->pipeline1->setViewPort(width, height, 0, 0);
+		app->pipeline1->setScissor(width, height, 0, 0);
 		app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
+		app->gui->resize(width, height);
 	}
 
 	Application(){
@@ -63,11 +69,13 @@ struct Application{
 			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
 			400,
 			400,
-			VMCORE_LOGLEVEL_TRACE,
+			VMCORE_LOGLEVEL_DEBUG,
 		0};
 		vmInstance.reset(new VmInstance(hintType, hintValue));
 		vmInstance->window->setUserPointer(this);
 		vmInstance->window->setResizedCallback(Application::resize);
+
+		gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
 
 		texture1 = vmInstance->createTexture("../assets/texture1.jpg");
 		texture2 = vmInstance->createTexture("", 512, 512, 4);
@@ -134,12 +142,13 @@ struct Application{
 			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 		});
 		pipeline2->setViewPort(texture2->width, texture2->height, 0, 0);
+		pipeline2->setScissor(texture2->width, texture2->height, 0, 0);
 
 		std::vector<float> vertices({
-			-0.5,	-0.5,	0.0,	1.0,		1.0,	0.0,	0.0,		1.0, 	0.0,
-			0.5	,	-0.5,	0.0,	1.0,		0.0,	1.0,	0.0,		0.0,	0.0,
-			0.5,	0.5,	0.0,	1.0,		0.0,	0.0,	1.0,		0.0,	1.0,
-			-0.5,	0.5,	0.0,	1.0,		1.0,	1.0,	1.0,		1.0,	1.0,
+			-1.0,	-1.0,	0.0,	1.0,		1.0,	0.0,	0.0,		1.0, 	0.0,
+			1.0	,	-1.0,	0.0,	1.0,		0.0,	1.0,	0.0,		0.0,	0.0,
+			1.0,	1.0,	0.0,	1.0,		0.0,	0.0,	1.0,		0.0,	1.0,
+			-1.0,	1.0,	0.0,	1.0,		1.0,	1.0,	1.0,		1.0,	1.0,
 		});
 		std::vector<unsigned int> indices({
 			0, 1, 2,
@@ -147,7 +156,7 @@ struct Application{
 		});
 		vertexBuffer = vmInstance->createVertexBuffer(vertices);
 		indexBuffer = vmInstance->createIndexBuffer(indices);
-		object = vmInstance->createRenderable(vertexBuffer, indexBuffer);
+		object = vmInstance->createRenderable(vertexBuffer, indexBuffer, 0, 0, 0);
 
 		uniformBuffer1 = vmInstance->createUniformBuffer(sizeof(UniformBufferObject));
 		uniformBuffer2 = vmInstance->createUniformBuffer(sizeof(UniformBufferObject));
@@ -181,6 +190,7 @@ struct Application{
 
 			defaultRenderTarget->start(0.05, 0.05, 0.05, 1.0);
 			defaultRenderTarget->draw(pipeline1, binding1, object);
+			gui->render();
 			defaultRenderTarget->end();
 
 			vmInstance->endRender({textureRenderTarget});

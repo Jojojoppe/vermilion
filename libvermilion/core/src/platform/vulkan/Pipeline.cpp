@@ -19,7 +19,10 @@ VkFormat VulkanBufferLayoutElementTypeToVulkanBaseType[] = {
 	VK_FORMAT_R32G32B32_SFLOAT,
 	VK_FORMAT_R32G32B32A32_SFLOAT,
 	VK_FORMAT_R32_UINT,
-	VK_FORMAT_R8_UINT
+	VK_FORMAT_R8_UNORM,
+	VK_FORMAT_R8G8_UNORM,
+	VK_FORMAT_R8G8B8_UNORM,
+	VK_FORMAT_R8G8B8A8_UNORM,
 };
 
 Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
@@ -175,7 +178,7 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	rasterizer.rasterizerDiscardEnable = VK_FALSE;
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
-	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+	rasterizer.cullMode = VK_CULL_MODE_NONE;
 	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 	rasterizer.depthBiasConstantFactor = 0.0f; // Optional
@@ -185,7 +188,7 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	// Depth buffer
 	VkPipelineDepthStencilStateCreateInfo depthStencil = {};
 	depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-	depthStencil.depthTestEnable = VK_TRUE;
+	depthStencil.depthTestEnable = VK_FALSE;
 	depthStencil.depthWriteEnable = VK_TRUE;
 	depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
 	depthStencil.depthBoundsTestEnable = VK_FALSE;
@@ -208,12 +211,23 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	// Color blending
 	VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-	colorBlendAttachment.blendEnable = VK_FALSE;
-	VkPipelineColorBlendStateCreateInfo colorBlending = {};
+	colorBlendAttachment.blendEnable = VK_TRUE;
+	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+	colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+	colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+	VkPipelineColorBlendStateCreateInfo colorBlending{};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlending.logicOpEnable = VK_FALSE;
+	colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
 	colorBlending.attachmentCount = 1;
 	colorBlending.pAttachments = &colorBlendAttachment;
+	colorBlending.blendConstants[0] = 0.0f; // Optional
+	colorBlending.blendConstants[1] = 0.0f; // Optional
+	colorBlending.blendConstants[2] = 0.0f; // Optional
+	colorBlending.blendConstants[3] = 0.0f; // Optional
 
 	// Dynamic states
 	std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
@@ -278,7 +292,11 @@ void Vermilion::Core::Vulkan::Pipeline::setViewPort(unsigned int width, unsigned
 	this->viewport.height = -1.0f*(float)height;
 	this->viewport.x = (float)x;
 	this->viewport.y = (float)height-(float)y;
-	this->scissor.extent = {width, height};
+}
+
+void Vermilion::Core::Vulkan::Pipeline::setScissor(unsigned int width, unsigned int height, unsigned int x, unsigned int y){
+	this->scissor.extent = {(int32_t)width, (int32_t)height};
+	this->scissor.offset = {(int32_t)x, (int32_t)y};
 }
 
 void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Binding> binding){

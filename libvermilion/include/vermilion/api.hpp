@@ -63,6 +63,7 @@ class API{
 			unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){return nullptr;};
 
 		virtual std::shared_ptr<Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){return nullptr;};
+		virtual std::shared_ptr<Texture> createTexture(void * data, size_t width, size_t height, unsigned int channels){return nullptr;};
 		virtual std::shared_ptr<Sampler> createSampler(std::shared_ptr<Texture> texture){return nullptr;};
 
 	private:

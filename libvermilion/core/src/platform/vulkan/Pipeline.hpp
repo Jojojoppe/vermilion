@@ -72,6 +72,7 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		void create();
 
 		virtual void setViewPort(unsigned int width, unsigned height, unsigned int x, unsigned int y) override;
+		virtual void setScissor(unsigned int width, unsigned height, unsigned int x, unsigned int y) override;
 
 		void bind(std::shared_ptr<Vermilion::Core::Binding> binding);
 

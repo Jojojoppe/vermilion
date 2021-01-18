@@ -75,6 +75,7 @@ class Instance{
 			unsigned int vertexOffset=0, unsigned int indexOffset=0, unsigned int length=0);
 
 		std::shared_ptr<Texture> createTexture(const std::string& path="", size_t width=0, size_t height=0, unsigned int channels=0);
+		std::shared_ptr<Texture> createTexture(void * data, size_t width=0, size_t height=0, unsigned int channels=0);
 		std::shared_ptr<Sampler> createSampler(std::shared_ptr<Texture> texture);
 
 	private:

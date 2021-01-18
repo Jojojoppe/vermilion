@@ -32,6 +32,7 @@ class Texture : public Vermilion::Core::Texture{
 		VkFormat format;
 
 		Texture(API * api, const std::string& path, size_t width, size_t height, unsigned int channels);
+		Texture(API * api, void * data, size_t width, size_t height, unsigned int channels);
 		~Texture();
 };
 

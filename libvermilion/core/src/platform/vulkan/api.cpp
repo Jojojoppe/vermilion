@@ -283,6 +283,9 @@ std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Vulkan::API::creat
 std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Vulkan::API::createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){
 	return std::static_pointer_cast<Vermilion::Core::Texture>(std::make_shared<Vermilion::Core::Vulkan::Texture>(this, path, width, height, channels));
 }
+std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Vulkan::API::createTexture(void * data, size_t width, size_t height, unsigned int channels){
+	return std::static_pointer_cast<Vermilion::Core::Texture>(std::make_shared<Vermilion::Core::Vulkan::Texture>(this, data, width, height, channels));
+}
 
 std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Vulkan::API::createSampler(std::shared_ptr<Vermilion::Core::Texture> texture){
 	return std::static_pointer_cast<Vermilion::Core::Sampler>(std::make_shared<Vermilion::Core::Vulkan::Sampler>(this, texture));

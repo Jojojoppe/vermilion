@@ -9,7 +9,8 @@
                 "/usr/include/**",
                 "/usr/include/c++/10.2.0/**",
                 "${workspaceFolder}/third_party/glad/include/**",
-                "${workspaceFolder}/third_party/stb"
+                "${workspaceFolder}/third_party/stb",
+                "${workspaceFolder}/third_party/imgui"
             ],
             "defines": [
                 "VMCORE_OPENGL",

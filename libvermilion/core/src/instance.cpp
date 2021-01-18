@@ -83,6 +83,11 @@ std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Instance::createRe
 std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Instance::createTexture(const std::string& path, size_t width, size_t height, unsigned int channels){
 	return this->api->createTexture(path, width, height, channels);
 }
+std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::Instance::createTexture(void * data, size_t width, size_t height, unsigned int channels){
+	return this->api->createTexture(data, width, height, channels);
+}
+
+
 
 std::shared_ptr<Vermilion::Core::Sampler> Vermilion::Core::Instance::createSampler(std::shared_ptr<Vermilion::Core::Texture> texture){
 	return this->api->createSampler(texture);

@@ -86,6 +86,7 @@ class API : public Vermilion::Core::API{
 			std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length) override;
 
 		virtual std::shared_ptr<Vermilion::Core::Texture> createTexture(const std::string& path, size_t width, size_t height, unsigned int channels) override;
+		virtual std::shared_ptr<Vermilion::Core::Texture> createTexture(void * data, size_t width, size_t height, unsigned int channels) override;
 		virtual std::shared_ptr<Vermilion::Core::Sampler> createSampler(std::shared_ptr<Vermilion::Core::Texture> texture) override;
 
 		void beginSingleTimeCommands();

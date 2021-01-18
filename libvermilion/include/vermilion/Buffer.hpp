@@ -21,7 +21,10 @@ enum BufferLayoutElementType{
 	BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT3,
 	BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT4,
 	BUFFER_LAYOUT_ELEMENT_TYPE_INT32,
-	BUFFER_LAYOUT_ELEMENT_TYPE_BYTE,
+	BUFFER_LAYOUT_ELEMENT_TYPE_BYTE1,
+	BUFFER_LAYOUT_ELEMENT_TYPE_BYTE2,
+	BUFFER_LAYOUT_ELEMENT_TYPE_BYTE3,
+	BUFFER_LAYOUT_ELEMENT_TYPE_BYTE4,
 };
 
 struct BufferLayoutElement{
@@ -56,6 +59,12 @@ struct BufferLayoutElementFloat4 : public BufferLayoutElement{
 	BufferLayoutElementFloat4(std::string name, bool normalized=false) :
 		BufferLayoutElement(name, 4, sizeof(float), normalized){
 			type = BUFFER_LAYOUT_ELEMENT_TYPE_FLOAT4;
+		}
+};
+struct BufferLayoutElementByte4 : public BufferLayoutElement{
+	BufferLayoutElementByte4(std::string name, bool normalized=false) :
+		BufferLayoutElement(name, 4, sizeof(char), normalized){
+			type = BUFFER_LAYOUT_ELEMENT_TYPE_BYTE4;
 		}
 };
 
