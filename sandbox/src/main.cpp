@@ -125,21 +125,29 @@ struct Application{
 		shaderProgram = vmInstance->createShaderProgram({vertexShader, fragmentShader});
 
 		pipeline1 = vmInstance->createPipeline(defaultRenderTarget, shaderProgram, {
-			Vermilion::Core::BufferLayoutElementFloat4("aPos"),
-			Vermilion::Core::BufferLayoutElementFloat3("aColor"),
-			Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
-		}, {
-			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
-			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
+				Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_ENABLED,
+				Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_BACK_CC,
+				Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
+			},{
+				Vermilion::Core::BufferLayoutElementFloat4("aPos"),
+				Vermilion::Core::BufferLayoutElementFloat3("aColor"),
+				Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
+			}, {
+				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
+				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 		});
 
 		pipeline2 = vmInstance->createPipeline(textureRenderTarget, shaderProgram, {
-			Vermilion::Core::BufferLayoutElementFloat4("aPos"),
-			Vermilion::Core::BufferLayoutElementFloat3("aColor"),
-			Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
-		}, {
-			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
-			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
+				Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_ENABLED,
+				Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_BACK_CC,
+				Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
+			},{
+				Vermilion::Core::BufferLayoutElementFloat4("aPos"),
+				Vermilion::Core::BufferLayoutElementFloat3("aColor"),
+				Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
+			}, {
+				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
+				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 		});
 		pipeline2->setViewPort(texture2->width, texture2->height, 0, 0);
 		pipeline2->setScissor(texture2->width, texture2->height, 0, 0);

@@ -53,6 +53,8 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		VkDescriptorSetLayout vk_descriptorSetLayout;
 
 		unsigned int stride = 0;
+
+		Vermilion::Core::PipelineSettings settings;
 		
 	public:
 		VkPipeline vk_pipeline;
@@ -64,7 +66,7 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		VkViewport viewport;
 		VkRect2D scissor;
 
-		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, 
+		Pipeline(API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, Vermilion::Core::PipelineSettings settings,
 			std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings);
 		~Pipeline();
 

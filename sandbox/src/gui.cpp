@@ -67,12 +67,16 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
     shaderProgram = instance->createShaderProgram({vertexShader, fragmentShader});
 
     pipeline = instance->createPipeline(renderTarget, shaderProgram, {
-        Vermilion::Core::BufferLayoutElementFloat2("Position"),
-        Vermilion::Core::BufferLayoutElementFloat2("UV"),
-        Vermilion::Core::BufferLayoutElementByte4("Color"),
-    }, {
-        Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
-        Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
+            Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_DISABLED,
+            Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_NONE,
+            Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
+        },{
+            Vermilion::Core::BufferLayoutElementFloat2("Position"),
+            Vermilion::Core::BufferLayoutElementFloat2("UV"),
+            Vermilion::Core::BufferLayoutElementByte4("Color"),
+        }, {
+            Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
+            Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
     });
 
     uniformBuffer = instance->createUniformBuffer(sizeof(UniformBufferType));

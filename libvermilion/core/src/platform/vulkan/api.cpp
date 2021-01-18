@@ -251,9 +251,9 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::cr
 }
 
 std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
-		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
+		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, Vermilion::Core::PipelineSettings settings, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
 		std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings){
-	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram, vertexLayout, layoutBindings);
+	std::shared_ptr<Vermilion::Core::Vulkan::Pipeline> newpipeline = std::make_shared<Vermilion::Core::Vulkan::Pipeline>(this, renderTarget, shaderProgram, settings, vertexLayout, layoutBindings);
 	pipelines.push_back(newpipeline);
 	return std::static_pointer_cast<Vermilion::Core::Pipeline>(newpipeline);
 }

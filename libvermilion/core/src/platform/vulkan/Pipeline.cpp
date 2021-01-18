@@ -26,10 +26,11 @@ VkFormat VulkanBufferLayoutElementTypeToVulkanBaseType[] = {
 };
 
 Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 
-		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
+		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram, Vermilion::Core::PipelineSettings settings, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout,
 		std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings){
 	this->api = api;
 	this->instance = api->instance;
+	this->settings = settings;
 
 	this->renderTarget = renderTarget;
 	this->shaderProgram = shaderProgram;
@@ -169,6 +170,12 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	if(settings.poygonmode==PIPELINE_SETTINGS_POLYGON_MODE_POINT){
+		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+	}
+	if(settings.poygonmode==PIPELINE_SETTINGS_POLYGON_MODE_LINE){
+		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+	}
 	inputAssembly.primitiveRestartEnable = VK_FALSE;
 
 	// Rasterizer
@@ -177,9 +184,20 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	rasterizer.depthClampEnable = VK_FALSE;
 	rasterizer.rasterizerDiscardEnable = VK_FALSE;
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+	if(settings.poygonmode==PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE_LINE){
+		rasterizer.polygonMode = VK_POLYGON_MODE_LINE;
+	}
 	rasterizer.lineWidth = 1.0f;
 	rasterizer.cullMode = VK_CULL_MODE_NONE;
 	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+	if(settings.cullmode==PIPELINE_SETTINGS_CULL_MODE_BACK_C){
+		rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	}
+	if(settings.cullmode==PIPELINE_SETTINGS_CULL_MODE_BACK_CC){
+		rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+		rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+	}
 	rasterizer.depthBiasEnable = VK_FALSE;
 	rasterizer.depthBiasConstantFactor = 0.0f; // Optional
 	rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -189,6 +207,9 @@ void Vermilion::Core::Vulkan::Pipeline::create(){
 	VkPipelineDepthStencilStateCreateInfo depthStencil = {};
 	depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 	depthStencil.depthTestEnable = VK_FALSE;
+	if(this->settings.depthtest==PIPELINE_SETTINGS_DEPTH_TEST_ENABLED){
+		depthStencil.depthTestEnable = VK_TRUE;
+	}
 	depthStencil.depthWriteEnable = VK_TRUE;
 	depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
 	depthStencil.depthBoundsTestEnable = VK_FALSE;
