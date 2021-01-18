@@ -5,5 +5,6 @@
 * <b>GLAD</b> GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specs.
 * <b>GLM</b> OpenGL Mathematics (GLM)
 * <b>stb</b> stb single-file public domain libraries for C/C++: stb-image.h
+* <b>VulkanMemoryAllocator</b> Easy to integrate Vulkan memory allocation library
 
 All licences of the third party libraries and software can be found in the licences folder
