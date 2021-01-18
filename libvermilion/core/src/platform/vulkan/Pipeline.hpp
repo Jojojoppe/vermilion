@@ -47,7 +47,7 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget;
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram;
 		std::vector<Vermilion::Core::BufferLayoutElement> vertexLayout;
-		std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings;
+		std::vector<Vermilion::Core::PipelineLayoutBinding> layoutBindings;
 
 		std::vector<VkDescriptorPool> vk_descriptorPool;
 		VkDescriptorSetLayout vk_descriptorSetLayout;

@@ -60,6 +60,10 @@ Vermilion::Core::Vulkan::Texture::Texture(Vermilion::Core::Vulkan::API * api, co
         this->width = 0;
         this->height = 0;
         pixels = stbi_load(path.c_str(), (int*)&this->width, (int*)&this->height, (int*)&this->channels, STBI_rgb_alpha);
+        if(pixels==nullptr){
+            instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not open file");
+            throw std::runtime_error("Vermilion::Core::Vulkan::Texture::Texture() - Could not open file");
+        }
         this->channels = 4;
 
         // Create staging buffer

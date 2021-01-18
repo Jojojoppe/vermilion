@@ -30,7 +30,6 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 
 	this->renderTarget = renderTarget;
 	this->shaderProgram = shaderProgram;
-	this->layoutBindings = layoutBindings;
 
 	this->createDescriptorPool();
 
@@ -49,6 +48,7 @@ Vermilion::Core::Vulkan::Pipeline::Pipeline(Vermilion::Core::Vulkan::API * api, 
 	std::vector<VkDescriptorSetLayoutBinding> layoutBindingsVector;
 	unsigned int binding=0;
 	for(const auto& b : layoutBindings){
+		this->layoutBindings.push_back(b);
 		switch(b){
 			case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
 				VkDescriptorSetLayoutBinding uboLayoutBinding = {};
@@ -346,7 +346,7 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 					} break;
 
 					default:
-						this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Unknown pipeline layout binding type");
+						this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Unknown pipeline layout binding type: %d", b);
 				}
 			}
 		}

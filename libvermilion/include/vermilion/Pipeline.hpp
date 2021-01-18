@@ -9,7 +9,7 @@ namespace Vermilion{
 namespace Core{
 
 enum PipelineLayoutBinding{
-	PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
+	PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER = 1,
 	PIPELINE_LAYOUT_BINDING_SAMPLER
 };
 

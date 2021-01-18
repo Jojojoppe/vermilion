@@ -16,6 +16,7 @@
  */
 
 #include <vermilion/instance.hpp>
+#include <memory>
 
 typedef Vermilion::Core::Instance VmInstance;
 typedef std::shared_ptr<Vermilion::Core::RenderTarget> VmRenderTarget;

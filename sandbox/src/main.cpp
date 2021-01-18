@@ -9,16 +9,48 @@ struct UniformBufferObject{
 	glm::mat4 proj;
 };
 
-void resize(VmInstance * instance, void * userPointer){
-	int width, height;
-	instance->window->getFrameBufferSize(&width, &height);
-	(*((VmPipeline*)userPointer))->setViewPort(width, height);
-}
+struct Application{
 
-int main(int argc, char ** argv){
-	try{
+	std::unique_ptr<VmInstance> vmInstance;
 
-		// Create Vermilion instance
+	VmRenderTarget defaultRenderTarget;
+	VmRenderTarget textureRenderTarget;
+
+	VmTexture texture1;
+	VmTexture texture2;
+	VmSampler sampler1;
+	VmSampler sampler2;
+
+	VmShader vertexShader;
+	VmShader fragmentShader;
+	VmShaderProgram shaderProgram;
+
+	VmPipeline pipeline1;
+	VmPipeline pipeline2;
+	VmBinding binding1;
+	VmBinding binding2;
+
+	VmVertexBuffer vertexBuffer;
+	VmIndexBuffer indexBuffer;
+	VmRenderable object;
+
+	VmUniformBuffer uniformBuffer1;
+	VmUniformBuffer uniformBuffer2;
+
+	UniformBufferObject ubo1;
+	UniformBufferObject ubo2;
+
+	float time;
+
+	static void resize(VmInstance * instance, void * userPointer){
+		Application * app = (Application*) userPointer;
+		int width, height;
+		instance->window->getFrameBufferSize(&width, &height);
+		app->pipeline1->setViewPort(width, height, 0, 0);
+		app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
+	}
+
+	Application(){
 		int hintType[] = {
 			Vermilion::Core::HintType::HINT_TYPE_WINDOW_PLATFORM, 
 			Vermilion::Core::HintType::HINT_TYPE_RENDER_PLATFORM, 
@@ -33,79 +65,76 @@ int main(int argc, char ** argv){
 			400,
 			VMCORE_LOGLEVEL_DEBUG,
 		0};
-		VmInstance vmInstance(hintType, hintValue);
+		vmInstance.reset(new VmInstance(hintType, hintValue));
+		vmInstance->window->setUserPointer(this);
+		vmInstance->window->setResizedCallback(Application::resize);
 
+		texture1 = vmInstance->createTexture("../assets/texture1.jpg");
+		texture2 = vmInstance->createTexture("", 512, 512, 4);
+		sampler1 = vmInstance->createSampler(texture1);
+		sampler2 = vmInstance->createSampler(texture2);
 
-		// Create render targets
-		VmRenderTarget defaultRenderTarget = vmInstance.getDefaultRenderTarget();
-		VmTexture renderTargetTexture = vmInstance.createTexture("", 512, 512, 4);
-		VmRenderTarget renderTarget = vmInstance.createRenderTarget(renderTargetTexture);
-		VmSampler renderTargetSampler = vmInstance.createSampler(renderTargetTexture);
+		defaultRenderTarget = vmInstance->getDefaultRenderTarget();
+		textureRenderTarget = vmInstance->createRenderTarget(texture2);
 
-		// Create shaders
-		VmShader vertexShader = vmInstance.createShader(
-			R"(
-				#version 450
-				#extension GL_ARB_separate_shader_objects : enable
+		vertexShader = vmInstance->createShader(R"(
+			#version 450
+			#extension GL_ARB_separate_shader_objects : enable
+			layout(location = 0) in vec4 aPos;
+			layout(location = 1) in vec3 aColor;
+			layout(location = 2) in vec2 aTexCoord;
+			
+			layout(location = 0) out vec3 fColor;
+			layout(location = 1) out vec2 fTexCoord;
 
-				layout(location = 0) in vec4 aPos;
-				layout(location = 1) in vec3 aColor;
-				layout(location = 2) in vec2 aTexCoord;
-				
-				layout(location = 0) out vec3 fColor;
-				layout(location = 1) out vec2 fTexCoord;
+			layout(binding=0) uniform UniformBufferObject{
+				mat4 model;
+				mat4 view;
+				mat4 proj;
+			} ubo;
+			
+			void main() {
+				gl_Position = ubo.proj * ubo.view * ubo.model * aPos;
+				fColor = aColor;
+				fTexCoord = aTexCoord;
+			}
+		)", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
+		fragmentShader = vmInstance->createShader(R"(
+			#version 450
+			#extension GL_ARB_separate_shader_objects : enable
 
-				layout(binding=0) uniform UniformBufferObject{
-					mat4 model;
-					mat4 view;
-					mat4 proj;
-				} ubo;
-				
-				void main() {
-					gl_Position = ubo.proj * ubo.view * ubo.model * aPos;
-					fColor = aColor;
-					fTexCoord = aTexCoord;
-				}
-			)", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
-		VmShader fragmentShader = vmInstance.createShader(
-			R"(
-				#version 450
-				#extension GL_ARB_separate_shader_objects : enable
+			layout(location = 0) in vec3 fColor;
+			layout(location = 1) in vec2 fTexCoord;
 
-				layout(location = 0) in vec3 fColor;
-				layout(location = 1) in vec2 fTexCoord;
+			layout(location = 0) out vec4 outColor;
 
-				layout(location = 0) out vec4 outColor;
+			layout(binding = 1) uniform sampler2D s_tex;
 
-				layout(binding = 1) uniform sampler2D s_tex;
+			void main() {
+				outColor = texture(s_tex, fTexCoord);
+			}
+		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
+		shaderProgram = vmInstance->createShaderProgram({vertexShader, fragmentShader});
 
-				void main() {
-					outColor = texture(s_tex, fTexCoord);
-				}
-			)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
-		VmShaderProgram shaderProgram = vmInstance.createShaderProgram({vertexShader, fragmentShader});
-
-		// Create render pipeline
-		VmPipeline pipeline = vmInstance.createPipeline(defaultRenderTarget, shaderProgram, {
+		pipeline1 = vmInstance->createPipeline(defaultRenderTarget, shaderProgram, {
 			Vermilion::Core::BufferLayoutElementFloat4("aPos"),
 			Vermilion::Core::BufferLayoutElementFloat3("aColor"),
 			Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
-		},{
+		}, {
 			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
 			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 		});
 
-		VmPipeline pipeline2 = vmInstance.createPipeline(renderTarget, shaderProgram, {
+		pipeline2 = vmInstance->createPipeline(textureRenderTarget, shaderProgram, {
 			Vermilion::Core::BufferLayoutElementFloat4("aPos"),
 			Vermilion::Core::BufferLayoutElementFloat3("aColor"),
 			Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
-		},{
+		}, {
 			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
 			Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 		});
-		pipeline2->setViewPort(renderTargetTexture->width, renderTargetTexture->height);
+		pipeline2->setViewPort(texture2->width, texture2->height, 0, 0);
 
-		// Render object
 		std::vector<float> vertices({
 			-0.5,	-0.5,	0.0,	1.0,		1.0,	0.0,	0.0,		1.0, 	0.0,
 			0.5	,	-0.5,	0.0,	1.0,		0.0,	1.0,	0.0,		0.0,	0.0,
@@ -116,55 +145,55 @@ int main(int argc, char ** argv){
 			0, 1, 2,
 			2, 3, 0,
 		});
-		// Create vertex and index buffers
-		VmVertexBuffer vertexBuffer = vmInstance.createVertexBuffer(vertices);
-		VmIndexBuffer indexBuffer = vmInstance.createIndexBuffer(indices);
-		VmRenderable renderObject = vmInstance.createRenderable(vertexBuffer, indexBuffer);
+		vertexBuffer = vmInstance->createVertexBuffer(vertices);
+		indexBuffer = vmInstance->createIndexBuffer(indices);
+		object = vmInstance->createRenderable(vertexBuffer, indexBuffer);
 
-		// Create texture
-		VmTexture texture = vmInstance.createTexture("/home/joppe/Pictures/texture.jpg");
-		VmSampler sampler = vmInstance.createSampler(texture);
+		uniformBuffer1 = vmInstance->createUniformBuffer(sizeof(UniformBufferObject));
+		uniformBuffer2 = vmInstance->createUniformBuffer(sizeof(UniformBufferObject));
 
-		// Create uniform buffer
-		VmUniformBuffer uniformBuffer1 = vmInstance.createUniformBuffer(sizeof(UniformBufferObject));
-		UniformBufferObject uboData1;
-		uboData1.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		uboData1.proj = glm::perspective(glm::radians(45.0f), vmInstance.window->width/(float)vmInstance.window->height, 0.1f, 10.0f); // TODO get window data
-		VmUniformBuffer uniformBuffer2 = vmInstance.createUniformBuffer(sizeof(UniformBufferObject));
-		UniformBufferObject uboData2;
-		uboData2.model = glm::mat4(1.0f);
-		uboData2.view = glm::mat4(1.0f);
-		uboData2.proj = glm::mat4(1.0f);
+		ubo1.model = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo1.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo1.proj = glm::perspective(glm::radians(45.0f), vmInstance->window->width/(float)vmInstance->window->height, 0.1f, 10.0f);
 
-		// Create binding (Must be in the format as the pipeline layoutBinding)
-		VmBinding binding2 = vmInstance.createBinding({uniformBuffer2}, {sampler});
-		VmBinding binding1 = vmInstance.createBinding({uniformBuffer1}, {renderTargetSampler});
+		ubo2.model = glm::mat4(0.5f);
+		ubo2.view = glm::mat4(1.0f);
+		ubo2.proj = glm::mat4(1.0f);
 
-		float time = 0.0f;
+		vmInstance->streamData(uniformBuffer1, &ubo1);
+		vmInstance->streamData(uniformBuffer2, &ubo2);
 
-		vmInstance.window->setResizedCallback(resize);
-		vmInstance.window->setUserPointer(&pipeline);
+		binding1 = vmInstance->createBinding({uniformBuffer1}, {sampler2});
+		binding2 = vmInstance->createBinding({uniformBuffer2}, {sampler1});
 
-		while(vmInstance.window->shouldClose()){
+		time = 0.0f;
+	}
+
+	void run(){
+		while(vmInstance->window->shouldClose()){
+			vmInstance->startRender();
+
+			ubo1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			vmInstance->streamData(uniformBuffer1, &ubo1);
+
+			textureRenderTarget->start();
+			textureRenderTarget->draw(pipeline2, binding2, object);
+			textureRenderTarget->end();
+
+			defaultRenderTarget->start();
+			defaultRenderTarget->draw(pipeline1, binding1, object);
+			defaultRenderTarget->end();
+
+			vmInstance->endRender({textureRenderTarget});
 			time += 0.01f;
-
-			vmInstance.startRender();
-
-				uboData1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-				vmInstance.streamData(uniformBuffer1, &uboData1);
-				vmInstance.streamData(uniformBuffer2, &uboData2);
-
-				renderTarget->start();
-					renderTarget->draw(pipeline2, binding2, renderObject);
-				renderTarget->end();
-
-				defaultRenderTarget->start();
-					defaultRenderTarget->draw(pipeline, binding1, renderObject);
-				defaultRenderTarget->end();
-
-			vmInstance.endRender({renderTarget});
 		}
+	}
+};
 
+int main(int argc, char ** argv){
+	try{
+		Application A;
+		A.run();
 	}catch(std::exception& ex){
 		return 1;
 	}
