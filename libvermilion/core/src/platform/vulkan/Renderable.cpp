@@ -10,11 +10,7 @@ Vermilion::Core::Vulkan::Renderable::Renderable(Vermilion::Core::Vulkan::API * a
 
     this->vertexBuffer = vertexBuffer;
     this->indexBuffer = indexBuffer;
-    if(length){
-        this->length = length;
-    }else{
-        this->length = indexBuffer->count;
-    }
+    this->length = length;
     this->vertexOffset = vertexOffset;
     this->indexOffset = indexOffset;
 }

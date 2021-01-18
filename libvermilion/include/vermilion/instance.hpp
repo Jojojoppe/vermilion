@@ -68,11 +68,13 @@ class Instance{
 			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> layoutBindings);
 		std::shared_ptr<Binding> createBinding(std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Sampler>> samplers);
 
-		std::shared_ptr<VertexBuffer> createVertexBuffer(std::vector<float>& vertices, BufferType type = BufferType::BUFFER_TYPE_STATIC);
-		std::shared_ptr<IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices, BufferType type = BufferType::BUFFER_TYPE_STATIC);
+		std::shared_ptr<VertexBuffer> createVertexBuffer(size_t size, BufferType type = BufferType::BUFFER_TYPE_STATIC);
+		std::shared_ptr<IndexBuffer> createIndexBuffer(size_t size, BufferType type = BufferType::BUFFER_TYPE_STATIC);
 		std::shared_ptr<UniformBuffer> createUniformBuffer(size_t size, BufferType type = BufferType::BUFFER_TYPE_STREAMING);
+		std::shared_ptr<StorageBuffer> createStorageBuffer(size_t size, BufferType type = BufferType::BUFFER_TYPE_STATIC);
+
 		std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, 
-			unsigned int vertexOffset=0, unsigned int indexOffset=0, unsigned int length=0);
+			unsigned int vertexOffset, unsigned int indexOffset, unsigned int length);
 
 		std::shared_ptr<Texture> createTexture(const std::string& path="", size_t width=0, size_t height=0, unsigned int channels=0);
 		std::shared_ptr<Texture> createTexture(void * data, size_t width=0, size_t height=0, unsigned int channels=0);

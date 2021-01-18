@@ -94,4 +94,9 @@ class UniformBuffer : public Buffer{
 		~UniformBuffer() = default;
 };
 
+class StorageBuffer : public Buffer{
+	public:
+		~StorageBuffer() = default;
+};
+
 }}

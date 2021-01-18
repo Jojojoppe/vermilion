@@ -262,18 +262,22 @@ std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Vulkan::API::createBi
 	return std::static_pointer_cast<Vermilion::Core::Binding>(std::make_shared<Vermilion::Core::Vulkan::Binding>(this, uniformBuffers, samplers));
 }
 
-std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Vulkan::API::createVertexBuffer(std::vector<float>& vertices, Vermilion::Core::BufferType type){
-	return std::static_pointer_cast<Vermilion::Core::VertexBuffer>(std::make_shared<Vermilion::Core::Vulkan::VertexBuffer>(this, vertices, type));
+std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Vulkan::API::createVertexBuffer(size_t size, Vermilion::Core::BufferType type){
+	return std::static_pointer_cast<Vermilion::Core::VertexBuffer>(std::make_shared<Vermilion::Core::Vulkan::VertexBuffer>(this, size, type));
 }
 
-std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Vulkan::API::createIndexBuffer(std::vector<unsigned int>& indices, Vermilion::Core::BufferType type){
-	return std::static_pointer_cast<Vermilion::Core::IndexBuffer>(std::make_shared<Vermilion::Core::Vulkan::IndexBuffer>(this, indices, type));
+std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Vulkan::API::createIndexBuffer(size_t size, Vermilion::Core::BufferType type){
+	return std::static_pointer_cast<Vermilion::Core::IndexBuffer>(std::make_shared<Vermilion::Core::Vulkan::IndexBuffer>(this, size, type));
 }
 
 std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Vulkan::API::createUniformBuffer(size_t length, Vermilion::Core::BufferType type){
 	auto n = std::make_shared<Vermilion::Core::Vulkan::UniformBuffer>(this, length, type);
 	uniformBuffers.push_back(n);
 	return std::static_pointer_cast<Vermilion::Core::UniformBuffer>(n);
+}
+
+std::shared_ptr<Vermilion::Core::StorageBuffer> Vermilion::Core::Vulkan::API::createStorageBuffer(size_t size, Vermilion::Core::BufferType type){
+	return std::static_pointer_cast<Vermilion::Core::StorageBuffer>(std::make_shared<Vermilion::Core::Vulkan::StorageBuffer>(this, size, type));
 }
 
 std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Vulkan::API::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){

@@ -56,9 +56,11 @@ class API{
 			std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> layoutBindings){return nullptr;};
 		virtual std::shared_ptr<Binding> createBinding(std::initializer_list<std::shared_ptr<UniformBuffer>> uniformBuffers, std::initializer_list<std::shared_ptr<Sampler>> samplers){return nullptr;};
 
-		virtual std::shared_ptr<VertexBuffer> createVertexBuffer(std::vector<float>& vertices, BufferType type){return nullptr;};
-		virtual std::shared_ptr<IndexBuffer> createIndexBuffer(std::vector<unsigned int>& indices, BufferType type){return nullptr;};
-		virtual std::shared_ptr<UniformBuffer> createUniformBuffer(size_t length, BufferType type){return nullptr;};
+		virtual std::shared_ptr<VertexBuffer> createVertexBuffer(size_t size, BufferType type){return nullptr;};
+		virtual std::shared_ptr<IndexBuffer> createIndexBuffer(size_t size, BufferType type){return nullptr;};
+		virtual std::shared_ptr<UniformBuffer> createUniformBuffer(size_t size, BufferType type){return nullptr;};
+		virtual std::shared_ptr<StorageBuffer> createStorageBuffer(size_t size, BufferType type){return nullptr;};
+
 		virtual std::shared_ptr<Renderable> createRenderable(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer, 
 			unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){return nullptr;};
 

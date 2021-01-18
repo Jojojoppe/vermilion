@@ -162,9 +162,11 @@ struct Application{
 			0, 1, 2,
 			2, 3, 0,
 		});
-		vertexBuffer = vmInstance->createVertexBuffer(vertices);
-		indexBuffer = vmInstance->createIndexBuffer(indices);
-		object = vmInstance->createRenderable(vertexBuffer, indexBuffer, 0, 0, 0);
+		vertexBuffer = vmInstance->createVertexBuffer(sizeof(float)*vertices.size());
+		indexBuffer = vmInstance->createIndexBuffer(sizeof(unsigned int)*indices.size());
+		vertexBuffer->setData(vertices.data());
+		indexBuffer->setData(indices.data());
+		object = vmInstance->createRenderable(vertexBuffer, indexBuffer, 0, 0, indices.size());
 
 		uniformBuffer1 = vmInstance->createUniformBuffer(sizeof(UniformBufferObject));
 		uniformBuffer2 = vmInstance->createUniformBuffer(sizeof(UniformBufferObject));

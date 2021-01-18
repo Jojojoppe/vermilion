@@ -80,11 +80,9 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
     });
 
     uniformBuffer = instance->createUniformBuffer(sizeof(UniformBufferType));
-    std::vector<float> vertices(1024*1024, 0.0f);
-    std::vector<unsigned int> indices(1024*1024, 0);
-    vertexBuffer = instance->createVertexBuffer(vertices, Vermilion::Core::BufferType::BUFFER_TYPE_STREAMING);
-    indexBuffer = instance->createIndexBuffer(indices, Vermilion::Core::BufferType::BUFFER_TYPE_STREAMING);
-    renderable = instance->createRenderable(vertexBuffer, indexBuffer);
+    vertexBuffer = instance->createVertexBuffer(1024*1024, Vermilion::Core::BufferType::BUFFER_TYPE_STREAMING);
+    indexBuffer = instance->createIndexBuffer(1024*1024, Vermilion::Core::BufferType::BUFFER_TYPE_STREAMING);
+    renderable = instance->createRenderable(vertexBuffer, indexBuffer, 0, 0, 0);
 
     binding = instance->createBinding({uniformBuffer}, {sampler});
 

@@ -31,7 +31,7 @@ class VertexBuffer : public Vermilion::Core::VertexBuffer{
 		VkBuffer vk_buffer;
 		VmaAllocation vk_allocation;
 
-		VertexBuffer(API * api, std::vector<float>& vertices, Vermilion::Core::BufferType type);
+		VertexBuffer(API * api, size_t, Vermilion::Core::BufferType type);
 		~VertexBuffer();
 
 		virtual void setData(void * data, size_t size) override;
@@ -46,7 +46,7 @@ class IndexBuffer : public Vermilion::Core::IndexBuffer{
 		VkBuffer vk_buffer;
 		VmaAllocation vk_allocation;
 
-		IndexBuffer(API * api, std::vector<unsigned int>& indices, Vermilion::Core::BufferType type);
+		IndexBuffer(API * api, size_t, Vermilion::Core::BufferType type);
 		~IndexBuffer();
 
 		virtual void setData(void * data, size_t size) override;
@@ -63,6 +63,21 @@ class UniformBuffer : public Vermilion::Core::UniformBuffer{
 
 		UniformBuffer(API * api, size_t size, Vermilion::Core::BufferType type);
 		~UniformBuffer();
+
+		virtual void setData(void * data, size_t size) override;
+};
+
+class StorageBuffer : public Vermilion::Core::StorageBuffer{
+	private:
+		Vermilion::Core::Instance * instance;
+		API * api;
+
+	public:
+		VkBuffer vk_buffer;
+		VmaAllocation vk_allocation;
+
+		StorageBuffer(API * api, size_t size, Vermilion::Core::BufferType type);
+		~StorageBuffer();
 
 		virtual void setData(void * data, size_t size) override;
 };

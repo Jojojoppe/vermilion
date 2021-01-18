@@ -64,16 +64,20 @@ std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Instance::createBindi
 	return this->api->createBinding(uniformBuffers, samplers);
 }
 
-std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(std::vector<float>& vertices, Vermilion::Core::BufferType type){
-	return this->api->createVertexBuffer(vertices, type);
+std::shared_ptr<Vermilion::Core::VertexBuffer> Vermilion::Core::Instance::createVertexBuffer(size_t size, Vermilion::Core::BufferType type){
+	return this->api->createVertexBuffer(size, type);
 }
 
-std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Instance::createIndexBuffer(std::vector<unsigned int>& indices, Vermilion::Core::BufferType type){
-	return this->api->createIndexBuffer(indices, type);
+std::shared_ptr<Vermilion::Core::IndexBuffer> Vermilion::Core::Instance::createIndexBuffer(size_t size, Vermilion::Core::BufferType type){
+	return this->api->createIndexBuffer(size, type);
 }
 
-std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Instance::createUniformBuffer(size_t length, Vermilion::Core::BufferType type){
-	return this->api->createUniformBuffer(length, type);
+std::shared_ptr<Vermilion::Core::UniformBuffer> Vermilion::Core::Instance::createUniformBuffer(size_t size, Vermilion::Core::BufferType type){
+	return this->api->createUniformBuffer(size, type);
+}
+
+std::shared_ptr<Vermilion::Core::StorageBuffer> Vermilion::Core::Instance::createStorageBuffer(size_t size, Vermilion::Core::BufferType type){
+	return this->api->createStorageBuffer(size, type);
 }
 
 std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::Instance::createRenderable(std::shared_ptr<Vermilion::Core::VertexBuffer> vertexBuffer, std::shared_ptr<Vermilion::Core::IndexBuffer> indexBuffer, unsigned int vertexOffset, unsigned int indexOffset, unsigned int length){
