@@ -6,9 +6,10 @@
 #include <stdint.h>
 #include <stdexcept>
 
-Vermilion::Core::GLFW::Window::Window(int renderPlatform, Vermilion::Core::Instance * instance){
+Vermilion::Core::GLFW::Window::Window(int renderPlatform, Vermilion::Core::WindowCallbackFunctions windowCallbackFunctions, Vermilion::Core::Instance * instance){
 	this->instance = instance;
 	this->renderPlatform = renderPlatform;
+	this->windowCallbackFunctions = windowCallbackFunctions;
 
 	this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Initializing GLFW");
 	glfwErrorCallbackLogger = &instance->logger;
@@ -74,12 +75,9 @@ void Vermilion::Core::GLFW::Window::setUserPointer(void * userPointer){
 	this->userPointer = userPointer;
 }
 
-void Vermilion::Core::GLFW::Window::setResizedCallback(void (*resize)(Vermilion::Core::Instance * instance, void * userPointer)){
-	this->resize = resize;
-}
 void Vermilion::Core::GLFW::Window::resized(){
-	if(this->resize){
-		this->resize(this->instance, userPointer);
+	if(this->windowCallbackFunctions.resizeCallback){
+		this->windowCallbackFunctions.resizeCallback(this->instance, userPointer);
 	}
 }
 

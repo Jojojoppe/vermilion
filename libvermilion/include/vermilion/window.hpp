@@ -23,14 +23,19 @@ extern const int windowPlatform[];
 class Instance;
 class RenderTarget;
 
+struct WindowCallbackFunctions{
+	void (*resizeCallback)(Vermilion::Core::Instance * instance, void * userPointer) = nullptr;
+};
+
 class Window{
 	public:
 		int width, height;
+		WindowCallbackFunctions windowCallbackFunctions;
 
 	private:
 
 	public:
-		static Window * create(int platform, int renderPlatform, Instance * instance);
+		static Window * create(int platform, int renderPlatform, WindowCallbackFunctions windowCallbackFunctions, Instance * instance);
 		virtual ~Window() = default;
 
 		virtual void setUserPointer(void * p){};
@@ -41,7 +46,6 @@ class Window{
 
 		virtual bool shouldClose(){return true;};
 
-		virtual void setResizedCallback(void (*resized)(Instance * instance, void * userPointer)){};
 		virtual void resized(){};
 
 		virtual void getFrameBufferSize(int * width, int * height){};

@@ -11,11 +11,11 @@ const int Vermilion::Core::windowPlatform[] = {
 	Vermilion::Core::WindowPlatform::WINDOW_PLATFORM_NONE
 };
 
-Vermilion::Core::Window * Vermilion::Core::Window::create(int platform, int renderPlatform, Vermilion::Core::Instance * instance){
+Vermilion::Core::Window * Vermilion::Core::Window::create(int platform, int renderPlatform, Vermilion::Core::WindowCallbackFunctions windowCallbackFunctions, Vermilion::Core::Instance * instance){
 	switch(platform){
 #ifdef VMCORE_GLFW
 		case Vermilion::Core::WindowPlatform::WINDOW_PLATFORM_GLFW:
-			return new Vermilion::Core::GLFW::Window(renderPlatform, instance);
+			return new Vermilion::Core::GLFW::Window(renderPlatform, windowCallbackFunctions, instance);
 			break;
 #endif
 		default:

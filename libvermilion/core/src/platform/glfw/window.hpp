@@ -22,10 +22,9 @@ class Window : public Vermilion::Core::Window{
 		GLFWwindow * window;
 
 		void * userPointer;
-		void (*resize)(Vermilion::Core::Instance * instance, void * userPointer) = nullptr;
 
 	public:
-		Window(int renderPlatform, Vermilion::Core::Instance * instance);
+		Window(int renderPlatform, Vermilion::Core::WindowCallbackFunctions windowCallbackFunctions, Vermilion::Core::Instance * instance);
 		virtual ~Window() override;
 		virtual void setUserPointer(void * p) override;
 
@@ -35,7 +34,6 @@ class Window : public Vermilion::Core::Window{
 
 		virtual bool shouldClose() override;
 
-		virtual void setResizedCallback(void (*resize)(Vermilion::Core::Instance * instance, void * userPointer)) override;
 		virtual void resized() override;
 
 		virtual void getFrameBufferSize(int * width, int * height) override;

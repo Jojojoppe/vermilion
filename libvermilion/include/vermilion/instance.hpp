@@ -51,7 +51,7 @@ class Instance{
 		 * @param hintType List of types of setup hints, terminated with zero
 		 * @param hintValue List of values of setup hints, terminated with zero
 		 */
-		Instance(int * hintType, int * hintValue);
+		Instance(int * hintType, int * hintValue, WindowCallbackFunctions windowCallbackFunctions);
 
 		~Instance();
 

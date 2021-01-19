@@ -1,7 +1,7 @@
 #include <vermilion/instance.hpp>
 #include <stdexcept>
 
-Vermilion::Core::Instance::Instance(int * hintType, int * hintValue){
+Vermilion::Core::Instance::Instance(int * hintType, int * hintValue, Vermilion::Core::WindowCallbackFunctions windowCallbackFunctions){
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "Initializing Vermilion");
 
 	// Parse hints
@@ -17,7 +17,7 @@ Vermilion::Core::Instance::Instance(int * hintType, int * hintValue){
 	// Create API
 	this->api.reset(API::create(platform_render, this));
 	// Create Window
-	this->window.reset(Window::create(platform_window, platform_render, this));
+	this->window.reset(Window::create(platform_window, platform_render, windowCallbackFunctions, this));
 
 	this->window->createWindow(window_width, window_height);
 }

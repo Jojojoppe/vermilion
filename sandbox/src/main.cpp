@@ -73,9 +73,8 @@ struct Application{
 			400,
 			VMCORE_LOGLEVEL_DEBUG,
 		0};
-		vmInstance.reset(new VmInstance(hintType, hintValue));
+		vmInstance.reset(new VmInstance(hintType, hintValue, Vermilion::Core::WindowCallbackFunctions{resize}));
 		vmInstance->window->setUserPointer(this);
-		vmInstance->window->setResizedCallback(Application::resize);
 
 		gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
 
@@ -140,13 +139,13 @@ struct Application{
 				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 		});
 
-		pipeline1 = vmInstance->createPipeline(defaultRenderTarget, shaderProgram, pipelineLayout, {
+		pipeline1 = vmInstance->createPipeline(defaultRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
 				Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_ENABLED,
 				Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_BACK_CC,
 				Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
 		});
 
-		pipeline2 = vmInstance->createPipeline(textureRenderTarget, shaderProgram, pipelineLayout, {
+		pipeline2 = vmInstance->createPipeline(textureRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
 				Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_ENABLED,
 				Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_BACK_CC,
 				Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
