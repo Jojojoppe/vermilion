@@ -6,5 +6,6 @@
 * <b>GLM</b> OpenGL Mathematics (GLM)
 * <b>stb</b> stb single-file public domain libraries for C/C++: stb-image.h
 * <b>VulkanMemoryAllocator</b> Easy to integrate Vulkan memory allocation library
+* <b>Dear ImGui</b> Dear ImGui: Bloat-free Graphical User interface for C++ with minimal dependencies (files placed in sandbox/src/imgui)
 
 All licences of the third party libraries and software can be found in the licences folder
