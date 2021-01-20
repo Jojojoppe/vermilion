@@ -35,6 +35,8 @@ class Window : public Vermilion::Core::Window{
 		virtual bool shouldClose() override;
 
 		virtual void resized() override;
+		void mouseButton(int button, int action, int mods);
+		void mousePos(double x, double y);
 
 		virtual void getFrameBufferSize(int * width, int * height) override;
 

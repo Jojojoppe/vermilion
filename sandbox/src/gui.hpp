@@ -36,5 +36,7 @@ class GUI{
 
         void render();
         void resize(int width, int height);
+        void mouseButton(Vermilion::Core::WindowMouseButton btn, Vermilion::Core::WindowMouseAction act);
+        void mousePos(double x, double y);
 
 };

@@ -19,6 +19,8 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
     io.DisplaySize = ImVec2((float)width, (float)height);
     io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 
+    io.WantCaptureMouse = true;
+
 
     // Get texture
     unsigned char * pixels;
@@ -118,7 +120,7 @@ void GUI::render(){
 
     int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
     int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
-    ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
+    ImVec2 clip_off = ImVec2(0,0);         // (0,0) unless using multi-viewports
     ImVec2 clip_scale = draw_data->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
     
     // Set projection
@@ -147,7 +149,11 @@ void GUI::render(){
                 clip_rect.z = (pcmd->ClipRect.z - clip_off.x) * clip_scale.x;
                 clip_rect.w = (pcmd->ClipRect.w - clip_off.y) * clip_scale.y;
                 if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0f && clip_rect.w >= 0.0f){
-                    // pipeline->setScissor((int)(clip_rect.z - clip_rect.x), (int)(clip_rect.w - clip_rect.y), (int)clip_rect.x, (int)(fb_height - clip_rect.w));
+                    if (clip_rect.x < 0.0f)
+                        clip_rect.x = 0.0f;
+                    if (clip_rect.y < 0.0f)
+                        clip_rect.y = 0.0f;
+                    pipeline->setScissor(clip_rect.z-clip_rect.x, clip_rect.w-clip_rect.y, clip_rect.x, clip_rect.y);
                     renderable->indexOffset = pcmd->IdxOffset;
                     renderable->vertexOffset = pcmd->VtxOffset;
                     renderable->length = pcmd->ElemCount;
@@ -169,4 +175,18 @@ void GUI::resize(int width, int height){
     io.DisplaySize = ImVec2((float)width, (float)height);
     this->pipeline->setViewPort(width, height);
     this->pipeline->setScissor(width, height);
+}
+
+void GUI::mouseButton(Vermilion::Core::WindowMouseButton btn, Vermilion::Core::WindowMouseAction act){
+    ImGuiIO& io = ImGui::GetIO();
+    int button = ImGuiMouseButton_Left;
+    if(act==Vermilion::Core::WindowMouseAction::WINDOW_MOUSE_ACTION_PRESS)
+        io.MouseDown[button] = true;
+    else
+        io.MouseDown[button] = false;
+}
+
+void GUI::mousePos(double x, double y){
+    ImGuiIO& io = ImGui::GetIO();
+    io.MousePos = ImVec2((float)x, (float)y);
 }

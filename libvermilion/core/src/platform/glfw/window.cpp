@@ -41,6 +41,12 @@ void Vermilion::Core::GLFW::Window::createWindow(int width, int height){
 	glfwSetFramebufferSizeCallback(this->window, [](GLFWwindow * window, int width, int height){
 		((Vermilion::Core::GLFW::Window*)(glfwGetWindowUserPointer(window)))->instance->api->resize();
 	});
+	glfwSetMouseButtonCallback(this->window, [](GLFWwindow * window, int button, int action, int mods){
+		((Vermilion::Core::GLFW::Window*)(glfwGetWindowUserPointer(window)))->mouseButton(button, action, mods);
+	});
+	glfwSetCursorPosCallback(this->window, [](GLFWwindow * window, double x, double y){
+		((Vermilion::Core::GLFW::Window*)(glfwGetWindowUserPointer(window)))->mousePos(x, y);
+	});
 
 	// Initialize render context
 	this->instance->api->init();
@@ -77,7 +83,34 @@ void Vermilion::Core::GLFW::Window::setUserPointer(void * userPointer){
 
 void Vermilion::Core::GLFW::Window::resized(){
 	if(this->windowCallbackFunctions.resizeCallback){
-		this->windowCallbackFunctions.resizeCallback(this->instance, userPointer);
+		int width, height;
+		glfwGetFramebufferSize(this->window, &width, &height);
+		this->width = width;
+		this->height = height;
+		this->windowCallbackFunctions.resizeCallback(this->instance, userPointer, width, height);
+	}
+}
+
+void Vermilion::Core::GLFW::Window::mouseButton(int button, int action, int mods){
+	if(this->windowCallbackFunctions.mouseButtonCallback){
+		Vermilion::Core::WindowMouseAction wact = WINDOW_MOUSE_ACTION_PRESS;
+		if(action==GLFW_RELEASE){
+			wact = WINDOW_MOUSE_ACTION_RELEASE;
+		}
+		Vermilion::Core::WindowMouseButton wbtn= WINDOW_MOUSE_BUTTON_LEFT;
+		if(button==GLFW_MOUSE_BUTTON_MIDDLE){
+			wbtn = WINDOW_MOUSE_BUTTON_MIDDLE;
+		}
+		if(button==GLFW_MOUSE_BUTTON_RIGHT){
+			wbtn = WINDOW_MOUSE_BUTTON_RIGHT;
+		}
+		this->windowCallbackFunctions.mouseButtonCallback(this->instance, userPointer, wbtn, wact);
+	}
+}
+
+void Vermilion::Core::GLFW::Window::mousePos(double x, double y){
+	if(this->windowCallbackFunctions.mousePosCallback){
+		this->windowCallbackFunctions.mousePosCallback(this->instance, userPointer, x, y);
 	}
 }
 

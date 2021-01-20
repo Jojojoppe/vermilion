@@ -23,8 +23,21 @@ extern const int windowPlatform[];
 class Instance;
 class RenderTarget;
 
+enum WindowMouseButton{
+	WINDOW_MOUSE_BUTTON_LEFT=0,
+	WINDOW_MOUSE_BUTTON_MIDDLE,
+	WINDOW_MOUSE_BUTTON_RIGHT
+};
+
+enum WindowMouseAction{
+	WINDOW_MOUSE_ACTION_PRESS,
+	WINDOW_MOUSE_ACTION_RELEASE
+};
+
 struct WindowCallbackFunctions{
-	void (*resizeCallback)(Vermilion::Core::Instance * instance, void * userPointer) = nullptr;
+	void (*resizeCallback)(Vermilion::Core::Instance * instance, void * userPointer, int width, int height) = nullptr;
+	void (*mouseButtonCallback)(Vermilion::Core::Instance * instance, void * userPointer, WindowMouseButton button, WindowMouseAction action) = nullptr;
+	void (*mousePosCallback)(Vermilion::Core::Instance * instance, void * userPointer, double x, double y) = nullptr;
 };
 
 class Window{

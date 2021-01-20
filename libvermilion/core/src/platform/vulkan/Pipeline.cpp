@@ -335,8 +335,8 @@ void Vermilion::Core::Vulkan::Pipeline::setViewPort(unsigned int width, unsigned
 }
 
 void Vermilion::Core::Vulkan::Pipeline::setScissor(unsigned int width, unsigned int height, unsigned int x, unsigned int y){
-	this->scissor.extent = {(int32_t)width, (int32_t)height};
-	this->scissor.offset = {(int32_t)x, (int32_t)y};
+	this->scissor.extent = {(uint32_t)width, (uint32_t)height};
+	this->scissor.offset = {(int32_t)x, (int32_t)(y)};
 }
 
 void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Binding> binding){

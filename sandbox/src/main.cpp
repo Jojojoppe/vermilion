@@ -48,14 +48,22 @@ struct Application{
 
 	float time;
 
-	static void resize(VmInstance * instance, void * userPointer){
+	static void resize(VmInstance * instance, void * userPointer, int width, int height){
 		Application * app = (Application*) userPointer;
-		int width, height;
-		instance->window->getFrameBufferSize(&width, &height);
 		app->pipeline1->setViewPort(width, height, 0, 0);
 		app->pipeline1->setScissor(width, height, 0, 0);
 		app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
 		app->gui->resize(width, height);
+	}
+
+	static void mouseButton(VmInstance * instance, void * userPointer, Vermilion::Core::WindowMouseButton btn, Vermilion::Core::WindowMouseAction action){
+		Application * app = (Application*) userPointer;
+		app->gui->mouseButton(btn, action);
+	}
+
+	static void mousePos(VmInstance * instance, void * userPointer, double x, double y){
+		Application * app = (Application*) userPointer;
+		app->gui->mousePos(x, y);
 	}
 
 	Application(){
@@ -73,7 +81,7 @@ struct Application{
 			400,
 			VMCORE_LOGLEVEL_DEBUG,
 		0};
-		vmInstance.reset(new VmInstance(hintType, hintValue, Vermilion::Core::WindowCallbackFunctions{resize}));
+		vmInstance.reset(new VmInstance(hintType, hintValue, Vermilion::Core::WindowCallbackFunctions{resize, mouseButton, mousePos}));
 		vmInstance->window->setUserPointer(this);
 
 		gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
