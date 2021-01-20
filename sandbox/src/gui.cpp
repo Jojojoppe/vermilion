@@ -190,3 +190,8 @@ void GUI::mousePos(double x, double y){
     ImGuiIO& io = ImGui::GetIO();
     io.MousePos = ImVec2((float)x, (float)y);
 }
+
+void GUI::scroll(double x, double y){
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseWheel = y;
+}

@@ -38,6 +38,8 @@ struct WindowCallbackFunctions{
 	void (*resizeCallback)(Vermilion::Core::Instance * instance, void * userPointer, int width, int height) = nullptr;
 	void (*mouseButtonCallback)(Vermilion::Core::Instance * instance, void * userPointer, WindowMouseButton button, WindowMouseAction action) = nullptr;
 	void (*mousePosCallback)(Vermilion::Core::Instance * instance, void * userPointer, double x, double y) = nullptr;
+	void (*mouseEnterCallback)(Vermilion::Core::Instance * instance, void * userPointer, bool entered) = nullptr;
+	void (*scrollCallback)(Vermilion::Core::Instance * instance, void * userPointer, double x, double y) = nullptr;
 };
 
 class Window{

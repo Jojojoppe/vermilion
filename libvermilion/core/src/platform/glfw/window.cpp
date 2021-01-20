@@ -47,6 +47,12 @@ void Vermilion::Core::GLFW::Window::createWindow(int width, int height){
 	glfwSetCursorPosCallback(this->window, [](GLFWwindow * window, double x, double y){
 		((Vermilion::Core::GLFW::Window*)(glfwGetWindowUserPointer(window)))->mousePos(x, y);
 	});
+	glfwSetCursorEnterCallback(this->window, [](GLFWwindow * window, int direction){
+		((Vermilion::Core::GLFW::Window*)(glfwGetWindowUserPointer(window)))->mouseEnter(direction);
+	});
+	glfwSetScrollCallback(this->window, [](GLFWwindow * window, double x, double y){
+		((Vermilion::Core::GLFW::Window*)(glfwGetWindowUserPointer(window)))->scroll(x, y);
+	});
 
 	// Initialize render context
 	this->instance->api->init();
@@ -111,6 +117,21 @@ void Vermilion::Core::GLFW::Window::mouseButton(int button, int action, int mods
 void Vermilion::Core::GLFW::Window::mousePos(double x, double y){
 	if(this->windowCallbackFunctions.mousePosCallback){
 		this->windowCallbackFunctions.mousePosCallback(this->instance, userPointer, x, y);
+	}
+}
+
+void Vermilion::Core::GLFW::Window::mouseEnter(int direction){
+	if(this->windowCallbackFunctions.mouseEnterCallback){
+		if(direction)
+			this->windowCallbackFunctions.mouseEnterCallback(this->instance, userPointer, true);
+		else
+			this->windowCallbackFunctions.mouseEnterCallback(this->instance, userPointer, false);
+	}
+}
+
+void Vermilion::Core::GLFW::Window::scroll(double x, double y){
+	if(this->windowCallbackFunctions.scrollCallback){
+		this->windowCallbackFunctions.scrollCallback(this->instance, userPointer, x, y);
 	}
 }
 

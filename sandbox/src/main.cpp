@@ -66,6 +66,19 @@ struct Application{
 		app->gui->mousePos(x, y);
 	}
 
+	static void mouseEnter(VmInstance * instance, void * userPointer, bool enter){
+		if(enter){
+			instance->logger.log(VMCORE_LOGLEVEL_INFO, "Mouse entered");
+		}else{
+			instance->logger.log(VMCORE_LOGLEVEL_INFO, "Mouse left");
+		}
+	}
+
+	static void scroll(VmInstance * instance, void * userPointer, double x, double y){
+		Application * app = (Application*) userPointer;
+		app->gui->scroll(x, y);
+	}
+
 	Application(){
 		int hintType[] = {
 			Vermilion::Core::HintType::HINT_TYPE_WINDOW_PLATFORM, 
@@ -81,7 +94,7 @@ struct Application{
 			400,
 			VMCORE_LOGLEVEL_DEBUG,
 		0};
-		vmInstance.reset(new VmInstance(hintType, hintValue, Vermilion::Core::WindowCallbackFunctions{resize, mouseButton, mousePos}));
+		vmInstance.reset(new VmInstance(hintType, hintValue, Vermilion::Core::WindowCallbackFunctions{resize, mouseButton, mousePos, mouseEnter, scroll}));
 		vmInstance->window->setUserPointer(this);
 
 		gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
