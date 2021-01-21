@@ -8,6 +8,8 @@ set(CMAKE_BUILD_TYPE Debug)
 # LIBVERMILION_CORE
 # -----------------
 
+add_compile_definitions(__VERMILION_INTERNAL__)
+
 find_package(OpenGL)
 if(OPENGL_FOUND)
 	message("-- OpenGL found, add to source tree")

@@ -9,8 +9,10 @@
 #include "Texture.hpp"
 
 VmRenderTarget::~VmRenderTarget(){
-    // instance->rendertargets[ID].reset();
-    // instance->rendertargets.erase(ID);
+    if(ID){
+        instance->rendertargets[ID].reset();
+        instance->rendertargets.erase(ID);
+    }
 }
 void VmRenderTarget::start(float r, float g, float b, float a){
     instance->rendertargets[ID]->start(r, g, b, a);
@@ -26,8 +28,8 @@ void VmRenderTarget::draw(VmPipeline& pipeline, VmBinding& binding, VmRenderable
 }
 
 VmShader::~VmShader(){
-    // instance->shaders[ID].reset();
-    // instance->shaders.erase(ID);
+    instance->shaders[ID].reset();
+    instance->shaders.erase(ID);
 }
 Vermilion::Core::ShaderType VmShader::type(){
     auto shd = instance->shaders[ID];
@@ -35,18 +37,18 @@ Vermilion::Core::ShaderType VmShader::type(){
 }
 
 VmShaderProgram::~VmShaderProgram(){
-    // instance->shaderprograms[ID].reset();
-    // instance->shaderprograms.erase(ID);
+    instance->shaderprograms[ID].reset();
+    instance->shaderprograms.erase(ID);
 }
 
 VmPipelineLayout::~VmPipelineLayout(){
-    // instance->pipelinelayouts[ID].reset();
-    // instance->pipelinelayouts.erase(ID);
+    instance->pipelinelayouts[ID].reset();
+    instance->pipelinelayouts.erase(ID);
 }
 
 VmPipeline::~VmPipeline(){
-    // instance->pipelines[ID].reset();
-    // instance->pipelines.erase(ID);
+    instance->pipelines[ID].reset();
+    instance->pipelines.erase(ID);
 }
 void VmPipeline::setViewport(int width, int height, int x, int y){
     instance->pipelines[ID]->setViewPort(width, height, x, y);
@@ -56,13 +58,13 @@ void VmPipeline::setScissor(int width, int height, int x, int y){
 }
 
 VmBinding::~VmBinding(){
-    // instance->bindings[ID].reset();
-    // instance->bindings.erase(ID);
+    instance->bindings[ID].reset();
+    instance->bindings.erase(ID);
 }
 
 VmBuffer::~VmBuffer(){
-    // instance->buffers[ID].reset();
-    // instance->buffers.erase(ID);
+    instance->buffers[ID].reset();
+    instance->buffers.erase(ID);
 }
 Vermilion::Core::BufferType VmBuffer::type(){
     auto buf = instance->buffers[ID];
@@ -82,10 +84,8 @@ void VmBuffer::getData(void * data, size_t size){
 }
 
 VmRenderable::~VmRenderable(){
-    if(ID){
-        // instance->renderables[ID].reset();
-        // instance->renderables.erase(ID);
-    }
+    instance->renderables[ID].reset();
+    instance->renderables.erase(ID);
 }
 unsigned int VmRenderable::vertexOffset(){
     auto ren = instance->renderables[ID];
@@ -113,8 +113,8 @@ void VmRenderable::length(unsigned int length){
 }
 
 VmTexture::~VmTexture(){
-    // instance->textures[ID].reset();
-    // instance->textures.erase(ID);
+    instance->textures[ID].reset();
+    instance->textures.erase(ID);
 }
 size_t VmTexture::width(){
     auto tex = instance->textures[ID];
@@ -134,6 +134,6 @@ void VmTexture::setData(void * data, size_t size){
 }
 
 VmSampler::~VmSampler(){
-    // instance->samplers[ID].reset();
-    // instance->samplers.erase(ID);
+    instance->samplers[ID].reset();
+    instance->samplers.erase(ID);
 }

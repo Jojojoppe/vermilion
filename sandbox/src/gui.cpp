@@ -27,12 +27,12 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
     int Twidth, Theight;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &Twidth, &Theight);
 
-    renderTarget = instance->getDefaultRenderTarget();
-    texture = instance->createTexture(Twidth, Theight, 4);
-    texture->setData(pixels);
-    sampler = instance->createSampler(texture);
+    instance->getDefaultRenderTarget(renderTarget);
+    instance->createTexture(texture, Twidth, Theight, 4);
+    texture.setData(pixels);
+    instance->createSampler(sampler, texture);
 
-    vertexShader = instance->createShader(R"(
+    instance->createShader(vertexShader, R"(
 			#version 450
 			#extension GL_ARB_separate_shader_objects : enable
 			layout(location = 0) in vec2 aPos;
@@ -52,7 +52,7 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
 				fTexCoord = aTexCoord;
 			}
     )", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
-    fragmentShader = instance->createShader(R"(
+    instance->createShader(fragmentShader, R"(
 			#version 450
 			#extension GL_ARB_separate_shader_objects : enable
 
@@ -67,9 +67,9 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
 				outColor = fColor * texture(s_tex, fTexCoord);
 			}
     )", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
-    shaderProgram = instance->createShaderProgram({vertexShader, fragmentShader});
+    instance->createShaderProgram(shaderProgram, {&vertexShader, &fragmentShader});
 
-    pipelineLayout = instance->createPipelineLayout({
+    instance->createPipelineLayout(pipelineLayout, {
             Vermilion::Core::BufferLayoutElementFloat2("Position"),
             Vermilion::Core::BufferLayoutElementFloat2("UV"),
             Vermilion::Core::BufferLayoutElementByte4("Color"),
@@ -78,30 +78,30 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
             Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
     });
 
-    pipeline = instance->createPipeline(renderTarget, shaderProgram, pipelineLayout, {
+    instance->createPipeline(pipeline, renderTarget, shaderProgram, pipelineLayout, {
             Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_DISABLED,
             Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_NONE,
             Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
     });
 
-    uniformBuffer = instance->createBuffer(sizeof(UniformBufferType),
+    instance->createBuffer(uniformBuffer, sizeof(UniformBufferType),
         Vermilion::Core::BufferType::BUFFER_TYPE_UNIFORM,
         Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
         Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
     );
-    vertexBuffer = instance->createBuffer(1024*1024, 
+    instance->createBuffer(vertexBuffer, 1024*1024, 
         Vermilion::Core::BufferType::BUFFER_TYPE_VERTEX,
         Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
         Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
     );
-    indexBuffer = instance->createBuffer(1024*1024,
+    instance->createBuffer(indexBuffer, 1024*1024,
         Vermilion::Core::BufferType::BUFFER_TYPE_INDEX,
         Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
         Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC   
     );
-    renderable = instance->createRenderable(vertexBuffer, indexBuffer, 0, 0, 0);
+    instance->createRenderable(renderable, vertexBuffer, indexBuffer, 0, 0, 0);
 
-    binding = instance->createBinding({uniformBuffer}, {sampler});
+    instance->createBinding(binding, {&uniformBuffer}, {&sampler});
 
     m_time = std::chrono::high_resolution_clock::now();
 }
@@ -130,13 +130,13 @@ void GUI::render(){
     float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
     UniformBufferType ubo;
     ubo.proj = glm::ortho(L, R, B, T);
-    uniformBuffer->setData(&ubo);
+    uniformBuffer.setData(&ubo);
 
     for(int i=0; i<draw_data->CmdListsCount; i++){
         const ImDrawList * cmd_list = draw_data->CmdLists[i];
         
-        vertexBuffer->setData(cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * sizeof(ImDrawVert));
-        indexBuffer->setData(cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx));
+        vertexBuffer.setData(cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * sizeof(ImDrawVert));
+        indexBuffer.setData(cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx));
     
         for(int j=0; j<cmd_list->CmdBuffer.Size; j++){
             const ImDrawCmd * pcmd = &cmd_list->CmdBuffer[j];
@@ -153,11 +153,11 @@ void GUI::render(){
                         clip_rect.x = 0.0f;
                     if (clip_rect.y < 0.0f)
                         clip_rect.y = 0.0f;
-                    pipeline->setScissor(clip_rect.z-clip_rect.x, clip_rect.w-clip_rect.y, clip_rect.x, clip_rect.y);
-                    renderable->indexOffset = pcmd->IdxOffset;
-                    renderable->vertexOffset = pcmd->VtxOffset;
-                    renderable->length = pcmd->ElemCount;
-                    renderTarget->draw(pipeline, binding, renderable);
+                    pipeline.setScissor(clip_rect.z-clip_rect.x, clip_rect.w-clip_rect.y, clip_rect.x, clip_rect.y);
+                    renderable.indexOffset(pcmd->IdxOffset);
+                    renderable.vertexOffset(pcmd->VtxOffset);
+                    renderable.length(pcmd->ElemCount);
+                    renderTarget.draw(pipeline, binding, renderable);
                 }
             }
         }
@@ -173,8 +173,8 @@ void GUI::render(){
 void GUI::resize(int width, int height){
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2((float)width, (float)height);
-    this->pipeline->setViewPort(width, height);
-    this->pipeline->setScissor(width, height);
+    this->pipeline.setViewport(width, height, 0, 0);
+    this->pipeline.setScissor(width, height, 0, 0);
 }
 
 void GUI::mouseButton(Vermilion::Core::WindowMouseButton btn, Vermilion::Core::WindowMouseAction act){

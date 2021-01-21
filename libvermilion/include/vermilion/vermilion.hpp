@@ -97,6 +97,15 @@ enum BufferLayoutElementType{
 	BUFFER_LAYOUT_ELEMENT_TYPE_BYTE4,
 };
 
+enum HintType{
+	HINT_TYPE_NONE = 0,
+	HINT_TYPE_WINDOW_PLATFORM,
+	HINT_TYPE_RENDER_PLATFORM,
+	HINT_TYPE_WINDOW_HEIGHT,
+	HINT_TYPE_WINDOW_WIDTH,
+	HINT_TYPE_LOGLEVEL,
+};
+
 struct BufferLayoutElement{
 	std::string name;
 	unsigned int count;
@@ -155,58 +164,53 @@ class VmTexture;
 class VmSampler;
 class VmBinding;
 
-class VmRenderTarget{
-    public:
+class VmObject{
+	friend class Vermilion::Core::Instance;
+	protected:
         unsigned int ID;
         Vermilion::Core::Instance * instance;
+};
+
+class VmRenderTarget : public VmObject{
+    public:
         ~VmRenderTarget();
         void start(float r=0.0, float g=0.0, float b=0.0, float a=1.0);
         void end();
         void draw(VmPipeline& pipeline, VmBinding& binding, VmRenderable& renderable, unsigned int instanceCount=1, unsigned int firstInstance=0);
 };
 
-class VmShader{
+class VmShader : public VmObject{
     public:
-        unsigned int ID = 0;
-        Vermilion::Core::Instance * instance;
         ~VmShader();
         Vermilion::Core::ShaderType type();
 };
 
-class VmShaderProgram{
+class VmShaderProgram : public VmObject{
     public:
-        unsigned int ID;
-        Vermilion::Core::Instance * instance;
         ~VmShaderProgram();
 };
 
-class VmPipelineLayout{
+class VmPipelineLayout : public VmObject{
     public:
-        unsigned int ID;
-        Vermilion::Core::Instance * instance;
         ~VmPipelineLayout();
 };
 
-class VmPipeline{
+class VmPipeline : public VmObject{
+	friend class VmRenderTarget;
     public:
-        unsigned int ID;
-        Vermilion::Core::Instance * instance;
         ~VmPipeline();
         void setViewport(int width, int height, int x, int y);
         void setScissor(int width, int height, int x, int y);
 };
 
-class VmBinding{
+class VmBinding : public VmObject{
+	friend class VmRenderTarget;
     public:
-        unsigned int ID;
-        Vermilion::Core::Instance * instance;
         ~VmBinding();
 };
 
-class VmBuffer{
+class VmBuffer : public VmObject{
     public:
-        unsigned int ID;
-        Vermilion::Core::Instance * instance;
         ~VmBuffer();
         Vermilion::Core::BufferType type();
         size_t size();
@@ -214,10 +218,9 @@ class VmBuffer{
         void getData(void * data, size_t size);
 };
 
-class VmRenderable{
+class VmRenderable : public VmObject{
+	friend class VmRenderTarget;
     public:
-        unsigned int ID;
-        Vermilion::Core::Instance * instance;
         ~VmRenderable();
         unsigned int vertexOffset();
         unsigned int indexOffset();
@@ -227,10 +230,8 @@ class VmRenderable{
         void length(unsigned int length);
 };
 
-class VmTexture{
+class VmTexture : public VmObject{
     public:
-        unsigned int ID = 0;
-        Vermilion::Core::Instance * instance;
         ~VmTexture();
         size_t width();
         size_t height();
@@ -238,10 +239,8 @@ class VmTexture{
         void setData(void * data, size_t size=0);
 };
 
-class VmSampler{
+class VmSampler : public VmObject{
     public:
-        unsigned int ID;
-        Vermilion::Core::Instance * instance;
         ~VmSampler();
 };
 
@@ -252,3 +251,7 @@ unsigned char * loadTextureData(const std::string& path, size_t * width, size_t 
 void freeTextureData(unsigned char * data);
 
 }}
+
+#ifndef __VERMILION_INTERNAL__
+#include <vermilion/instance.hpp>
+#endif

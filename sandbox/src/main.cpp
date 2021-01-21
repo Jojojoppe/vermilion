@@ -1,11 +1,10 @@
 #include <vermilion/vermilion.hpp>
-#include <vermilion/instance.hpp>
 
 #include <vermilion/glm/glm.hpp>
 #include <vermilion/glm/gtc/matrix_transform.hpp>
 #include <memory>
 
-// #include "gui.hpp"
+#include "gui.hpp"
 
 struct UniformBufferObject{
 	glm::mat4 model;
@@ -46,7 +45,7 @@ struct Application{
 	UniformBufferObject ubo1;
 	UniformBufferObject ubo2;
 
-	// std::unique_ptr<GUI> gui;
+	std::unique_ptr<GUI> gui;
 
 	float time;
 
@@ -55,17 +54,17 @@ struct Application{
 		app->pipeline1.setViewport(width, height, 0, 0);
 		app->pipeline1.setScissor(width, height, 0, 0);
 		app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
-		// app->gui->resize(width, height);
+		app->gui->resize(width, height);
 	}
 
 	static void mouseButton(VmInstance * instance, void * userPointer, Vermilion::Core::WindowMouseButton btn, Vermilion::Core::WindowMouseAction action){
 		Application * app = (Application*) userPointer;
-		// app->gui->mouseButton(btn, action);
+		app->gui->mouseButton(btn, action);
 	}
 
 	static void mousePos(VmInstance * instance, void * userPointer, double x, double y){
 		Application * app = (Application*) userPointer;
-		// app->gui->mousePos(x, y);
+		app->gui->mousePos(x, y);
 	}
 
 	static void mouseEnter(VmInstance * instance, void * userPointer, bool enter){
@@ -78,7 +77,7 @@ struct Application{
 
 	static void scroll(VmInstance * instance, void * userPointer, double x, double y){
 		Application * app = (Application*) userPointer;
-		// app->gui->scroll(x, y);
+		app->gui->scroll(x, y);
 	}
 
 	Application(){
@@ -99,22 +98,22 @@ struct Application{
 		vmInstance.reset(new VmInstance(hintType, hintValue, Vermilion::Core::WindowCallbackFunctions{resize, mouseButton, mousePos, mouseEnter, scroll}));
 		vmInstance->window->setUserPointer(this);
 
-		// gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
+		gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
 
 		size_t width, height, channels;
 		unsigned char * texture1_pixels = Vermilion::Core::loadTextureData("../assets/texture1.jpg", &width, &height, &channels);
-		texture1 = vmInstance->createTexture(width, height, 4);
+		vmInstance->createTexture(texture1, width, height, 4);
 		texture1.setData(texture1_pixels);
 		Vermilion::Core::freeTextureData(texture1_pixels);
-		sampler1 = vmInstance->createSampler(texture1);
+		vmInstance->createSampler(sampler1, texture1);
 
-		texture2 = vmInstance->createTexture(512, 512, 4);
-		sampler2 = vmInstance->createSampler(texture2);
+		vmInstance->createTexture(texture2, 512, 512, 4);
+		vmInstance->createSampler(sampler2, texture2);
 
-		defaultRenderTarget = vmInstance->getDefaultRenderTarget();
-		textureRenderTarget = vmInstance->createRenderTarget(texture2);
+		vmInstance->getDefaultRenderTarget(defaultRenderTarget);
+		vmInstance->createRenderTarget(textureRenderTarget, texture2);
 
-		vertexShader = vmInstance->createShader(R"(
+		vmInstance->createShader(vertexShader, R"(
 			#version 450
 			#extension GL_ARB_separate_shader_objects : enable
 			layout(location = 0) in vec4 aPos;
@@ -136,7 +135,7 @@ struct Application{
 				fTexCoord = aTexCoord;
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
-		fragmentShader = vmInstance->createShader(R"(
+		vmInstance->createShader(fragmentShader, R"(
 			#version 450
 			#extension GL_ARB_separate_shader_objects : enable
 
@@ -151,9 +150,9 @@ struct Application{
 				outColor = texture(s_tex, fTexCoord);
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
-		shaderProgram = vmInstance->createShaderProgram({&vertexShader, &fragmentShader});
+		vmInstance->createShaderProgram(shaderProgram, {&vertexShader, &fragmentShader});
 
-		pipelineLayout = vmInstance->createPipelineLayout({
+		vmInstance->createPipelineLayout(pipelineLayout, {
 				Vermilion::Core::BufferLayoutElementFloat4("aPos"),
 				Vermilion::Core::BufferLayoutElementFloat3("aColor"),
 				Vermilion::Core::BufferLayoutElementFloat2("aTexCoord")
@@ -162,13 +161,13 @@ struct Application{
 				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
 		});
 
-		pipeline1 = vmInstance->createPipeline(defaultRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
+		vmInstance->createPipeline(pipeline1, defaultRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
 				Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_ENABLED,
 				Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_BACK_CC,
 				Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
 		});
 
-		pipeline2 = vmInstance->createPipeline(textureRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
+		vmInstance->createPipeline(pipeline2, textureRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
 				Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_ENABLED,
 				Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_BACK_CC,
 				Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
@@ -186,26 +185,26 @@ struct Application{
 			0, 1, 2,
 			2, 3, 0,
 		});
-		vertexBuffer = vmInstance->createBuffer(sizeof(float)*vertices.size(), 
+		vmInstance->createBuffer(vertexBuffer, sizeof(float)*vertices.size(), 
 			Vermilion::Core::BufferType::BUFFER_TYPE_VERTEX,
 			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
 			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_STATIC
 		);
-		indexBuffer = vmInstance->createBuffer(sizeof(unsigned int)*indices.size(),
+		vmInstance->createBuffer(indexBuffer, sizeof(unsigned int)*indices.size(),
 			Vermilion::Core::BufferType::BUFFER_TYPE_INDEX,
 			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
 			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_STATIC
 		);
 		vertexBuffer.setData(vertices.data());
 		indexBuffer.setData(indices.data());
-		object = vmInstance->createRenderable(vertexBuffer, indexBuffer, 0, 0, indices.size());
+		vmInstance->createRenderable(object, vertexBuffer, indexBuffer, 0, 0, indices.size());
 
-		uniformBuffer1 = vmInstance->createBuffer(sizeof(UniformBufferObject),
+		vmInstance->createBuffer(uniformBuffer1, sizeof(UniformBufferObject),
 			Vermilion::Core::BufferType::BUFFER_TYPE_UNIFORM,
 			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
 			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
 		);
-		uniformBuffer2 = vmInstance->createBuffer(sizeof(UniformBufferObject),
+		vmInstance->createBuffer(uniformBuffer2, sizeof(UniformBufferObject),
 			Vermilion::Core::BufferType::BUFFER_TYPE_UNIFORM,
 			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
 			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
@@ -219,8 +218,8 @@ struct Application{
 		ubo2.view = glm::mat4(1.0f);
 		ubo2.proj = glm::mat4(1.0f);
 
-		binding1 = vmInstance->createBinding({&uniformBuffer1}, {&sampler2});
-		binding2 = vmInstance->createBinding({&uniformBuffer2}, {&sampler1});
+		vmInstance->createBinding(binding1, {&uniformBuffer1}, {&sampler2});
+		vmInstance->createBinding(binding2, {&uniformBuffer2}, {&sampler1});
 
 		time = 0.0f;
 	}
@@ -240,7 +239,7 @@ struct Application{
 
 			defaultRenderTarget.start(0.05, 0.05, 0.05, 1.0);
 			defaultRenderTarget.draw(pipeline1, binding1, object);
-			// gui->render();
+			gui->render();
 			defaultRenderTarget.end();
 
 			vmInstance->endRender({&textureRenderTarget});
