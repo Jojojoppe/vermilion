@@ -27,6 +27,12 @@ Vermilion::Core::OpenGL::Texture::Texture(Vermilion::Core::OpenGL::API * api, si
     this->format = OpenGLChannelFormatField[channels];
 
     glGenTextures(1, &this->texture);
+    char * px = new char[this->size];
+    for(int i=0; i<this->size; i++){
+        px[i] = 0;
+    }
+    this->setData(px, this->size);
+    delete[] px;
 }
 
 Vermilion::Core::OpenGL::Texture::~Texture(){

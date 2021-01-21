@@ -15,8 +15,8 @@ struct Application{
 
 	std::shared_ptr<VmInstance> vmInstance;
 
-	VmTexture texture1;
-	VmSampler sampler1;
+	VmTexture texture1, texture2;
+	VmSampler sampler1, sampler2;
 
 	VmShader vertexShader, fragmentShader;
 	VmShaderProgram shaderProgram;
@@ -46,6 +46,9 @@ struct Application{
 		texture1.setData(texture1_pixels);
 		Vermilion::Core::freeTextureData(texture1_pixels);
 		vmInstance->createSampler(sampler1, texture1);
+
+		vmInstance->createTexture(texture2, 512, 512, 4);
+		vmInstance->createSampler(sampler2, texture2);
 
 		vmInstance->createShader(vertexShader, R"(
 			#version 450
