@@ -69,6 +69,10 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vkCommandPool.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/vk_mem_alloc.cpp
 
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/api.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/Texture.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/Shader.cpp
+
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/glfw/window.cpp
 
 	${GLAD_SOURCES}
