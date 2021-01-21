@@ -8,8 +8,8 @@
 #include <cstdint>
 #include <vector>
 
-#include <vermilion/Buffer.hpp>
-#include <vermilion/Renderable.hpp>
+#include "../../Buffer.hpp"
+#include "../../Renderable.hpp"
 
 namespace Vermilion{
 namespace Core{

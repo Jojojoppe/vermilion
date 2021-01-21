@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <vector>
 
-#include <vermilion/Shader.hpp>
+#include "../../Shader.hpp"
 
 namespace Vermilion{
 namespace Core{
@@ -43,7 +43,7 @@ class ShaderProgram : public Vermilion::Core::ShaderProgram{
 
 		std::vector<VkShaderModule> vk_shadermodules;
 
-		ShaderProgram(API * api, std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders);
+		ShaderProgram(API * api, std::vector<std::shared_ptr<Vermilion::Core::Shader>>& shaders);
 		~ShaderProgram();
 
 		void createModules();

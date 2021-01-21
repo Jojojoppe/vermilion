@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vermilion/vermilion.hpp>
 #include <vermilion/logger.hpp>
 
 #include <memory>
@@ -7,13 +8,6 @@
 
 namespace Vermilion{
 namespace Core{
-
-enum ShaderType{
-	SHADER_TYPE_VERTEX,
-	SHADER_TYPE_GEOMETRY,
-	SHADER_TYPE_FRAGMENT,
-	SHADER_TYPE_COMPUTE
-};
 
 class Shader{
 	public:

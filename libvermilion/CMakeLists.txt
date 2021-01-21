@@ -48,8 +48,7 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/instance.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/Buffer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/stb_image.cpp
-
-	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/api.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/vermilion.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/api.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/vulkan/RenderTarget.cpp

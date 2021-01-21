@@ -1,7 +1,8 @@
 #pragma once
 
+#include "Buffer.hpp"
+#include <vermilion/vermilion.hpp>
 #include <vermilion/logger.hpp>
-#include <vermilion/Buffer.hpp>
 
 #include <memory>
 #include <vector>

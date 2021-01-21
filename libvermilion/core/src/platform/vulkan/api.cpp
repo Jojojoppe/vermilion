@@ -179,7 +179,7 @@ void Vermilion::Core::Vulkan::API::startRender(){
 	imagesInFlight[imageIndex] = inFlightFences[currentFrame];
 }
 
-void Vermilion::Core::Vulkan::API::endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets){
+void Vermilion::Core::Vulkan::API::endRender(std::vector<std::shared_ptr<Vermilion::Core::RenderTarget>>& extraRenderTargets){
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	
@@ -242,7 +242,7 @@ std::shared_ptr<Vermilion::Core::Shader> Vermilion::Core::Vulkan::API::createSha
 	return std::static_pointer_cast<Vermilion::Core::Shader>(std::make_shared<Vermilion::Core::Vulkan::Shader>(this, source, type));
 }
 
-std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::createShaderProgram(std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders){
+std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::createShaderProgram(std::vector<std::shared_ptr<Vermilion::Core::Shader>>& shaders){
 	return std::static_pointer_cast<Vermilion::Core::ShaderProgram>(std::make_shared<Vermilion::Core::Vulkan::ShaderProgram>(this, shaders));
 }
 
@@ -257,7 +257,7 @@ std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createP
 	return std::static_pointer_cast<Vermilion::Core::Pipeline>(newpipeline);
 }
 
-std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Vulkan::API::createBinding(std::initializer_list<std::shared_ptr<Vermilion::Core::Buffer>> buffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+std::shared_ptr<Vermilion::Core::Binding> Vermilion::Core::Vulkan::API::createBinding(std::vector<std::shared_ptr<Vermilion::Core::Buffer>>& buffers, std::vector<std::shared_ptr<Vermilion::Core::Sampler>>& samplers){
 	return std::static_pointer_cast<Vermilion::Core::Binding>(std::make_shared<Vermilion::Core::Vulkan::Binding>(this, buffers, samplers));
 }
 

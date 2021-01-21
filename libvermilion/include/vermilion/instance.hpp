@@ -1,21 +1,16 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 
-#include <vermilion/api.hpp>
 #include <vermilion/window.hpp>
 #include <vermilion/logger.hpp>
-#include <vermilion/Shader.hpp>
-#include <vermilion/Pipeline.hpp>
-#include <vermilion/Buffer.hpp>
-#include <vermilion/Renderable.hpp>
-#include <vermilion/Texture.hpp>
+#include <vermilion/vermilion.hpp>
 
 namespace Vermilion{
 namespace Core{
 
 class API;
-class RenderTarget;
 
 /**
  * @brief Hint types
@@ -29,6 +24,17 @@ enum HintType{
 	HINT_TYPE_LOGLEVEL,
 };
 
+class Renderable;
+class RenderTarget;
+class Texture;
+class Shader;
+class ShaderProgram;
+class PipelineLayout;
+class Pipeline;
+class Sampler;
+class Buffer;
+class Binding;
+
 /**
  * @brief The instance class it the most top level class of Vermilion
  */
@@ -40,6 +46,20 @@ class Instance{
 
 		int platform_render;
 		int platform_window;
+
+		// Vermilion objects: <ID, object>
+		unsigned int IDcounter = 1;
+		// ID==0: default render target
+		std::unordered_map<unsigned int, std::shared_ptr<Renderable>> renderables;
+		std::unordered_map<unsigned int, std::shared_ptr<RenderTarget>> rendertargets;
+		std::unordered_map<unsigned int, std::shared_ptr<Texture>> textures;
+		std::unordered_map<unsigned int, std::shared_ptr<Shader>> shaders;
+		std::unordered_map<unsigned int, std::shared_ptr<ShaderProgram>> shaderprograms;
+		std::unordered_map<unsigned int, std::shared_ptr<PipelineLayout>> pipelinelayouts;
+		std::unordered_map<unsigned int, std::shared_ptr<Pipeline>> pipelines;
+		std::unordered_map<unsigned int, std::shared_ptr<Sampler>> samplers;
+		std::unordered_map<unsigned int, std::shared_ptr<Buffer>> buffers;
+		std::unordered_map<unsigned int, std::shared_ptr<Binding>> bindings;
 
 	private:
 
@@ -56,25 +76,25 @@ class Instance{
 		~Instance();
 
 		void startRender();
-		void endRender(std::initializer_list<std::shared_ptr<RenderTarget>> extraRenderTargets = {});
+		void endRender(std::initializer_list<VmRenderTarget*> extraRenderTargets = {});
 
-		std::shared_ptr<RenderTarget> getDefaultRenderTarget();
-		std::shared_ptr<RenderTarget> createRenderTarget(std::shared_ptr<Texture> texture);
+		VmRenderTarget getDefaultRenderTarget();
+		VmRenderTarget createRenderTarget(VmTexture& texture);
 
-		std::shared_ptr<Shader> createShader(const std::string& source, ShaderType type);
-		std::shared_ptr<ShaderProgram> createShaderProgram(std::initializer_list<std::shared_ptr<Shader>> shaders);
+		VmShader createShader(const std::string& source, ShaderType type);
+		VmShaderProgram createShaderProgram(std::initializer_list<VmShader*> shaders);
 
-		std::shared_ptr<PipelineLayout> createPipelineLayout(std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> bindings);
-		std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, std::shared_ptr<PipelineLayout> pipelineLayout, PipelineSettings settings);
-		std::shared_ptr<Binding> createBinding(std::initializer_list<std::shared_ptr<Buffer>> buffers, std::initializer_list<std::shared_ptr<Sampler>> samplers);
+		VmPipelineLayout createPipelineLayout(std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> bindings);
+		VmPipeline createPipeline(VmRenderTarget& renderTarget, VmShaderProgram& shaderProgram, VmPipelineLayout& pipelineLayout, PipelineSettings settings);
+		VmBinding createBinding(std::initializer_list<VmBuffer*> buffers, std::initializer_list<VmSampler*> samplers);
 
-		std::shared_ptr<Buffer> createBuffer(size_t size, BufferType type, BufferUsage usage, BufferDataUsage dataUsage);
+		VmBuffer createBuffer(size_t size, BufferType type, BufferUsage usage, BufferDataUsage dataUsage);
 
-		std::shared_ptr<Renderable> createRenderable(std::shared_ptr<Buffer> vertexBuffer, std::shared_ptr<Buffer> indexBuffer, 
+		VmRenderable createRenderable(VmBuffer& vertexBuffer, VmBuffer& indexBuffer, 
 			unsigned int vertexOffset, unsigned int indexOffset, unsigned int length);
 
-		std::shared_ptr<Texture> createTexture(size_t width=0, size_t height=0, unsigned int channels=0);
-		std::shared_ptr<Sampler> createSampler(std::shared_ptr<Texture> texture);
+		VmTexture createTexture(size_t width=0, size_t height=0, unsigned int channels=0);
+		VmSampler createSampler(VmTexture& texture);
 
 	private:
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);

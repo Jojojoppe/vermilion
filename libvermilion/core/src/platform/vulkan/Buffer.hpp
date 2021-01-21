@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <vector>
 
-#include <vermilion/Buffer.hpp>
+#include "../../Buffer.hpp"
 #include "vk_mem_alloc.h"
 
 namespace Vermilion{

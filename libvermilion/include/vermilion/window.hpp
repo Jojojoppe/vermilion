@@ -2,6 +2,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace Vermilion{
 namespace Core{
@@ -57,7 +58,7 @@ class Window{
 
 		virtual void createWindow(int width, int height){};
 		virtual void startRender(){};
-		virtual void endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets){};
+		virtual void endRender(std::vector<std::shared_ptr<Vermilion::Core::RenderTarget>>& extraRenderTargets){};
 
 		virtual bool shouldClose(){return true;};
 

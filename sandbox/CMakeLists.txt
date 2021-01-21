@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_executable(sandbox
 	${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp	
-	${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp	
+	# ${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp	
 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui_draw.cpp

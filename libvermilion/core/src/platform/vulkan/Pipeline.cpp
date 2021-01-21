@@ -439,7 +439,7 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 	}
 }
 
-Vermilion::Core::Vulkan::Binding::Binding(Vermilion::Core::Vulkan::API* api, std::initializer_list<std::shared_ptr<Vermilion::Core::Buffer>> buffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers){
+Vermilion::Core::Vulkan::Binding::Binding(Vermilion::Core::Vulkan::API* api, std::vector<std::shared_ptr<Vermilion::Core::Buffer>>& buffers, std::vector<std::shared_ptr<Vermilion::Core::Sampler>>& samplers){
 	this->api = api;
 	this->instance = api->instance;
 	for(const auto& u : buffers){

@@ -1,6 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#include <vermilion/Texture.hpp>
+#include "Texture.hpp"
 #include <string>
 
 unsigned char * Vermilion::Core::loadTextureData(const std::string& path, size_t * width, size_t * height, size_t * channels){

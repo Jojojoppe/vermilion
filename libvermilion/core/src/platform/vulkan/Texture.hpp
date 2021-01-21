@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <vermilion/Texture.hpp>
+#include "../../Texture.hpp"
 #include "vk_mem_alloc.h"
 #include "vkImageView.hpp"
 

@@ -61,7 +61,7 @@ Vermilion::Core::Vulkan::Shader::Shader(Vermilion::Core::Vulkan::API * api, cons
 Vermilion::Core::Vulkan::Shader::~Shader(){	
 }
 
-Vermilion::Core::Vulkan::ShaderProgram::ShaderProgram(Vermilion::Core::Vulkan::API * api, std::initializer_list<std::shared_ptr<Vermilion::Core::Shader>> shaders){
+Vermilion::Core::Vulkan::ShaderProgram::ShaderProgram(Vermilion::Core::Vulkan::API * api, std::vector<std::shared_ptr<Vermilion::Core::Shader>>& shaders){
 	this->api = api;
 	this->instance = api->instance;
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vermilion/vermilion.hpp>
 #include <vermilion/logger.hpp>
 
 #include <memory>

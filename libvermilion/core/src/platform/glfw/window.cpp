@@ -2,6 +2,8 @@
 
 #include "window.hpp"
 #include <vermilion/instance.hpp>
+#include <vermilion/vermilion.hpp>
+#include "../../api.hpp"
 
 #include <stdint.h>
 #include <stdexcept>
@@ -72,7 +74,7 @@ void Vermilion::Core::GLFW::Window::startRender(){
 	this->instance->api->startRender();
 }
 
-void Vermilion::Core::GLFW::Window::endRender(std::initializer_list<std::shared_ptr<Vermilion::Core::RenderTarget>> extraRenderTargets){
+void Vermilion::Core::GLFW::Window::endRender(std::vector<std::shared_ptr<Vermilion::Core::RenderTarget>>& extraRenderTargets){
 	this->instance->api->endRender(extraRenderTargets);
 	if(this->renderPlatform==Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL){
 		glfwSwapBuffers(this->window);

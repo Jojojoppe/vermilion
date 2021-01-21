@@ -1,12 +1,13 @@
 #pragma once
 
+#include <vermilion/vermilion.hpp>
 #include <vermilion/instance.hpp>
 #include <vermilion/window.hpp>
 #include <vermilion/logger.hpp>
 
-#include <vermilion/Pipeline.hpp>
-#include <vermilion/Buffer.hpp>
-#include <vermilion/Renderable.hpp>
+#include "Pipeline.hpp"
+#include "Buffer.hpp"
+#include "Renderable.hpp"
 
 #include <memory>
 

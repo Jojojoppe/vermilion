@@ -1,9 +1,11 @@
 #include <vermilion/vermilion.hpp>
+#include <vermilion/instance.hpp>
+
 #include <vermilion/glm/glm.hpp>
 #include <vermilion/glm/gtc/matrix_transform.hpp>
 #include <memory>
 
-#include "gui.hpp"
+// #include "gui.hpp"
 
 struct UniformBufferObject{
 	glm::mat4 model;
@@ -44,26 +46,26 @@ struct Application{
 	UniformBufferObject ubo1;
 	UniformBufferObject ubo2;
 
-	std::unique_ptr<GUI> gui;
+	// std::unique_ptr<GUI> gui;
 
 	float time;
 
 	static void resize(VmInstance * instance, void * userPointer, int width, int height){
 		Application * app = (Application*) userPointer;
-		app->pipeline1->setViewPort(width, height, 0, 0);
-		app->pipeline1->setScissor(width, height, 0, 0);
+		app->pipeline1.setViewport(width, height, 0, 0);
+		app->pipeline1.setScissor(width, height, 0, 0);
 		app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
-		app->gui->resize(width, height);
+		// app->gui->resize(width, height);
 	}
 
 	static void mouseButton(VmInstance * instance, void * userPointer, Vermilion::Core::WindowMouseButton btn, Vermilion::Core::WindowMouseAction action){
 		Application * app = (Application*) userPointer;
-		app->gui->mouseButton(btn, action);
+		// app->gui->mouseButton(btn, action);
 	}
 
 	static void mousePos(VmInstance * instance, void * userPointer, double x, double y){
 		Application * app = (Application*) userPointer;
-		app->gui->mousePos(x, y);
+		// app->gui->mousePos(x, y);
 	}
 
 	static void mouseEnter(VmInstance * instance, void * userPointer, bool enter){
@@ -76,7 +78,7 @@ struct Application{
 
 	static void scroll(VmInstance * instance, void * userPointer, double x, double y){
 		Application * app = (Application*) userPointer;
-		app->gui->scroll(x, y);
+		// app->gui->scroll(x, y);
 	}
 
 	Application(){
@@ -97,12 +99,12 @@ struct Application{
 		vmInstance.reset(new VmInstance(hintType, hintValue, Vermilion::Core::WindowCallbackFunctions{resize, mouseButton, mousePos, mouseEnter, scroll}));
 		vmInstance->window->setUserPointer(this);
 
-		gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
+		// gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
 
 		size_t width, height, channels;
 		unsigned char * texture1_pixels = Vermilion::Core::loadTextureData("../assets/texture1.jpg", &width, &height, &channels);
 		texture1 = vmInstance->createTexture(width, height, 4);
-		texture1->setData(texture1_pixels);
+		texture1.setData(texture1_pixels);
 		Vermilion::Core::freeTextureData(texture1_pixels);
 		sampler1 = vmInstance->createSampler(texture1);
 
@@ -149,7 +151,7 @@ struct Application{
 				outColor = texture(s_tex, fTexCoord);
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
-		shaderProgram = vmInstance->createShaderProgram({vertexShader, fragmentShader});
+		shaderProgram = vmInstance->createShaderProgram({&vertexShader, &fragmentShader});
 
 		pipelineLayout = vmInstance->createPipelineLayout({
 				Vermilion::Core::BufferLayoutElementFloat4("aPos"),
@@ -171,8 +173,8 @@ struct Application{
 				Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_BACK_CC,
 				Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
 		});
-		pipeline2->setViewPort(texture2->width, texture2->height, 0, 0);
-		pipeline2->setScissor(texture2->width, texture2->height, 0, 0);
+		pipeline2.setViewport(texture2.width(), texture2.height(), 0, 0);
+		pipeline2.setScissor(texture2.width(), texture2.height(), 0, 0);
 
 		std::vector<float> vertices({
 			-1.0,	-1.0,	0.0,	1.0,		1.0,	0.0,	0.0,		1.0, 	0.0,
@@ -194,8 +196,8 @@ struct Application{
 			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
 			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_STATIC
 		);
-		vertexBuffer->setData(vertices.data());
-		indexBuffer->setData(indices.data());
+		vertexBuffer.setData(vertices.data());
+		indexBuffer.setData(indices.data());
 		object = vmInstance->createRenderable(vertexBuffer, indexBuffer, 0, 0, indices.size());
 
 		uniformBuffer1 = vmInstance->createBuffer(sizeof(UniformBufferObject),
@@ -217,8 +219,8 @@ struct Application{
 		ubo2.view = glm::mat4(1.0f);
 		ubo2.proj = glm::mat4(1.0f);
 
-		binding1 = vmInstance->createBinding({uniformBuffer1}, {sampler2});
-		binding2 = vmInstance->createBinding({uniformBuffer2}, {sampler1});
+		binding1 = vmInstance->createBinding({&uniformBuffer1}, {&sampler2});
+		binding2 = vmInstance->createBinding({&uniformBuffer2}, {&sampler1});
 
 		time = 0.0f;
 	}
@@ -228,20 +230,20 @@ struct Application{
 			vmInstance->startRender();
 
 			ubo1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			uniformBuffer1->setData(&ubo1);
+			uniformBuffer1.setData(&ubo1);
 			ubo2.model = glm::rotate(glm::mat4(1.0f), -1*time*glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			uniformBuffer2->setData(&ubo2);
+			uniformBuffer2.setData(&ubo2);
 
-			textureRenderTarget->start(1.0, 0.0, 0.0, 1.0);
-			textureRenderTarget->draw(pipeline2, binding2, object);
-			textureRenderTarget->end();
+			textureRenderTarget.start(1.0, 0.0, 0.0, 1.0);
+			textureRenderTarget.draw(pipeline2, binding2, object);
+			textureRenderTarget.end();
 
-			defaultRenderTarget->start(0.05, 0.05, 0.05, 1.0);
-			defaultRenderTarget->draw(pipeline1, binding1, object);
-			gui->render();
-			defaultRenderTarget->end();
+			defaultRenderTarget.start(0.05, 0.05, 0.05, 1.0);
+			defaultRenderTarget.draw(pipeline1, binding1, object);
+			// gui->render();
+			defaultRenderTarget.end();
 
-			vmInstance->endRender({textureRenderTarget});
+			vmInstance->endRender({&textureRenderTarget});
 			time += 0.01f;
 		}
 	}

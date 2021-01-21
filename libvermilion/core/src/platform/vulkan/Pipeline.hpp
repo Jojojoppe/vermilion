@@ -9,9 +9,9 @@
 #include <vector>
 #include <unordered_map>
 
-#include <vermilion/Pipeline.hpp>
-#include <vermilion/Buffer.hpp>
-#include <vermilion/Texture.hpp>
+#include "../../Pipeline.hpp"
+#include "../../Buffer.hpp"
+#include "../../Texture.hpp"
 
 namespace Vermilion{
 namespace Core{
@@ -35,7 +35,7 @@ class Binding : public Vermilion::Core::Binding{
 		std::vector<std::shared_ptr<Vermilion::Core::Vulkan::Buffer>> buffers;
 		std::vector<std::shared_ptr<Vermilion::Core::Vulkan::Sampler>> samplers;
 
-		Binding(API * api, std::initializer_list<std::shared_ptr<Vermilion::Core::Buffer>> buffers, std::initializer_list<std::shared_ptr<Vermilion::Core::Sampler>> samplers);
+		Binding(API * api, std::vector<std::shared_ptr<Vermilion::Core::Buffer>>& buffers, std::vector<std::shared_ptr<Vermilion::Core::Sampler>>& samplers);
 		~Binding();
 };
 
