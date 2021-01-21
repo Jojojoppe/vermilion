@@ -17,11 +17,12 @@
 
 #include <string>
 #include <cstddef>
-#include <vermilion/window.hpp>
 #include <vermilion/logger.hpp>
 
 namespace Vermilion{
 namespace Core{
+
+class Instance;
 
 enum RenderPlatform{
 	RENDER_PLATFORM_NONE = 0,
@@ -97,6 +98,30 @@ enum BufferLayoutElementType{
 	BUFFER_LAYOUT_ELEMENT_TYPE_BYTE4,
 };
 
+enum WindowMouseButton{
+	WINDOW_MOUSE_BUTTON_LEFT=0,
+	WINDOW_MOUSE_BUTTON_MIDDLE,
+	WINDOW_MOUSE_BUTTON_RIGHT
+};
+
+enum WindowMouseAction{
+	WINDOW_MOUSE_ACTION_PRESS,
+	WINDOW_MOUSE_ACTION_RELEASE
+};
+
+enum WindowPlatform{
+	WINDOW_PLATFORM_NONE = 0,
+	WINDOW_PLATFORM_GLFW
+};
+
+struct WindowCallbackFunctions{
+	void (*resizeCallback)(Vermilion::Core::Instance * instance, void * userPointer, int width, int height) = nullptr;
+	void (*mouseButtonCallback)(Vermilion::Core::Instance * instance, void * userPointer, WindowMouseButton button, WindowMouseAction action) = nullptr;
+	void (*mousePosCallback)(Vermilion::Core::Instance * instance, void * userPointer, double x, double y) = nullptr;
+	void (*mouseEnterCallback)(Vermilion::Core::Instance * instance, void * userPointer, bool entered) = nullptr;
+	void (*scrollCallback)(Vermilion::Core::Instance * instance, void * userPointer, double x, double y) = nullptr;
+};
+
 enum HintType{
 	HINT_TYPE_NONE = 0,
 	HINT_TYPE_WINDOW_PLATFORM,
@@ -146,8 +171,6 @@ struct BufferLayoutElementByte4 : public BufferLayoutElement{
 			type = BUFFER_LAYOUT_ELEMENT_TYPE_BYTE4;
 		}
 };
-
-class Instance;
 
 }}
 

@@ -3,6 +3,7 @@
 #include <vermilion/glm/glm.hpp>
 #include <vermilion/glm/gtc/matrix_transform.hpp>
 #include <memory>
+#include <vector>
 
 #include "gui.hpp"
 
@@ -95,10 +96,9 @@ struct Application{
 			400,
 			VMCORE_LOGLEVEL_DEBUG,
 		0};
-		vmInstance.reset(new VmInstance(hintType, hintValue, Vermilion::Core::WindowCallbackFunctions{resize, mouseButton, mousePos, mouseEnter, scroll}));
-		vmInstance->window->setUserPointer(this);
+		vmInstance.reset(new VmInstance(hintType, hintValue, this, Vermilion::Core::WindowCallbackFunctions{resize, mouseButton, mousePos, mouseEnter, scroll}));
 
-		gui.reset(new GUI(vmInstance, vmInstance->window->width, vmInstance->window->height));
+		gui.reset(new GUI(vmInstance, 400, 400));
 
 		size_t width, height, channels;
 		unsigned char * texture1_pixels = Vermilion::Core::loadTextureData("../assets/texture1.jpg", &width, &height, &channels);
@@ -212,7 +212,7 @@ struct Application{
 
 		ubo1.model = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ubo1.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo1.proj = glm::perspective(glm::radians(45.0f), vmInstance->window->width/(float)vmInstance->window->height, 0.1f, 10.0f);
+		ubo1.proj = glm::perspective(glm::radians(45.0f), (float)400/400, 0.1f, 10.0f);
 
 		ubo2.model = glm::mat4(0.5f);
 		ubo2.view = glm::mat4(1.0f);
@@ -225,7 +225,7 @@ struct Application{
 	}
 
 	void run(){
-		while(vmInstance->window->shouldClose()){
+		while(vmInstance->shouldClose()){
 			vmInstance->startRender();
 
 			ubo1.model = glm::rotate(glm::mat4(1.0f), time*glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));

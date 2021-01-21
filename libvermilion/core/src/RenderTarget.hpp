@@ -2,7 +2,7 @@
 
 #include <vermilion/vermilion.hpp>
 #include <vermilion/instance.hpp>
-#include <vermilion/window.hpp>
+#include "window.hpp"
 #include <vermilion/logger.hpp>
 
 #include "Pipeline.hpp"

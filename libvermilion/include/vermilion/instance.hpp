@@ -3,15 +3,14 @@
 #include <memory>
 #include <unordered_map>
 
-#include <vermilion/window.hpp>
-#include <vermilion/logger.hpp>
 #include <vermilion/vermilion.hpp>
+#include <vermilion/logger.hpp>
 
 namespace Vermilion{
 namespace Core{
 
 class API;
-
+class Window;
 class Renderable;
 class RenderTarget;
 class Texture;
@@ -23,11 +22,7 @@ class Sampler;
 class Buffer;
 class Binding;
 
-/**
- * @brief The instance class it the most top level class of Vermilion
- */
 class Instance{
-	friend class VmObject;
 	public:
 		Logger logger;
 		std::shared_ptr<API> api;
@@ -36,32 +31,7 @@ class Instance{
 		int platform_render;
 		int platform_window;
 
-		// Vermilion objects: <ID, object>
-		// ID==0: default render target
-		std::unordered_map<unsigned int, std::shared_ptr<Renderable>> renderables;
-		std::unordered_map<unsigned int, std::shared_ptr<RenderTarget>> rendertargets;
-		std::unordered_map<unsigned int, std::shared_ptr<Texture>> textures;
-		std::unordered_map<unsigned int, std::shared_ptr<Shader>> shaders;
-		std::unordered_map<unsigned int, std::shared_ptr<ShaderProgram>> shaderprograms;
-		std::unordered_map<unsigned int, std::shared_ptr<PipelineLayout>> pipelinelayouts;
-		std::unordered_map<unsigned int, std::shared_ptr<Pipeline>> pipelines;
-		std::unordered_map<unsigned int, std::shared_ptr<Sampler>> samplers;
-		std::unordered_map<unsigned int, std::shared_ptr<Buffer>> buffers;
-		std::unordered_map<unsigned int, std::shared_ptr<Binding>> bindings;
-
-	private:
-		unsigned int IDcounter = 1;
-
-	public:
-
-		/**
-		 * @brief Create Vermilion instance
-		 *
-		 * @param hintType List of types of setup hints, terminated with zero
-		 * @param hintValue List of values of setup hints, terminated with zero
-		 */
-		Instance(int * hintType, int * hintValue, WindowCallbackFunctions windowCallbackFunctions);
-
+		Instance(int * hintType, int * hintValue, void * userPointer, WindowCallbackFunctions windowCallbackFunctions);
 		~Instance();
 
 		void startRender();
@@ -84,12 +54,37 @@ class Instance{
 		void createTexture(VmTexture& texture, size_t width=0, size_t height=0, unsigned int channels=0);
 		void createSampler(VmSampler& sampler, VmTexture& texture);
 
+		bool shouldClose();
+
 	private:
+		std::unordered_map<unsigned int, std::shared_ptr<Renderable>> renderables;
+		std::unordered_map<unsigned int, std::shared_ptr<RenderTarget>> rendertargets;
+		std::unordered_map<unsigned int, std::shared_ptr<Texture>> textures;
+		std::unordered_map<unsigned int, std::shared_ptr<Shader>> shaders;
+		std::unordered_map<unsigned int, std::shared_ptr<ShaderProgram>> shaderprograms;
+		std::unordered_map<unsigned int, std::shared_ptr<PipelineLayout>> pipelinelayouts;
+		std::unordered_map<unsigned int, std::shared_ptr<Pipeline>> pipelines;
+		std::unordered_map<unsigned int, std::shared_ptr<Sampler>> samplers;
+		std::unordered_map<unsigned int, std::shared_ptr<Buffer>> buffers;
+		std::unordered_map<unsigned int, std::shared_ptr<Binding>> bindings;
+		unsigned int IDcounter = 1;
 		int parseHintType_RENDER_PLATFORM(int * hintType, int * hintValue);
 		int parseHintType_WINDOW_PLATFORM(int * hintType, int * hintValue);
 		int parseHintType_WINDOW_HEIGHT(int * hintType, int * hintValue);
 		int parseHintType_WINDOW_WIDTH(int * hintType, int * hintValue);
 		int parseHintType_LOGLEVEL(int * hintType, int * hintValue);
+
+	friend class ::VmRenderTarget;
+	friend class ::VmShader;
+	friend class ::VmShaderProgram;
+	friend class ::VmPipelineLayout;
+	friend class ::VmPipeline;
+	friend class ::VmBuffer;
+	friend class ::VmRenderable;
+	friend class ::VmTexture;
+	friend class ::VmTexture;
+	friend class ::VmBinding;
+	friend class ::VmSampler;
 };
 
 }}

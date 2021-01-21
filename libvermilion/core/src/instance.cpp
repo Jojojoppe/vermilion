@@ -10,7 +10,7 @@
 #include "Shader.hpp"
 #include "Texture.hpp"
 
-Vermilion::Core::Instance::Instance(int * hintType, int * hintValue, Vermilion::Core::WindowCallbackFunctions windowCallbackFunctions){
+Vermilion::Core::Instance::Instance(int * hintType, int * hintValue, void * userPointer, Vermilion::Core::WindowCallbackFunctions windowCallbackFunctions){
 	this->logger.log(VMCORE_LOGLEVEL_INFO, "Initializing Vermilion");
 
 	// Parse hints
@@ -31,6 +31,7 @@ Vermilion::Core::Instance::Instance(int * hintType, int * hintValue, Vermilion::
 	this->window->createWindow(window_width, window_height);
 
 	rendertargets.insert(std::pair<unsigned int, std::shared_ptr<RenderTarget>>(0, api->getDefaultRenderTarget()));
+	this->window->setUserPointer(userPointer);
 }
 
 Vermilion::Core::Instance::~Instance(){
@@ -52,6 +53,10 @@ Vermilion::Core::Instance::~Instance(){
 	this->window.reset();
 
 	this->logger.log(VMCORE_LOGLEVEL_DEBUG, "Deinitialized Vermilion");
+}
+
+bool Vermilion::Core::Instance::shouldClose(){
+	return window->shouldClose();
 }
 
 void Vermilion::Core::Instance::startRender(){

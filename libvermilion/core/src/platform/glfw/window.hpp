@@ -2,6 +2,7 @@
 #pragma once
 
 #include <vermilion/instance.hpp>
+#include "../../window.hpp"
 
 #ifdef VMCORE_VULKAN
 	#define GLFW_INCLUDE_VULKAN
