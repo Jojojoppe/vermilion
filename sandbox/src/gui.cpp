@@ -70,7 +70,7 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
 			layout(binding = 1) uniform sampler2D s_tex;
 
 			void main() {
-				outColor = fColor * texture(s_tex, fTexCoord);
+				outColor = texture(s_tex, fTexCoord) * fColor;
 			}
     )", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
     instance->createShaderProgram(shaderProgram, {&vertexShader, &fragmentShader});

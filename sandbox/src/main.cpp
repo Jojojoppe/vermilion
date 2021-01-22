@@ -277,13 +277,10 @@ struct Application{
 		ubo1.model = glm::mat4(1.0f);
 		ubo1.view = glm::lookAt(glm::vec3(0.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 0, 1));
 		ubo1.proj = glm::perspective(glm::radians(45.0f), (float)400/400, 0.1f, 10.0f);
+		ubo2 = ubo1;
 		
-		vmInstance->createBinding(binding1, {&uniformBuffer1}, {&sampler1});
+		vmInstance->createBinding(binding1, {&uniformBuffer1}, {&sampler2});
 		vmInstance->createBinding(binding2, {&uniformBuffer2}, {&sampler1});
-
-		ubo2.model = glm::mat4(1.0f);
-		ubo2.view = glm::mat4(1.0f);
-		ubo2.proj = glm::mat4(1.0f);
 
 	}
 	void run(){
@@ -291,8 +288,8 @@ struct Application{
 			vmInstance->startRender();
 
 			ubo1.model = glm::rotate(ubo1.model, 0.01f, glm::vec3(0.0f, 0.0f, 1.0f));
+			ubo2.model = glm::rotate(ubo2.model, -0.02f, glm::vec3(0.0f, 0.0f, 1.0f));
 			uniformBuffer1.setData(&ubo1);
-			// ubo2.model = glm::rotate(ubo2.model, 0.01f, glm::vec3(0.0f, 0.0f, 1.0f));
 			uniformBuffer2.setData(&ubo2);
 
 			textureRenderTarget.start(1.0, 0.0, 0.0, 1.0);
@@ -301,7 +298,7 @@ struct Application{
 
 			defaultRenderTarget.start(1.0, 1.0, 1.0, 1.0);
 			defaultRenderTarget.draw(pipeline1, binding1, object, 1, 0);
-			// gui->render();
+			gui->render();
 			defaultRenderTarget.end();
 
 			vmInstance->endRender({&textureRenderTarget});

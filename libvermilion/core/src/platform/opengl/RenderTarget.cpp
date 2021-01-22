@@ -59,7 +59,9 @@ void Vermilion::Core::OpenGL::RenderTarget::start(float r, float g, float b, flo
 }
 
 void Vermilion::Core::OpenGL::RenderTarget::end(){
-    glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT);
+    glBindTexture(GL_TEXTURE_2D, this->texture->texture);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Vermilion::Core::OpenGL::RenderTarget::draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance){
