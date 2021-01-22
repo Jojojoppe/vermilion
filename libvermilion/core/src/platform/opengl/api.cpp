@@ -35,9 +35,9 @@ void Vermilion::Core::OpenGL::API::init(){
 
 	this->defaultRenderTarget = std::make_shared<Vermilion::Core::OpenGL::DefaultRenderTarget>(this);
 
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_BLEND);
+	// glBlendEquation(GL_FUNC_ADD);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Vermilion::Core::flipLoading();
 }

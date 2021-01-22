@@ -28,18 +28,22 @@ Vermilion::Core::OpenGL::RenderTarget::RenderTarget(Vermilion::Core::OpenGL::API
     if(texture!=nullptr){
         glGenFramebuffers(1, &this->framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
+
         glBindTexture(GL_TEXTURE_2D, this->texture->texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->texture->texture, 0);
 
         glGenRenderbuffers(1, &this->depthbuffer);
-        glBindRenderbuffer(GL_RENDERBUFFER, this->depthbuffer);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, texture->width, texture->height);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this->depthbuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, this->depthbuffer); 
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, texture->width, texture->height);  
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->depthbuffer);
 
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->texture->texture, 0);
         GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
         glDrawBuffers(1, DrawBuffers);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 }
 
@@ -55,7 +59,6 @@ void Vermilion::Core::OpenGL::RenderTarget::start(float r, float g, float b, flo
 }
 
 void Vermilion::Core::OpenGL::RenderTarget::end(){
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT);
 }
 
@@ -139,7 +142,6 @@ void Vermilion::Core::OpenGL::DefaultRenderTarget::start(float r, float g, float
 }
 
 void Vermilion::Core::OpenGL::DefaultRenderTarget::end(){
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 #endif
