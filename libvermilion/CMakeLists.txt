@@ -72,6 +72,10 @@ add_library(vermilion_core SHARED
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/api.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/Texture.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/Shader.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/Buffer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/Renderable.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/Pipeline.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/opengl/RenderTarget.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/glfw/window.cpp
 

@@ -7,9 +7,14 @@ unsigned char * Vermilion::Core::loadTextureData(const std::string& path, size_t
     *width = 0;
     *height = 0;
     *channels = 0;
+    Vermilion::Core::flipLoading();
     return stbi_load(path.c_str(), (int*)width, (int*)height, (int*)channels, STBI_rgb_alpha);
 }
 
 void Vermilion::Core::freeTextureData(unsigned char * data){
     stbi_image_free(data);
+}
+
+void Vermilion::Core::flipLoading(){
+	stbi_set_flip_vertically_on_load(true);  
 }

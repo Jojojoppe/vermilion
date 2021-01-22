@@ -48,7 +48,13 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
 			
 			void main() {
 				gl_Position = ubo.proj * vec4(aPos, 0.0, 1.0);
-				fColor = aColor;
+
+                #ifdef VULKAN
+                    fColor = aColor;
+                #else
+				    fColor = aColor/256;
+                #endif
+
 				fTexCoord = aTexCoord;
 			}
     )", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
