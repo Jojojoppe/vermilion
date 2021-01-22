@@ -41,6 +41,7 @@ class API : public Vermilion::Core::API{
 		virtual std::shared_ptr<Vermilion::Core::Binding> createBinding(std::vector<std::shared_ptr<Vermilion::Core::Buffer>>& buffers, std::vector<std::shared_ptr<Vermilion::Core::Sampler>>& samplers)override;
 
 		virtual std::shared_ptr<Vermilion::Core::RenderTarget> getDefaultRenderTarget() override;
+		virtual std::shared_ptr<Vermilion::Core::RenderTarget> createRenderTarget(std::shared_ptr<Vermilion::Core::Texture> texture) override;
 
 	private:
 

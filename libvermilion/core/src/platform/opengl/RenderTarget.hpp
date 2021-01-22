@@ -28,6 +28,8 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 		API * api;
 
 	public:
+		unsigned int framebuffer;
+		unsigned int depthbuffer;
 		RenderTarget(API * api, std::shared_ptr<Vermilion::Core::Texture> texture);
 		~RenderTarget();
 
@@ -48,8 +50,6 @@ class DefaultRenderTarget : public RenderTarget{
 
 		virtual void start(float r, float g, float b, float a) override;
 		virtual void end() override;
-
-		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance) override;
 };
 
 }}}

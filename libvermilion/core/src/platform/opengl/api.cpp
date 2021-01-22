@@ -56,6 +56,10 @@ std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::OpenGL::API::get
 	return std::static_pointer_cast<Vermilion::Core::RenderTarget>(this->defaultRenderTarget);
 }
 
+std::shared_ptr<Vermilion::Core::RenderTarget> Vermilion::Core::OpenGL::API::createRenderTarget(std::shared_ptr<Vermilion::Core::Texture> texture){
+    return std::static_pointer_cast<Vermilion::Core::RenderTarget>(std::make_shared<Vermilion::Core::OpenGL::RenderTarget>(this, texture));
+}
+
 std::shared_ptr<Vermilion::Core::Texture> Vermilion::Core::OpenGL::API::createTexture(size_t width, size_t height, unsigned int channels){
     return std::static_pointer_cast<Vermilion::Core::Texture>(std::make_shared<Vermilion::Core::OpenGL::Texture>(this, width, height, channels));
 }

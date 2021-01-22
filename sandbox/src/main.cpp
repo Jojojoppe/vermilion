@@ -20,7 +20,7 @@ struct Application{
 	VmTexture texture1, texture2;
 	VmSampler sampler1, sampler2;
 
-	VmRenderTarget defaultRenderTarget;
+	VmRenderTarget defaultRenderTarget, textureRenderTarget;
 
 	VmShader vertexShader, fragmentShader;
 	VmShaderProgram shaderProgram;
@@ -31,8 +31,8 @@ struct Application{
 	UniformBufferObject ubo1, ubo2;
 
 	VmPipelineLayout pipelineLayout;
-	VmPipeline pipeline1;
-	VmBinding binding1;
+	VmPipeline pipeline1, pipeline2;
+	VmBinding binding1, binding2;
 
 	std::unique_ptr<GUI> gui;
 
@@ -42,7 +42,7 @@ struct Application{
 		Application * app = (Application*) userPointer;
 		app->pipeline1.setViewport(width, height, 0, 0);
 		app->pipeline1.setScissor(width, height, 0, 0);
-		app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
+		// app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
 		app->gui->resize(width, height);
 	}
 
@@ -79,7 +79,7 @@ app->gui->scroll(x, y);
 		0};
 		int hintValue[] = {
 			Vermilion::Core::WindowPlatform::WINDOW_PLATFORM_GLFW, 
-			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
+			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL,
 			400,
 			400,
 			VMCORE_LOGLEVEL_DEBUG,
@@ -99,6 +99,7 @@ app->gui->scroll(x, y);
 		vmInstance->createSampler(sampler2, texture2);
 
 		vmInstance->getDefaultRenderTarget(defaultRenderTarget);
+		vmInstance->createRenderTarget(textureRenderTarget, texture2);
 
 		vmInstance->createShader(vertexShader, R"(
 			#version 450
@@ -126,8 +127,11 @@ app->gui->scroll(x, y);
 			#extension GL_ARB_separate_shader_objects : enable
 			layout(location = 0) in vec3 fColor;
 			layout(location = 1) in vec2 fTexCoord;
+
 			layout(location = 0) out vec4 outColor;
+
 			layout(binding = 1) uniform sampler2D s_tex;
+
 			void main() {
 				outColor = texture(s_tex, fTexCoord);
 			}
@@ -148,6 +152,13 @@ app->gui->scroll(x, y);
 			Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_NONE,
 			Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
 		});
+		vmInstance->createPipeline(pipeline2, textureRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
+			Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_ENABLED,
+			Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_NONE,
+			Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
+		});
+		pipeline2.setViewport(texture2.width(), texture2.height(), 0, 0);
+		pipeline2.setScissor(texture2.width(), texture2.height(), 0, 0);
 
 		std::vector<float> vertices({
 			-1.0,	-1.0,	0.0,	1.0,		1.0,	0.0,	0.0,		1.0, 	0.0,
@@ -184,11 +195,15 @@ app->gui->scroll(x, y);
 			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
 		);
 		
-		ubo1.model = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo1.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo1.proj = glm::perspective(glm::radians(45.0f), (float)400/400, 0.1f, 10.0f);
+		// ubo1.model = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		// ubo1.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		// ubo1.proj = glm::perspective(glm::radians(45.0f), (float)400/400, 0.1f, 10.0f);
+		ubo1.model = glm::mat4(0.5f);
+		ubo1.view = glm::mat4(1.0f);
+		ubo1.proj = glm::mat4(1.0f);
 		
-		vmInstance->createBinding(binding1, {&uniformBuffer1}, {&sampler1});
+		vmInstance->createBinding(binding1, {&uniformBuffer1}, {&sampler2});
+		vmInstance->createBinding(binding2, {&uniformBuffer2}, {&sampler1});
 
 		ubo2.model = glm::mat4(0.5f);
 		ubo2.view = glm::mat4(1.0f);
@@ -196,7 +211,6 @@ app->gui->scroll(x, y);
 
 		time = 0.0f;
 	}
-
 	void run(){
 		while(vmInstance->shouldClose()){
 			vmInstance->startRender();
@@ -206,12 +220,16 @@ app->gui->scroll(x, y);
 			ubo2.model = glm::rotate(glm::mat4(1.0f), -1*time*glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 			uniformBuffer2.setData(&ubo2);
 
-			defaultRenderTarget.start(1.0, 0.0, 0.0, 1.0);
+			textureRenderTarget.start(1.0, 0.0, 0.0, 1.0);
+			textureRenderTarget.draw(pipeline2, binding2, object, 1, 0);
+			textureRenderTarget.end();
+
+			defaultRenderTarget.start(0.0, 0.0, 0.0, 1.0);
 			defaultRenderTarget.draw(pipeline1, binding1, object, 1, 0);
-			gui->render();
+			// gui->render();
 			defaultRenderTarget.end();
 
-			vmInstance->endRender({});
+			vmInstance->endRender({&textureRenderTarget});
 			time += 0.01f;
 		}
 	}
