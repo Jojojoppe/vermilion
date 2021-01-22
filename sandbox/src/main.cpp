@@ -42,7 +42,7 @@ struct Application{
 		Application * app = (Application*) userPointer;
 		app->pipeline1.setViewport(width, height, 0, 0);
 		app->pipeline1.setScissor(width, height, 0, 0);
-		// app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
+		app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
 		app->gui->resize(width, height);
 	}
 
