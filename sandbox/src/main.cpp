@@ -1,4 +1,5 @@
 #include <vermilion/vermilion.hpp>
+#include <vermilion/utils.hpp>
 
 #include <vermilion/glm/glm.hpp>
 #include <vermilion/glm/gtc/matrix_transform.hpp>
@@ -106,8 +107,8 @@ struct Application{
 			#extension GL_ARB_separate_shader_objects : enable
 			#extension GL_KHR_vulkan_glsl : enable
 
-			layout(location = 0) in vec3 aPos;
-			layout(location = 1) in vec2 aTexCoord;
+			layout(location = 0) in vec4 aPos;
+			layout(location = 1) in vec3 aTexCoord;
 			layout(location = 2) in vec3 aNorm;
 			layout(location = 0) out vec2 fTexCoord;
 			layout(binding=0) uniform UniformBufferObject{
@@ -126,8 +127,8 @@ struct Application{
 			#endif
 			
 			void main() {
-				gl_Position = ubo.proj * ubo.view * uModel * vec4(aPos, 1.0);
-				fTexCoord = aTexCoord;
+				gl_Position = ubo.proj * ubo.view * uModel * aPos;
+				fTexCoord = aTexCoord.xy;
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
 		vmInstance->createShader(fragmentShader, R"(
@@ -156,8 +157,8 @@ struct Application{
 		vmInstance->createShaderProgram(shaderProgram, {&vertexShader, &fragmentShader});
 
 		vmInstance->createPipelineLayout(pipelineLayout, {
-				Vermilion::Core::BufferLayoutElementFloat3("aPos"),
-				Vermilion::Core::BufferLayoutElementFloat2("aTexCoord"),
+				Vermilion::Core::BufferLayoutElementFloat4("aPos"),
+				Vermilion::Core::BufferLayoutElementFloat3("aTexCoord"),
 				Vermilion::Core::BufferLayoutElementFloat3("aNorm")
 			},{
 				Vermilion::Core::PipelineLayoutBinding(Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER, 0, 0),
@@ -183,97 +184,7 @@ struct Application{
 		std::vector<float> vertices;
 		std::vector<unsigned int> indices;
 
-		{	// LOAD OBJ
-			struct vertex_s{
-				float x, y, z;
-			};
-			struct normal_s{
-				float x, y, z;
-			};
-			struct uv_s{
-				float u, v;
-			};
-			struct face_s{
-				unsigned int v1, v2, v3, n1, n2, n3, t1, t2, t3;
-			};
-			std::ifstream in("../assets/cube.obj");
-			std::vector<std::string*> lines;
-			std::vector<vertex_s*> verts = {nullptr};
-			std::vector<normal_s*> norms = {nullptr};
-			std::vector<uv_s*> uvs = {nullptr};
-			std::vector<face_s*> faces;
-			char buf[512];
-			while(!in.eof()){
-				in.getline(buf, 512);
-				lines.push_back(new std::string(buf));
-			}
-
-			for(int i=0; i<lines.size(); i++){
-				if(lines[i]->c_str()[0]=='#') continue;		// Comment
-				if(lines[i]->c_str()[0]=='o') continue;		// Object name
-				if(lines[i]->c_str()[0]=='s') continue;		// Smooth shading
-				if(lines[i]->c_str()[0]=='v' && lines[i]->c_str()[1]==' '){		// vertex
-					float x, y, z;
-					sscanf(lines[i]->c_str(), "v %f %f %f", &x, &y, &z);
-					verts.push_back(new vertex_s{x, y, z});
-				}
-				if(lines[i]->c_str()[0]=='v' && lines[i]->c_str()[1]=='n'){		// normal
-					float x, y, z;
-					sscanf(lines[i]->c_str(), "vn %f %f %f", &x, &y, &z);
-					norms.push_back(new normal_s{x, y, z});
-				}
-				if(lines[i]->c_str()[0]=='v' && lines[i]->c_str()[1]=='t'){		// UV
-					float x, y;
-					sscanf(lines[i]->c_str(), "vt %f %f", &x, &y);
-					uvs.push_back(new uv_s{x, y});
-				}
-				if(lines[i]->c_str()[0]=='f' && lines[i]->c_str()[1]==' '){		// face
-					unsigned int v1, v2, v3, n1, n2, n3, t1, t2, t3;
-					sscanf(lines[i]->c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &t1, &n1, &v2, &t2, &n2, &v3, &t3, &n3);
-					faces.push_back(new face_s{v1, v2, v3, n1, n2, n3, t1, t2, t3});
-				}
-			}
-			int i=0;
-			for(auto f : faces){
-				// Vertex layout: pos UV norm
-				vertices.push_back(verts[f->v1]->x);
-				vertices.push_back(verts[f->v1]->y);
-				vertices.push_back(verts[f->v1]->z);
-				vertices.push_back(uvs[f->t1]->u);
-				vertices.push_back(uvs[f->t1]->v);
-				vertices.push_back(norms[f->n1]->x);
-				vertices.push_back(norms[f->n1]->y);
-				vertices.push_back(norms[f->n1]->z);
-
-				vertices.push_back(verts[f->v2]->x);
-				vertices.push_back(verts[f->v2]->y);
-				vertices.push_back(verts[f->v2]->z);
-				vertices.push_back(uvs[f->t2]->u);
-				vertices.push_back(uvs[f->t2]->v);
-				vertices.push_back(norms[f->n2]->x);
-				vertices.push_back(norms[f->n2]->y);
-				vertices.push_back(norms[f->n2]->z);
-
-				vertices.push_back(verts[f->v3]->x);
-				vertices.push_back(verts[f->v3]->y);
-				vertices.push_back(verts[f->v3]->z);
-				vertices.push_back(uvs[f->t3]->u);
-				vertices.push_back(uvs[f->t3]->v);
-				vertices.push_back(norms[f->n3]->x);
-				vertices.push_back(norms[f->n3]->y);
-				vertices.push_back(norms[f->n3]->z);
-
-				indices.push_back(i+0);
-				indices.push_back(i+1);
-				indices.push_back(i+2);
-				i+=3;
-			}
-			for(int i=0; i<lines.size(); i++) delete lines[i];
-			for(int i=0; i<verts.size(); i++) delete verts[i];
-			for(int i=0; i<norms.size(); i++) delete norms[i];
-			for(int i=0; i<faces.size(); i++) delete faces[i];
-			for(int i=0; i<uvs.size(); i++) delete uvs[i];
-		}
+		Vermilion::Utils::loadObj(vertices, indices, "../assets/cube.obj");
 
 		vmInstance->createBuffer(vertexBuffer, sizeof(float)*vertices.size(), 
 			Vermilion::Core::BufferType::BUFFER_TYPE_VERTEX,
