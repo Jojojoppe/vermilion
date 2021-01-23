@@ -59,8 +59,8 @@ Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan:
 	unsigned int binding=0;
 	for(const auto& b : bindings){
 		this->bindings.push_back(b);
-		switch(b){
-			case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
+		switch(b.type){
+			case Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
 				VkDescriptorSetLayoutBinding uboLayoutBinding = {};
 				uboLayoutBinding.binding = binding++;
 				uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -70,7 +70,7 @@ Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan:
 				layoutBindingsVector.push_back(uboLayoutBinding);
 			} break;
 
-			case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER:{
+			case Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER:{
 				VkDescriptorSetLayoutBinding uboLayoutBinding = {};
 				uboLayoutBinding.binding = binding++;
 				uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -80,7 +80,7 @@ Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan:
 				layoutBindingsVector.push_back(uboLayoutBinding);
 			} break;
 
-			case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER:{
+			case Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_SAMPLER:{
 				VkDescriptorSetLayoutBinding texLayoutBinding = {};
 				texLayoutBinding.binding = binding++;
 				texLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -376,13 +376,14 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 			int sam_i = 0;
 			int offset = 0;
 			for(const auto& b : this->pipelineLayout->bindings){
-				switch(b){
-					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
+				switch(b.type){
+					case Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:{
 						std::shared_ptr<Vermilion::Core::Vulkan::Buffer> bo = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->buffers[bo_i++];
 						VkDescriptorBufferInfo bufferInfo = {};
 						bufferInfo.buffer = bo->vk_buffer;
-						bufferInfo.offset = 0;
+						bufferInfo.offset = b.offset;
 						bufferInfo.range = bo->size;
+						if(b.size) bufferInfo.range = b.size;
 						
 						VkWriteDescriptorSet descriptorWrite = {};
 						descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -401,12 +402,13 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 						vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
 					} break;
 
-					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER:{
+					case Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER:{
 						std::shared_ptr<Vermilion::Core::Vulkan::Buffer> bo = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->buffers[bo_i++];
 						VkDescriptorBufferInfo bufferInfo = {};
 						bufferInfo.buffer = bo->vk_buffer;
-						bufferInfo.offset = 0;
+						bufferInfo.offset = b.offset;
 						bufferInfo.range = bo->size;
+						if(b.size) bufferInfo.range = b.size;
 						
 						VkWriteDescriptorSet descriptorWrite = {};
 						descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -425,7 +427,7 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 						vkUpdateDescriptorSets(api->vk_device->vk_device, 1, &descriptorWrite, 0, nullptr);
 					} break;
 
-					case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER:{
+					case Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_SAMPLER:{
 						std::shared_ptr<Vermilion::Core::Vulkan::Sampler> sam = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding)->samplers[sam_i++];
 						VkDescriptorImageInfo imageInfo = {};
 						imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

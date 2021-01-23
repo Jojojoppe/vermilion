@@ -79,7 +79,7 @@ struct Application{
 		0};
 		int hintValue[] = {
 			Vermilion::Core::WindowPlatform::WINDOW_PLATFORM_GLFW, 
-			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
+			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL,
 			400,
 			400,
 			VMCORE_LOGLEVEL_DEBUG,
@@ -160,8 +160,8 @@ struct Application{
 				Vermilion::Core::BufferLayoutElementFloat2("aTexCoord"),
 				Vermilion::Core::BufferLayoutElementFloat3("aNorm")
 			},{
-				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
-				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
+				Vermilion::Core::PipelineLayoutBinding(Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER, 0, 0),
+				Vermilion::Core::PipelineLayoutBinding(Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_SAMPLER)
 			},{
 				Vermilion::Core::PipelineLayoutUniformMat4("uModel"),
 				Vermilion::Core::PipelineLayoutUniformFloat1("uColMul")

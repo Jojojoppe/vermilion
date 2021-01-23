@@ -80,8 +80,8 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
             Vermilion::Core::BufferLayoutElementFloat2("UV"),
             Vermilion::Core::BufferLayoutElementByte4("Color"),
         }, {
-            Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
-            Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
+            Vermilion::Core::PipelineLayoutBinding(Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER, 0, 0),
+            Vermilion::Core::PipelineLayoutBinding(Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_SAMPLER)
         },{
     });
 

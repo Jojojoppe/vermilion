@@ -37,10 +37,17 @@ enum ShaderType{
 	SHADER_TYPE_COMPUTE
 };
 
-enum PipelineLayoutBinding{
+enum PipelineLayoutBindingType{
 	PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
 	PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER,
 	PIPELINE_LAYOUT_BINDING_SAMPLER
+};
+
+struct PipelineLayoutBinding{
+	PipelineLayoutBindingType type;
+	unsigned int offset;
+	size_t size;
+	PipelineLayoutBinding(PipelineLayoutBindingType, unsigned int offset=0, size_t size=0);
 };
 
 enum PipelineLayoutUniformType{

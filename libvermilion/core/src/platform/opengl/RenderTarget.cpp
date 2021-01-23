@@ -86,13 +86,17 @@ void Vermilion::Core::OpenGL::RenderTarget::draw(std::shared_ptr<Vermilion::Core
     int bufi = 0;
     int sami = 0;
     for(auto& b : glpipeline->pipelineLayout->bindings){
-        switch(b){
-            case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:
-            case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER:
-                glBindBufferBase(glbinding->buffers[bufi]->destination, i, glbinding->buffers[bufi]->buffer);
+        switch(b.type){
+            case Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER:
+            case Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_STORAGE_BUFFER:
+                // glBindBufferBase(glbinding->buffers[bufi]->destination, i, glbinding->buffers[bufi]->buffer);
+                if(b.size)
+                    glBindBufferRange(glbinding->buffers[bufi]->destination, i, glbinding->buffers[bufi]->buffer, b.offset, b.size);
+                else
+                    glBindBufferRange(glbinding->buffers[bufi]->destination, i, glbinding->buffers[bufi]->buffer, b.offset, glbinding->buffers[bufi]->size);
                 bufi++;
                 break;
-            case Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER:
+            case Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_SAMPLER:
                 glActiveTexture(GL_TEXTURE0+i);
                 glBindTexture(GL_TEXTURE_2D, glbinding->samplers[sami]->texture->texture);
                 glBindSampler(i, glbinding->samplers[sami]->sampler);
