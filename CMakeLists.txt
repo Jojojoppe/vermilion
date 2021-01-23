@@ -16,5 +16,4 @@ set(CMAKE_BUILD_TYPE Release)
 link_directories("${PROJECT_BINARY_DIR}/out")
 
 add_subdirectory(libvermilion)
-add_subdirectory(sandbox)
 add_subdirectory(examples)
