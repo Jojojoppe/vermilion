@@ -25,7 +25,7 @@ VkFormat VulkanBufferLayoutElementTypeToVulkanBaseType[] = {
 	VK_FORMAT_R8G8B8A8_UNORM,
 };
 
-Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan::API * api, std::initializer_list<Vermilion::Core::BufferLayoutElement> _vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings){
+Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan::API * api, std::initializer_list<Vermilion::Core::BufferLayoutElement> _vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings, std::initializer_list<Vermilion::Core::PipelineLayoutUniform> uniforms){
 	this->api = api;
 	this->instance = api->instance;
 
@@ -38,6 +38,20 @@ Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan:
 		offset += e.size;
 		stride += e.size;
 		this->vertexLayout.push_back(e);
+	}	
+
+	std::vector<VkPushConstantRange> push_constants;
+	unsigned int push_offset = 0;
+	for(auto& u : uniforms){
+		VkPushConstantRange p = {};
+		p.offset = push_offset;
+		p.size = u.size;
+		p.stageFlags = VK_SHADER_STAGE_VERTEX_BIT|VK_SHADER_STAGE_FRAGMENT_BIT;
+		push_constants.push_back(p);
+		this->uniforms.insert(std::pair<std::string, std::shared_ptr<Vermilion::Core::PipelineLayoutUniform>>(u.name, std::make_shared<Vermilion::Core::PipelineLayoutUniform>(u.name, u.size)));
+		this->uniforms[u.name]->offset = push_offset;
+		this->uniforms[u.name]->type = u.type;
+		offset += u.size;
 	}
 
 	// Create pipeline descriptor layout
@@ -94,8 +108,8 @@ Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan:
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 1;
 	pipelineLayoutInfo.pSetLayouts = &vk_descriptorSetLayout;
-	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+	pipelineLayoutInfo.pushConstantRangeCount = push_constants.size(); // Optional
+	pipelineLayoutInfo.pPushConstantRanges = push_constants.data(); // Optional
 	if(vkCreatePipelineLayout(api->vk_device->vk_device, &pipelineLayoutInfo, nullptr, &this->vk_pipelineLayout)!=VK_SUCCESS){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create pipeline layout");
 		throw std::runtime_error("Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout() - Could not create pipeline layout");

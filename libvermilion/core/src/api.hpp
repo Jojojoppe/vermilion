@@ -47,7 +47,7 @@ class API{
 		virtual std::shared_ptr<Shader> createShader(const std::string& source, ShaderType type){return nullptr;};
 		virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::vector<std::shared_ptr<Shader>>& shaders){return nullptr;};
 
-		virtual std::shared_ptr<PipelineLayout> createPipelineLayout(std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> bindings){return nullptr;};
+		virtual std::shared_ptr<PipelineLayout> createPipelineLayout(std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> bindings, std::initializer_list<PipelineLayoutUniform> uniforms){return nullptr;};
 		virtual std::shared_ptr<Pipeline> createPipeline(std::shared_ptr<RenderTarget> renderTarget, std::shared_ptr<ShaderProgram> shaderProgram, std::shared_ptr<PipelineLayout> pipelineLayout, PipelineSettings settings){return nullptr;};
 		virtual std::shared_ptr<Binding> createBinding(std::vector<std::shared_ptr<Buffer>>& buffers, std::vector<std::shared_ptr<Sampler>>& samplers){return nullptr;};
 

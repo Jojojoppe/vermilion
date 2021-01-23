@@ -154,6 +154,18 @@ VkFormat Vermilion::Core::Vulkan::RenderTarget::findSupportedFormat(const std::v
     throw std::runtime_error("failed to find supported format!");
 }
 
+void Vermilion::Core::Vulkan::RenderTarget::setUniform(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, const std::string& name, void * data){
+	auto pl = std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline);
+	if(pl->pipelineLayout->uniforms.find(name)==pl->pipelineLayout->uniforms.end()){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Uniform with name %s not found in pipeline", name.c_str());
+		throw std::runtime_error("Vermilion::Core::Vulkan::RenderTarget::setUniform() - Uniform not found in pipeline");
+	}
+	unsigned int offset = pl->pipelineLayout->uniforms[name]->offset;
+	size_t size = pl->pipelineLayout->uniforms[name]->size;
+	vkCmdBindPipeline(vk_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pl->vk_pipeline);
+	vkCmdPushConstants(this->vk_commandBuffer, pl->pipelineLayout->vk_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT|VK_SHADER_STAGE_FRAGMENT_BIT, offset, size, data);
+}
+
 // DEFAULT RENDER TARGET -----------------------------------------------------------------------------------
 
 Vermilion::Core::Vulkan::DefaultRenderTarget::DefaultRenderTarget(Vermilion::Core::Vulkan::API * api, std::shared_ptr<Vermilion::Core::Texture> texture) :
@@ -289,5 +301,17 @@ void Vermilion::Core::Vulkan::DefaultRenderTarget::reset(){
 	vmaDestroyImage(api->vma_allocator, this->depthImage, this->depthImageMemory);
 }
 
+void Vermilion::Core::Vulkan::DefaultRenderTarget::setUniform(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, const std::string& name, void * data){
+	auto pl = std::static_pointer_cast<Vermilion::Core::Vulkan::Pipeline>(pipeline);
+	if(pl->pipelineLayout->uniforms.find(name)==pl->pipelineLayout->uniforms.end()){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Uniform with name %s not found in pipeline", name.c_str());
+		throw std::runtime_error("Vermilion::Core::Vulkan::DefaultRenderTarget::setUniform() - Uniform not found in pipeline");
+	}
+	unsigned int offset = pl->pipelineLayout->uniforms[name]->offset;
+	size_t size = pl->pipelineLayout->uniforms[name]->size;
+	int i = this->api->imageIndex;
+	vkCmdBindPipeline(vk_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pl->vk_pipeline);
+	vkCmdPushConstants(this->vk_commandBuffers[i], pl->pipelineLayout->vk_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT|VK_SHADER_STAGE_FRAGMENT_BIT, offset, size, data);
+}
 
 #endif

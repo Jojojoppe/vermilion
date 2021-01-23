@@ -51,6 +51,8 @@ class RenderTarget : public Vermilion::Core::RenderTarget{
 
 		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance) override;
 
+		virtual void setUniform(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, const std::string& name, void * data) override;
+
 		VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 };
 
@@ -77,6 +79,8 @@ class DefaultRenderTarget : public RenderTarget{
 		virtual void end() override;
 
 		virtual void draw(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, std::shared_ptr<Vermilion::Core::Binding> binding, std::shared_ptr<Vermilion::Core::Renderable> renderable, int instanceCount, int firstInstance) override;
+
+		virtual void setUniform(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, const std::string& name, void * data) override;
 
 		void create();
 		virtual void reset() override;

@@ -246,8 +246,8 @@ std::shared_ptr<Vermilion::Core::ShaderProgram> Vermilion::Core::Vulkan::API::cr
 	return std::static_pointer_cast<Vermilion::Core::ShaderProgram>(std::make_shared<Vermilion::Core::Vulkan::ShaderProgram>(this, shaders));
 }
 
-std::shared_ptr<Vermilion::Core::PipelineLayout> Vermilion::Core::Vulkan::API::createPipelineLayout(std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings){
-	return std::static_pointer_cast<Vermilion::Core::PipelineLayout>(std::make_shared<Vermilion::Core::Vulkan::PipelineLayout>(this, vertexLayout, bindings));
+std::shared_ptr<Vermilion::Core::PipelineLayout> Vermilion::Core::Vulkan::API::createPipelineLayout(std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings, std::initializer_list<Vermilion::Core::PipelineLayoutUniform> uniforms){
+	return std::static_pointer_cast<Vermilion::Core::PipelineLayout>(std::make_shared<Vermilion::Core::Vulkan::PipelineLayout>(this, vertexLayout, bindings, uniforms));
 }
 
 std::shared_ptr<Vermilion::Core::Pipeline> Vermilion::Core::Vulkan::API::createPipeline(std::shared_ptr<Vermilion::Core::RenderTarget> renderTarget, 

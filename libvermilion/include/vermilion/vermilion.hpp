@@ -43,6 +43,53 @@ enum PipelineLayoutBinding{
 	PIPELINE_LAYOUT_BINDING_SAMPLER
 };
 
+enum PipelineLayoutUniformType{
+	PIPELINE_LAYOUT_UNIFORM_TYPE_NONE,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT1,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT2,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT3,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT4,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_MAT3,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_MAT4,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_INT1,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_INT2,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_INT3,
+	PIPELINE_LAYOUT_UNIFORM_TYPE_INT4,
+};
+
+struct PipelineLayoutUniform{
+	std::string name;
+	size_t size;
+	unsigned int offset;
+	PipelineLayoutUniformType type;
+	PipelineLayoutUniform(std::string name, size_t size);
+};
+
+struct PipelineLayoutUniformFloat1 : public PipelineLayoutUniform{
+	PipelineLayoutUniformFloat1(std::string name) :
+		PipelineLayoutUniform(name, sizeof(float)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT1;
+		}
+};
+struct PipelineLayoutUniformFloat2 : public PipelineLayoutUniform{
+	PipelineLayoutUniformFloat2(std::string name) :
+		PipelineLayoutUniform(name, 2*sizeof(float)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT2;
+		}
+};
+struct PipelineLayoutUniformFloat3 : public PipelineLayoutUniform{
+	PipelineLayoutUniformFloat3(std::string name) :
+		PipelineLayoutUniform(name, 3*sizeof(float)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT3;
+		}
+};
+struct PipelineLayoutUniformFloat4 : public PipelineLayoutUniform{
+	PipelineLayoutUniformFloat4(std::string name) :
+		PipelineLayoutUniform(name, 4*sizeof(float)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT4;
+		}
+};
+
 enum PipelineSettingsDepthTest{
 	PIPELINE_SETTINGS_DEPTH_TEST_DISABLED,
 	PIPELINE_SETTINGS_DEPTH_TEST_ENABLED
@@ -200,6 +247,7 @@ class VmRenderTarget : public VmObject{
         void start(float r=0.0, float g=0.0, float b=0.0, float a=1.0);
         void end();
         void draw(VmPipeline& pipeline, VmBinding& binding, VmRenderable& renderable, unsigned int instanceCount=1, unsigned int firstInstance=0);
+		void setUniform(VmPipeline& pipeline, const std::string& name, void * data);
 };
 
 class VmShader : public VmObject{

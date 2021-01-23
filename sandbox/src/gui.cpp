@@ -82,6 +82,7 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
         }, {
             Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
             Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
+        },{
     });
 
     instance->createPipeline(pipeline, renderTarget, shaderProgram, pipelineLayout, {

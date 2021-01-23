@@ -22,6 +22,7 @@ class RenderTarget{
 		virtual void end(){};
 
 		virtual void draw(std::shared_ptr<Pipeline> pipeline, std::shared_ptr<Binding> binding, std::shared_ptr<Renderable> renderable, int instanceCount=1, int firstInstance=0){};
+		virtual void setUniform(std::shared_ptr<Pipeline> pipeline, const std::string& name, void * data){};
 };
 
 }}

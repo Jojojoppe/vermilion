@@ -43,7 +43,7 @@ class Instance{
 		void createShader(VmShader& shader, const std::string& source, ShaderType type);
 		void createShaderProgram(VmShaderProgram& shaderProgram, std::initializer_list<VmShader*> shaders);
 
-		void createPipelineLayout(VmPipelineLayout& pipelineLayout, std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> bindings);
+		void createPipelineLayout(VmPipelineLayout& pipelineLayout, std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> bindings, std::initializer_list<PipelineLayoutUniform> uniforms);
 		void createPipeline(VmPipeline& pipeline, VmRenderTarget& renderTarget, VmShaderProgram& shaderProgram, VmPipelineLayout& pipelineLayout, PipelineSettings settings);
 		void createBinding(VmBinding& binding, std::initializer_list<VmBuffer*> buffers, std::initializer_list<VmSampler*> samplers);
 

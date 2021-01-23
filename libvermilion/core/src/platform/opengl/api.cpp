@@ -84,7 +84,7 @@ std::shared_ptr<Vermilion::Core::Renderable> Vermilion::Core::OpenGL::API::creat
     return std::static_pointer_cast<Vermilion::Core::Renderable>(std::make_shared<Vermilion::Core::OpenGL::Renderable>(this, vertexBuffer, indexBuffer, vertexOffset, indexOffset, length));
 }
 
-std::shared_ptr<Vermilion::Core::PipelineLayout> Vermilion::Core::OpenGL::API::createPipelineLayout(std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings){
+std::shared_ptr<Vermilion::Core::PipelineLayout> Vermilion::Core::OpenGL::API::createPipelineLayout(std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings, std::initializer_list<Vermilion::Core::PipelineLayoutUniform> uniforms){
     return std::static_pointer_cast<Vermilion::Core::PipelineLayout>(std::make_shared<Vermilion::Core::OpenGL::PipelineLayout>(this, vertexLayout, bindings));
 }
 

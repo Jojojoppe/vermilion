@@ -8,6 +8,7 @@
 #include "gui.hpp"
 
 #include <fstream>
+#include <cmath>
 
 struct UniformBufferObject{
 	glm::mat4 model;
@@ -79,10 +80,10 @@ struct Application{
 		0};
 		int hintValue[] = {
 			Vermilion::Core::WindowPlatform::WINDOW_PLATFORM_GLFW, 
-			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL,
+			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
 			400,
 			400,
-			VMCORE_LOGLEVEL_DEBUG,
+			VMCORE_LOGLEVEL_TRACE,
 		0};
 		vmInstance.reset(new VmInstance(hintType, hintValue, this, Vermilion::Core::WindowCallbackFunctions{resize, mouseButton, mousePos, mouseEnter, scroll}));
 
@@ -125,9 +126,12 @@ struct Application{
 			layout(location = 0) in vec2 fTexCoord;
 			layout(location = 0) out vec4 outColor;
 			layout(binding = 1) uniform sampler2D s_tex;
+			layout(push_constant) uniform uColMul_u {
+				float col;
+			} uColMul;
 
 			void main() {
-				outColor = vec4(texture(s_tex, fTexCoord).xyz, 1.0);
+				outColor = vec4(texture(s_tex, fTexCoord).xyz * uColMul.col, 1.0);
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
 		vmInstance->createShaderProgram(shaderProgram, {&vertexShader, &fragmentShader});
@@ -138,7 +142,9 @@ struct Application{
 				Vermilion::Core::BufferLayoutElementFloat3("aNorm")
 			},{
 				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
-				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER
+				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
+			},{
+				Vermilion::Core::PipelineLayoutUniformFloat1("uColMul")
 		});
 
 		vmInstance->createPipeline(pipeline1, defaultRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
@@ -284,6 +290,10 @@ struct Application{
 
 	}
 	void run(){
+
+		float uColMul;
+		float time = 0.0f;
+
 		while(vmInstance->shouldClose()){
 			vmInstance->startRender();
 
@@ -292,16 +302,21 @@ struct Application{
 			uniformBuffer1.setData(&ubo1);
 			uniformBuffer2.setData(&ubo2);
 
+			uColMul = 1.0f;
 			textureRenderTarget.start(1.0, 0.0, 0.0, 1.0);
+			textureRenderTarget.setUniform(pipeline2, "uColMul", &uColMul);
 			textureRenderTarget.draw(pipeline2, binding2, object, 1, 0);
 			textureRenderTarget.end();
 
+			uColMul = std::fmod(time, 2.0f);
 			defaultRenderTarget.start(1.0, 1.0, 1.0, 1.0);
+			defaultRenderTarget.setUniform(pipeline2, "uColMul", &uColMul);
 			defaultRenderTarget.draw(pipeline1, binding1, object, 1, 0);
 			gui->render();
 			defaultRenderTarget.end();
 
 			vmInstance->endRender({&textureRenderTarget});
+			time += 0.01f;
 		}
 	}
 };

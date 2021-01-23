@@ -26,6 +26,10 @@ void VmRenderTarget::draw(VmPipeline& pipeline, VmBinding& binding, VmRenderable
     auto rdb = instance->renderables[renderable.ID];
     instance->rendertargets[ID]->draw(pl, bd, rdb, instances, firstinstance);
 }
+void VmRenderTarget::setUniform(VmPipeline& pipeline, const std::string& name, void * data){
+    auto pl = instance->pipelines[pipeline.ID];
+    instance->rendertargets[ID]->setUniform(pl, name, data);
+}
 
 VmShader::~VmShader(){
     instance->shaders[ID].reset();

@@ -108,8 +108,8 @@ void Vermilion::Core::Instance::createShaderProgram(VmShaderProgram& s, std::ini
 	s.instance = this;
 }
 
-void Vermilion::Core::Instance::createPipelineLayout(VmPipelineLayout& p, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings){
-	auto pll = this->api->createPipelineLayout(vertexLayout, bindings);
+void Vermilion::Core::Instance::createPipelineLayout(VmPipelineLayout& p, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings, std::initializer_list<PipelineLayoutUniform> uniforms){
+	auto pll = this->api->createPipelineLayout(vertexLayout, bindings, uniforms);
 	this->pipelinelayouts.insert(std::pair<unsigned int, std::shared_ptr<PipelineLayout>>(IDcounter, pll));
 	p.ID = IDcounter++;
 	p.instance = this;
