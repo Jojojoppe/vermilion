@@ -11,7 +11,6 @@
 #include <cmath>
 
 struct UniformBufferObject{
-	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 proj;
 };
@@ -112,23 +111,22 @@ struct Application{
 			layout(location = 2) in vec3 aNorm;
 			layout(location = 0) out vec2 fTexCoord;
 			layout(binding=0) uniform UniformBufferObject{
-				mat4 model;
 				mat4 view;
 				mat4 proj;
 			} ubo;
 
 			#ifdef VULKAN
 				layout(push_constant) uniform PC0{
+					mat4 uModel;
 					float uColMul;
-					float uZ;
 				};
 			#else
+				layout(push_constant) uniform mat4 uModel;
 				layout(push_constant) uniform float uColMul;
-				layout(push_constant) uniform float uZ;
 			#endif
 			
 			void main() {
-				gl_Position = ubo.proj * ubo.view * ubo.model * vec4(aPos.x, aPos.y, aPos.z+uZ, 1.0);
+				gl_Position = ubo.proj * ubo.view * uModel * vec4(aPos, 1.0);
 				fTexCoord = aTexCoord;
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
@@ -143,12 +141,12 @@ struct Application{
 
 			#ifdef VULKAN
 				layout(push_constant) uniform PC0{
+					mat4 uModel;
 					float uColMul;
-					float uZ;
 				};
 			#else
+				layout(push_constant) uniform mat4 uModel;
 				layout(push_constant) uniform float uColMul;
-				layout(push_constant) uniform float uZ;
 			#endif
 
 			void main() {
@@ -165,8 +163,8 @@ struct Application{
 				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
 				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
 			},{
-				Vermilion::Core::PipelineLayoutUniformFloat1("uColMul"),
-				Vermilion::Core::PipelineLayoutUniformFloat1("uZ")
+				Vermilion::Core::PipelineLayoutUniformMat4("uModel"),
+				Vermilion::Core::PipelineLayoutUniformFloat1("uColMul")
 		});
 
 		vmInstance->createPipeline(pipeline1, defaultRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
@@ -302,10 +300,11 @@ struct Application{
 			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
 		);
 		
-		ubo1.model = glm::mat4(1.0f);
 		ubo1.view = glm::lookAt(glm::vec3(0.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 0, 1));
 		ubo1.proj = glm::perspective(glm::radians(45.0f), (float)400/400, 0.1f, 10.0f);
 		ubo2 = ubo1;
+		uniformBuffer1.setData(&ubo1);
+		uniformBuffer2.setData(&ubo2);
 		
 		vmInstance->createBinding(binding1, {&uniformBuffer1}, {&sampler2});
 		vmInstance->createBinding(binding2, {&uniformBuffer2}, {&sampler1});
@@ -313,32 +312,32 @@ struct Application{
 	}
 	void run(){
 
-		float uColMul, uZ;
+		float uColMul;
+		glm::vec3 uPos = glm::vec3(0.0f);
 		float time = 0.0f;
+
+		glm::mat4 model1 = glm::mat4(1.0f);
+		glm::mat4 model2 = glm::mat4(1.0f);
 
 		while(vmInstance->shouldClose()){
 			vmInstance->startRender();
 
-			ubo1.model = glm::rotate(ubo1.model, 0.01f, glm::vec3(0.0f, 0.0f, 1.0f));
-			ubo2.model = glm::rotate(ubo2.model, -0.02f, glm::vec3(0.0f, 0.0f, 1.0f));
-			uniformBuffer1.setData(&ubo1);
-			uniformBuffer2.setData(&ubo2);
+			model1 = glm::rotate(model1, 0.01f, glm::vec3(0.0f, 0.0f, 1.0f));
+			model2 = glm::rotate(model1, -0.02f, glm::vec3(0.0f, 0.0f, 1.0f));
 
 			uColMul = 1.0f;
-			uZ = 0.0f;
 
 			textureRenderTarget.start(1.0, 0.0, 0.0, 1.0);
 			textureRenderTarget.setUniform(pipeline2, "uColMul", &uColMul);
-			textureRenderTarget.setUniform(pipeline2, "uZ", &uZ);
+			textureRenderTarget.setUniform(pipeline2, "uModel", &model1);
 			textureRenderTarget.draw(pipeline2, binding2, object, 1, 0);
 			textureRenderTarget.end();
 
 			uColMul = std::fmod(time, 2.0f);
-			uZ = uColMul;
 
 			defaultRenderTarget.start(1.0, 1.0, 1.0, 1.0);
 			defaultRenderTarget.setUniform(pipeline2, "uColMul", &uColMul);
-			defaultRenderTarget.setUniform(pipeline2, "uZ", &uZ);
+			defaultRenderTarget.setUniform(pipeline2, "uModel", &model2);
 			defaultRenderTarget.draw(pipeline1, binding1, object, 1, 0);
 			gui->render();
 			defaultRenderTarget.end();

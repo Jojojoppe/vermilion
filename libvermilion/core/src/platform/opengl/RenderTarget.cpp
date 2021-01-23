@@ -142,8 +142,28 @@ void Vermilion::Core::OpenGL::RenderTarget::setUniform(std::shared_ptr<Vermilion
     }
     switch(glpipeline->pipelineLayout->uniforms[name]->type){
         case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT1:
-            glUniform1f(loc, *((float*)data));
-            break;
+            glUniform1fv(loc, 1, (GLfloat*)data); break;
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT2:
+            glUniform2fv(loc, 1, (GLfloat*)data); break;
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT3:
+            glUniform3fv(loc, 1, (GLfloat*)data); break;
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT4:
+            glUniform4fv(loc, 1, (GLfloat*)data); break;
+
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_MAT3:
+            glUniformMatrix3fv(loc,1, GL_FALSE, (GLfloat*)data); break;
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_MAT4:
+            glUniformMatrix4fv(loc,1, GL_FALSE, (GLfloat*)data); break;
+
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_INT1:
+            glUniform1iv(loc, 1, (GLint*)data); break;
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_INT2:
+            glUniform2iv(loc, 1, (GLint*)data); break;
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_INT3:
+            glUniform3iv(loc, 1, (GLint*)data); break;
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_INT4:
+            glUniform4iv(loc, 1, (GLint*)data); break;
+
         default:
            break;
     }

@@ -60,6 +60,7 @@ enum PipelineLayoutUniformType{
 struct PipelineLayoutUniform{
 	std::string name;
 	size_t size;
+	unsigned int count;
 	unsigned int offset;
 	PipelineLayoutUniformType type;
 	PipelineLayoutUniform(std::string name, size_t size);
@@ -69,24 +70,70 @@ struct PipelineLayoutUniformFloat1 : public PipelineLayoutUniform{
 	PipelineLayoutUniformFloat1(std::string name) :
 		PipelineLayoutUniform(name, sizeof(float)){
 			type = PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT1;
+			count = 1;
 		}
 };
 struct PipelineLayoutUniformFloat2 : public PipelineLayoutUniform{
 	PipelineLayoutUniformFloat2(std::string name) :
 		PipelineLayoutUniform(name, 2*sizeof(float)){
 			type = PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT2;
+			count = 2;
 		}
 };
 struct PipelineLayoutUniformFloat3 : public PipelineLayoutUniform{
 	PipelineLayoutUniformFloat3(std::string name) :
 		PipelineLayoutUniform(name, 3*sizeof(float)){
 			type = PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT3;
+			count = 3;
 		}
 };
 struct PipelineLayoutUniformFloat4 : public PipelineLayoutUniform{
 	PipelineLayoutUniformFloat4(std::string name) :
 		PipelineLayoutUniform(name, 4*sizeof(float)){
 			type = PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT4;
+			count = 4;
+		}
+};
+struct PipelineLayoutUniformMat3 : public PipelineLayoutUniform{
+	PipelineLayoutUniformMat3(std::string name) :
+		PipelineLayoutUniform(name, 3*3*sizeof(float)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_MAT3;
+			count = 3*3;
+		}
+};
+struct PipelineLayoutUniformMat4 : public PipelineLayoutUniform{
+	PipelineLayoutUniformMat4(std::string name) :
+		PipelineLayoutUniform(name, 4*4*sizeof(float)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_MAT4;
+			count = 4*4;
+		}
+};
+struct PipelineLayoutUniformInt1 : public PipelineLayoutUniform{
+	PipelineLayoutUniformInt1(std::string name) :
+		PipelineLayoutUniform(name, sizeof(int)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_INT1;
+			count = 1;
+		}
+};
+struct PipelineLayoutUniformInt2 : public PipelineLayoutUniform{
+	PipelineLayoutUniformInt2(std::string name) :
+		PipelineLayoutUniform(name, 2*sizeof(int)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_INT2;
+			count = 2;
+		}
+};
+struct PipelineLayoutUniformInt3 : public PipelineLayoutUniform{
+	PipelineLayoutUniformInt3(std::string name) :
+		PipelineLayoutUniform(name, 3*sizeof(int)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_INT3;
+			count = 3;
+		}
+};
+struct PipelineLayoutUniformInt4 : public PipelineLayoutUniform{
+	PipelineLayoutUniformInt4(std::string name) :
+		PipelineLayoutUniform(name, 4*sizeof(int)){
+			type = PIPELINE_LAYOUT_UNIFORM_TYPE_INT4;
+			count = 4;
 		}
 };
 
