@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <cstdint>
 
-Vermilion::Core::OpenGL::PipelineLayout::PipelineLayout(Vermilion::Core::OpenGL::API * api, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings){
+Vermilion::Core::OpenGL::PipelineLayout::PipelineLayout(Vermilion::Core::OpenGL::API * api, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> layoutBindings, std::initializer_list<Vermilion::Core::PipelineLayoutUniform> uniforms){
     this->api = api;
     this->instance = api->instance;
     for(auto& b : layoutBindings) this->bindings.push_back(b);
@@ -23,6 +23,14 @@ Vermilion::Core::OpenGL::PipelineLayout::PipelineLayout(Vermilion::Core::OpenGL:
     	stride += e.size;
     	this->vertexLayout.push_back(e);
     }
+
+	unsigned int push_offset = 0;
+	for(auto& u : uniforms){
+		this->uniforms.insert(std::pair<std::string, std::shared_ptr<Vermilion::Core::PipelineLayoutUniform>>(u.name, std::make_shared<Vermilion::Core::PipelineLayoutUniform>(u.name, u.size)));
+		this->uniforms[u.name]->offset = push_offset;
+		this->uniforms[u.name]->type = u.type;
+		push_offset += u.size;
+	}
 
     glGenVertexArrays(1, &this->vao);
 }

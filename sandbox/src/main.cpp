@@ -83,7 +83,7 @@ struct Application{
 			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
 			400,
 			400,
-			VMCORE_LOGLEVEL_TRACE,
+			VMCORE_LOGLEVEL_DEBUG,
 		0};
 		vmInstance.reset(new VmInstance(hintType, hintValue, this, Vermilion::Core::WindowCallbackFunctions{resize, mouseButton, mousePos, mouseEnter, scroll}));
 
@@ -105,6 +105,8 @@ struct Application{
 		vmInstance->createShader(vertexShader, R"(
 			#version 450
 			#extension GL_ARB_separate_shader_objects : enable
+			#extension GL_KHR_vulkan_glsl : enable
+
 			layout(location = 0) in vec3 aPos;
 			layout(location = 1) in vec2 aTexCoord;
 			layout(location = 2) in vec3 aNorm;
@@ -114,24 +116,43 @@ struct Application{
 				mat4 view;
 				mat4 proj;
 			} ubo;
+
+			#ifdef VULKAN
+				layout(push_constant) uniform PC0{
+					float uColMul;
+					float uZ;
+				};
+			#else
+				layout(push_constant) uniform float uColMul;
+				layout(push_constant) uniform float uZ;
+			#endif
 			
 			void main() {
-				gl_Position = ubo.proj * ubo.view * ubo.model * vec4(aPos, 1.0);
+				gl_Position = ubo.proj * ubo.view * ubo.model * vec4(aPos.x, aPos.y, aPos.z+uZ, 1.0);
 				fTexCoord = aTexCoord;
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX);
 		vmInstance->createShader(fragmentShader, R"(
 			#version 450
 			#extension GL_ARB_separate_shader_objects : enable
+			#extension GL_KHR_vulkan_glsl : enable
+
 			layout(location = 0) in vec2 fTexCoord;
 			layout(location = 0) out vec4 outColor;
 			layout(binding = 1) uniform sampler2D s_tex;
-			layout(push_constant) uniform uColMul_u {
-				float col;
-			} uColMul;
+
+			#ifdef VULKAN
+				layout(push_constant) uniform PC0{
+					float uColMul;
+					float uZ;
+				};
+			#else
+				layout(push_constant) uniform float uColMul;
+				layout(push_constant) uniform float uZ;
+			#endif
 
 			void main() {
-				outColor = vec4(texture(s_tex, fTexCoord).xyz * uColMul.col, 1.0);
+				outColor = vec4(texture(s_tex, fTexCoord).xyz * uColMul, 1.0);
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
 		vmInstance->createShaderProgram(shaderProgram, {&vertexShader, &fragmentShader});
@@ -144,7 +165,8 @@ struct Application{
 				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_UNIFORM_BUFFER,
 				Vermilion::Core::PipelineLayoutBinding::PIPELINE_LAYOUT_BINDING_SAMPLER,
 			},{
-				Vermilion::Core::PipelineLayoutUniformFloat1("uColMul")
+				Vermilion::Core::PipelineLayoutUniformFloat1("uColMul"),
+				Vermilion::Core::PipelineLayoutUniformFloat1("uZ")
 		});
 
 		vmInstance->createPipeline(pipeline1, defaultRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
@@ -291,7 +313,7 @@ struct Application{
 	}
 	void run(){
 
-		float uColMul;
+		float uColMul, uZ;
 		float time = 0.0f;
 
 		while(vmInstance->shouldClose()){
@@ -303,14 +325,20 @@ struct Application{
 			uniformBuffer2.setData(&ubo2);
 
 			uColMul = 1.0f;
+			uZ = 0.0f;
+
 			textureRenderTarget.start(1.0, 0.0, 0.0, 1.0);
 			textureRenderTarget.setUniform(pipeline2, "uColMul", &uColMul);
+			textureRenderTarget.setUniform(pipeline2, "uZ", &uZ);
 			textureRenderTarget.draw(pipeline2, binding2, object, 1, 0);
 			textureRenderTarget.end();
 
 			uColMul = std::fmod(time, 2.0f);
+			uZ = uColMul;
+
 			defaultRenderTarget.start(1.0, 1.0, 1.0, 1.0);
 			defaultRenderTarget.setUniform(pipeline2, "uColMul", &uColMul);
+			defaultRenderTarget.setUniform(pipeline2, "uZ", &uZ);
 			defaultRenderTarget.draw(pipeline1, binding1, object, 1, 0);
 			gui->render();
 			defaultRenderTarget.end();

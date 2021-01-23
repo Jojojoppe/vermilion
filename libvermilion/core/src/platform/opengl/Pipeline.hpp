@@ -49,8 +49,9 @@ class PipelineLayout : public Vermilion::Core::PipelineLayout{
 		unsigned int vao;
 		std::vector<Vermilion::Core::BufferLayoutElement> vertexLayout;
 		std::vector<Vermilion::Core::PipelineLayoutBinding> bindings;
+		std::unordered_map<std::string, std::shared_ptr<Vermilion::Core::PipelineLayoutUniform>> uniforms;
 
-		PipelineLayout(API * api, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings);
+		PipelineLayout(API * api, std::initializer_list<Vermilion::Core::BufferLayoutElement> vertexLayout, std::initializer_list<Vermilion::Core::PipelineLayoutBinding> bindings, std::initializer_list<Vermilion::Core::PipelineLayoutUniform> uniforms);
 		~PipelineLayout();
 };
 

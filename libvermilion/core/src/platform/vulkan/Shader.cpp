@@ -28,7 +28,7 @@ Vermilion::Core::Vulkan::Shader::Shader(Vermilion::Core::Vulkan::API * api, cons
 		case Vermilion::Core::ShaderType::SHADER_TYPE_VERTEX:{
 			shaderc::CompilationResult res = comp.CompileGlslToSpv(source, shaderc_vertex_shader, "vertex_shader", compoptions);
 			if(res.GetCompilationStatus()!=shaderc_compilation_status_success){
-				this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Could not compile vertex shader: %s", res.GetErrorMessage().c_str());
+				this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not compile vertex shader: %s", res.GetErrorMessage().c_str());
 				throw std::runtime_error("Vermilion::Core::Vulkan::Shader::Shader() - Could not compile vertex shader");
 			}
 			this->bytecode = std::vector<uint32_t>(res.cbegin(), res.cend());
@@ -38,7 +38,7 @@ Vermilion::Core::Vulkan::Shader::Shader(Vermilion::Core::Vulkan::API * api, cons
 		case Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT:{
 			shaderc::CompilationResult res = comp.CompileGlslToSpv(source, shaderc_fragment_shader, "vertex_shader", compoptions);
 			if(res.GetCompilationStatus()!=shaderc_compilation_status_success){
-				this->instance->logger.log(VMCORE_LOGLEVEL_DEBUG, "Could not compile fragment shader: %s", res.GetErrorMessage().c_str());
+				this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not compile fragment shader: %s", res.GetErrorMessage().c_str());
 				throw std::runtime_error("Vermilion::Core::Vulkan::Shader::Shader() - Could not compile fragment shader");
 			}
 			this->bytecode = std::vector<uint32_t>(res.cbegin(), res.cend());

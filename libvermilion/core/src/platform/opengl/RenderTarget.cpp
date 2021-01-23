@@ -6,6 +6,7 @@
 #include "Renderable.hpp"
 #include "Shader.hpp"
 #include "Buffer.hpp"
+#include <stdexcept>
 
 int OpenGLBufferLayoutElementTypeToOpenGLBaseType[] = {
     GL_FLOAT,
@@ -128,6 +129,24 @@ void Vermilion::Core::OpenGL::RenderTarget::draw(std::shared_ptr<Vermilion::Core
     glBindBuffer(glindex->destination, glindex->buffer);
 
     glDrawElementsInstancedBaseVertexBaseInstance(glpipeline->drawmode, glrenderable->length, GL_UNSIGNED_INT, (void*)(glrenderable->indexOffset*sizeof(unsigned int)), instanceCount, glrenderable->vertexOffset, firstInstance);
+}
+
+void Vermilion::Core::OpenGL::RenderTarget::setUniform(std::shared_ptr<Vermilion::Core::Pipeline> pipeline, const std::string& name, void * data){
+    auto glpipeline = std::static_pointer_cast<Vermilion::Core::OpenGL::Pipeline>(pipeline);
+    auto glprog = std::static_pointer_cast<Vermilion::Core::OpenGL::ShaderProgram>(glpipeline->shaderProgram);
+    glUseProgram(glprog->shaderProgram);
+    int loc = glGetUniformLocation(glprog->shaderProgram, name.c_str());
+    if(loc<0){
+		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Uniform with name %s not found in pipeline", name.c_str());
+		throw std::runtime_error("Vermilion::Core::OpenGL::RenderTarget::setUniform() - Uniform not found in pipeline");
+    }
+    switch(glpipeline->pipelineLayout->uniforms[name]->type){
+        case Vermilion::Core::PipelineLayoutUniformType::PIPELINE_LAYOUT_UNIFORM_TYPE_FLOAT1:
+            glUniform1f(loc, *((float*)data));
+            break;
+        default:
+           break;
+    }
 }
 
 Vermilion::Core::OpenGL::DefaultRenderTarget::DefaultRenderTarget(Vermilion::Core::OpenGL::API * api, std::shared_ptr<Vermilion::Core::Texture> texture) :

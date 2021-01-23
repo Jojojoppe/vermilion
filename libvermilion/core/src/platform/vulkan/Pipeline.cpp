@@ -51,7 +51,7 @@ Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan:
 		this->uniforms.insert(std::pair<std::string, std::shared_ptr<Vermilion::Core::PipelineLayoutUniform>>(u.name, std::make_shared<Vermilion::Core::PipelineLayoutUniform>(u.name, u.size)));
 		this->uniforms[u.name]->offset = push_offset;
 		this->uniforms[u.name]->type = u.type;
-		offset += u.size;
+		push_offset += u.size;
 	}
 
 	// Create pipeline descriptor layout
