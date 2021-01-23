@@ -44,7 +44,8 @@ struct Application{
 		app->pipeline1.setViewport(width, height, 0, 0);
 		app->pipeline1.setScissor(width, height, 0, 0);
 		app->ubo1.proj = glm::perspective(glm::radians(45.0f), width/(float)height, 0.1f, 10.0f);
-		app->gui->resize(width, height);
+		app->uniformBuffer1.setData(&app->ubo1);
+		// app->gui->resize(width, height);
 	}
 
 	static void mouseButton(VmInstance * instance, void * userPointer, Vermilion::Core::WindowMouseButton btn, Vermilion::Core::WindowMouseAction action){
@@ -90,17 +91,13 @@ struct Application{
 		gui.reset(new GUI(vmInstance, 400, 400));
 
 		size_t width, height, channels;
-		unsigned char * texture1_pixels = Vermilion::Core::loadTextureData("../assets/texture1.jpg", &width, &height, &channels);
+		unsigned char * texture1_pixels = Vermilion::Core::loadTextureData("../assets/viking_room.png", &width, &height, &channels);
 		vmInstance->createTexture(texture1, width, height, 4);
 		texture1.setData(texture1_pixels);
 		Vermilion::Core::freeTextureData(texture1_pixels);
 		vmInstance->createSampler(sampler1, texture1);
 
-		vmInstance->createTexture(texture2, 512, 512, 4);
-		vmInstance->createSampler(sampler2, texture2);
-
 		vmInstance->getDefaultRenderTarget(defaultRenderTarget);
-		vmInstance->createRenderTarget(textureRenderTarget, texture2);
 
 		vmInstance->createShader(vertexShader, R"(
 			#version 450
@@ -119,11 +116,9 @@ struct Application{
 			#ifdef VULKAN
 				layout(push_constant) uniform PC0{
 					mat4 uModel;
-					float uColMul;
 				};
 			#else
 				layout(push_constant) uniform mat4 uModel;
-				layout(push_constant) uniform float uColMul;
 			#endif
 			
 			void main() {
@@ -143,15 +138,13 @@ struct Application{
 			#ifdef VULKAN
 				layout(push_constant) uniform PC0{
 					mat4 uModel;
-					float uColMul;
 				};
 			#else
 				layout(push_constant) uniform mat4 uModel;
-				layout(push_constant) uniform float uColMul;
 			#endif
 
 			void main() {
-				outColor = vec4(texture(s_tex, fTexCoord).xyz * uColMul, 1.0);
+				outColor = vec4(texture(s_tex, fTexCoord).xyz, 1.0);
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
 		vmInstance->createShaderProgram(shaderProgram, {&vertexShader, &fragmentShader});
@@ -165,7 +158,6 @@ struct Application{
 				Vermilion::Core::PipelineLayoutBinding(Vermilion::Core::PipelineLayoutBindingType::PIPELINE_LAYOUT_BINDING_SAMPLER)
 			},{
 				Vermilion::Core::PipelineLayoutUniformMat4("uModel"),
-				Vermilion::Core::PipelineLayoutUniformFloat1("uColMul")
 		});
 
 		vmInstance->createPipeline(pipeline1, defaultRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
@@ -173,18 +165,11 @@ struct Application{
 			Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_NONE,
 			Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
 		});
-		vmInstance->createPipeline(pipeline2, textureRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
-			Vermilion::Core::PipelineSettingsDepthTest::PIPELINE_SETTINGS_DEPTH_TEST_ENABLED,
-			Vermilion::Core::PipelineSettingsCullMode::PIPELINE_SETTINGS_CULL_MODE_NONE,
-			Vermilion::Core::PipelineSettingsPolygonMode::PIPELINE_SETTINGS_POLYGON_MODE_TRIANGLE
-		});
-		pipeline2.setViewport(texture2.width(), texture2.height(), 0, 0);
-		pipeline2.setScissor(texture2.width(), texture2.height(), 0, 0);
 
 		std::vector<float> vertices;
 		std::vector<unsigned int> indices;
 
-		Vermilion::Utils::loadObj(vertices, indices, "../assets/cube.obj");
+		Vermilion::Utils::loadObj(vertices, indices, "../assets/viking_room.obj");
 
 		vmInstance->createBuffer(vertexBuffer, sizeof(float)*vertices.size(), 
 			Vermilion::Core::BufferType::BUFFER_TYPE_VERTEX,
@@ -205,20 +190,12 @@ struct Application{
 			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
 			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
 		);
-		vmInstance->createBuffer(uniformBuffer2, sizeof(UniformBufferObject),
-			Vermilion::Core::BufferType::BUFFER_TYPE_UNIFORM,
-			Vermilion::Core::BufferUsage::BUFFER_USAGE_WRITE_ONLY,
-			Vermilion::Core::BufferDataUsage::BUFFER_DATA_USAGE_DYNAMIC
-		);
 		
 		ubo1.view = glm::lookAt(glm::vec3(0.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 0, 1));
 		ubo1.proj = glm::perspective(glm::radians(45.0f), (float)400/400, 0.1f, 10.0f);
-		ubo2 = ubo1;
 		uniformBuffer1.setData(&ubo1);
-		uniformBuffer2.setData(&ubo2);
 		
-		vmInstance->createBinding(binding1, {&uniformBuffer1}, {&sampler2});
-		vmInstance->createBinding(binding2, {&uniformBuffer2}, {&sampler1});
+		vmInstance->createBinding(binding1, {&uniformBuffer1}, {&sampler1});
 
 	}
 	void run(){
@@ -228,32 +205,19 @@ struct Application{
 		float time = 0.0f;
 
 		glm::mat4 model1 = glm::mat4(1.0f);
-		glm::mat4 model2 = glm::mat4(1.0f);
 
 		while(vmInstance->shouldClose()){
 			vmInstance->startRender();
 
 			model1 = glm::rotate(model1, 0.01f, glm::vec3(0.0f, 0.0f, 1.0f));
-			model2 = glm::rotate(model1, -0.02f, glm::vec3(0.0f, 0.0f, 1.0f));
-
-			uColMul = 1.0f;
-
-			textureRenderTarget.start(1.0, 0.0, 0.0, 1.0);
-			textureRenderTarget.setUniform(pipeline2, "uColMul", &uColMul);
-			textureRenderTarget.setUniform(pipeline2, "uModel", &model1);
-			textureRenderTarget.draw(pipeline2, binding2, object, 1, 0);
-			textureRenderTarget.end();
-
-			uColMul = std::fmod(time, 2.0f);
 
 			defaultRenderTarget.start(1.0, 1.0, 1.0, 1.0);
-			defaultRenderTarget.setUniform(pipeline2, "uColMul", &uColMul);
-			defaultRenderTarget.setUniform(pipeline2, "uModel", &model2);
+			defaultRenderTarget.setUniform(pipeline1, "uModel", &model1);
 			defaultRenderTarget.draw(pipeline1, binding1, object, 1, 0);
-			gui->render();
+			// gui->render();
 			defaultRenderTarget.end();
 
-			vmInstance->endRender({&textureRenderTarget});
+			vmInstance->endRender({});
 			time += 0.01f;
 		}
 	}
