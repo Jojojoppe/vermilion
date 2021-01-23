@@ -153,6 +153,10 @@ void __loadMtl(std::unordered_map<std::string, Vermilion::Utils::material>& mate
             sscanf(buf, "Kd %f %f %f", &M.Kdr, &M.Kdg, &M.Kdb);
         }
 
+        if(buf[0]=='K' && buf[1]=='a'){                     // Ambient color
+            sscanf(buf, "Ka %f %f %f", &M.Kar, &M.Kag, &M.Kab);
+        }
+
     }
     materials.insert(std::pair<std::string, Vermilion::Utils::material>(currentMaterial, M));
 }

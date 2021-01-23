@@ -111,6 +111,7 @@ GUI::GUI(std::shared_ptr<VmInstance> instance, int width, int height){
     instance->createBinding(binding, {&uniformBuffer}, {&sampler});
 
     m_time = std::chrono::high_resolution_clock::now();
+    ImGui::NewFrame();
 }
 
 GUI::~GUI(){
@@ -118,9 +119,6 @@ GUI::~GUI(){
 }
 
 void GUI::render(){
-    ImGui::NewFrame();
-    ImGui::ShowMetricsWindow();
-
     ImGui::Render();
 
     ImDrawData * draw_data = ImGui::GetDrawData();
@@ -175,6 +173,7 @@ void GUI::render(){
     ImGuiIO& io = ImGui::GetIO();
     io.DeltaTime = time_span.count();
     m_time = current_time;
+    ImGui::NewFrame();
 }
 
 void GUI::resize(int width, int height){

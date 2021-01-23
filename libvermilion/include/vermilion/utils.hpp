@@ -20,6 +20,8 @@ struct material{
     std::string tex_d;
     // Diffuse color
     float Kdr, Kdg, Kdb;
+    // Ambient color
+    float Kar, Kag, Kab;
 };
 
 void loadObj(std::vector<float>& vertices, std::vector<unsigned int>& indices, std::vector<mesh>& meshes, std::unordered_map<std::string, material>& materials, const std::string& objname, const std::string& path);

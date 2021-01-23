@@ -3,6 +3,7 @@
 
 #include <vermilion/glm/glm.hpp>
 #include <vermilion/glm/gtc/matrix_transform.hpp>
+#include "imgui/imgui.h"
 #include <memory>
 #include <vector>
 #include <unordered_map>
@@ -29,6 +30,7 @@ class RenderObject{
 		std::unordered_map<std::string, unsigned int> renderableBindingIndex;
 
 		std::unordered_map<std::string, glm::vec4> uKd;
+		std::unordered_map<std::string, glm::vec4> uKa;
 
 	public:
 		RenderObject(std::shared_ptr<VmInstance>& instance, const std::string& path, const std::string& objname){
@@ -56,7 +58,7 @@ class RenderObject{
 			}
 
 			instance->createTexture(whiteTexture, 1, 1, 4);
-			unsigned char white[4] = {0,0,0,0};
+			unsigned char white[4] = {255, 255, 255, 255};
 			whiteTexture.setData(white);
 			instance->createSampler(whiteTextureSampler, whiteTexture);
 
@@ -83,6 +85,7 @@ class RenderObject{
 				}
 
 				uKd.insert(std::pair<std::string, glm::vec4>(m.first, glm::vec4(m.second.Kdr, m.second.Kdg, m.second.Kdb, 1.0f)));
+				uKa.insert(std::pair<std::string, glm::vec4>(m.first, glm::vec4(m.second.Kar, m.second.Kag, m.second.Kab, 1.0f)));
 
 				instance->createBinding(bindings[i], bindingBuffers, bindingSamplers);
 				renderableBindingIndex.insert(std::pair<std::string, unsigned int>(m.first, i));
@@ -95,6 +98,7 @@ class RenderObject{
 			for(int i=0; i<renderables.size(); i++){
 				unsigned int bindingIndex = renderableBindingIndex[renderableMaterials[i]];
 				target.setUniform(pipeline, "uKd", &(uKd[renderableMaterials[i]]));
+				target.setUniform(pipeline, "uKa", &(uKa[renderableMaterials[i]]));
 				target.draw(pipeline, bindings[bindingIndex], renderables[i], 1, 0);
 			}
 		}
@@ -153,7 +157,7 @@ struct Application{
 		0};
 		int hintValue[] = {
 			Vermilion::Core::WindowPlatform::WINDOW_PLATFORM_GLFW, 
-			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_VULKAN,
+			Vermilion::Core::RenderPlatform::RENDER_PLATFORM_OPENGL,
 			400,
 			400,
 			VMCORE_LOGLEVEL_DEBUG,
@@ -178,12 +182,14 @@ struct Application{
 					mat4 uView;
 					mat4 uProjection;
 					vec4 uKd;
+					vec4 uKa;
 				};
 			#else
-				layout(push_constant) uniform mat4 uModel;
-				layout(push_constant) uniform mat4 uView;
-				layout(push_constant) uniform mat4 uProjection;
-				layout(push_constant) uniform vec4 uKd;
+				uniform mat4 uModel;
+				uniform mat4 uView;
+				uniform mat4 uProjection;
+				uniform vec4 uKd;
+				uniform vec4 uKa;
 			#endif
 			
 			void main() {
@@ -206,16 +212,18 @@ struct Application{
 					mat4 uView;
 					mat4 uProjection;
 					vec4 uKd;
+					vec4 uKa;
 				};
 			#else
-				layout(push_constant) uniform mat4 uModel;
-				layout(push_constant) uniform mat4 uView;
-				layout(push_constant) uniform mat4 uProjection;
-				layout(push_constant) uniform vec4 uKd;
+				uniform mat4 uModel;
+				uniform mat4 uView;
+				uniform mat4 uProjection;
+				uniform vec4 uKd;
+				uniform vec4 uKa;
 			#endif
 
 			void main() {
-				outColor = vec4(texture(s_tex, fTexCoord).xyz, 1.0) + uKd;
+				outColor = vec4(texture(s_tex, fTexCoord).xyz, 1.0) * uKd * uKa;
 			}
 		)", Vermilion::Core::ShaderType::SHADER_TYPE_FRAGMENT);
 		vmInstance->createShaderProgram(shaderProgram, {&vertexShader, &fragmentShader});
@@ -231,6 +239,7 @@ struct Application{
 				Vermilion::Core::PipelineLayoutUniformMat4("uView"),
 				Vermilion::Core::PipelineLayoutUniformMat4("uProjection"),
 				Vermilion::Core::PipelineLayoutUniformFloat4("uKd"),
+				Vermilion::Core::PipelineLayoutUniformFloat4("uKa"),
 		});
 
 		vmInstance->createPipeline(pipeline, defaultRenderTarget, shaderProgram, pipelineLayout, Vermilion::Core::PipelineSettings{
@@ -250,7 +259,7 @@ struct Application{
 
 		while(vmInstance->shouldClose()){
 			vmInstance->startRender();
-				defaultRenderTarget.start(1.0, 1.0, 1.0, 1.0);
+				defaultRenderTarget.start(0.0, 0.0, 0.0, 1.0);
 
 					model1 = glm::rotate(model1, 0.01f, glm::vec3(0,0,1));
 					defaultRenderTarget.setUniform(pipeline, "uModel", &model1);
@@ -258,7 +267,11 @@ struct Application{
 					defaultRenderTarget.setUniform(pipeline, "uProjection", &projection);
 					object1->draw(defaultRenderTarget, pipeline);
 
+					ImGui::Begin("Settings");
+					ImGui::End();
+
 					gui->render();
+
 				defaultRenderTarget.end();
 			vmInstance->endRender({});
 		}
