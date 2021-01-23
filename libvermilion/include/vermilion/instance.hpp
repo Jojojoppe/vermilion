@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 #include <vermilion/vermilion.hpp>
 #include <vermilion/logger.hpp>
@@ -46,6 +47,7 @@ class Instance{
 		void createPipelineLayout(VmPipelineLayout& pipelineLayout, std::initializer_list<BufferLayoutElement> vertexLayout, std::initializer_list<PipelineLayoutBinding> bindings, std::initializer_list<PipelineLayoutUniform> uniforms);
 		void createPipeline(VmPipeline& pipeline, VmRenderTarget& renderTarget, VmShaderProgram& shaderProgram, VmPipelineLayout& pipelineLayout, PipelineSettings settings);
 		void createBinding(VmBinding& binding, std::initializer_list<VmBuffer*> buffers, std::initializer_list<VmSampler*> samplers);
+		void createBinding(VmBinding& binding, std::vector<VmBuffer*>& buffers, std::vector<VmSampler*>& samplers);
 
 		void createBuffer(VmBuffer& buffer, size_t size, BufferType type, BufferUsage usage, BufferDataUsage dataUsage);
 
