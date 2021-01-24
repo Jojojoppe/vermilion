@@ -80,8 +80,6 @@ add_library(vermilion_core SHARED
 
 	${CMAKE_CURRENT_SOURCE_DIR}/core/src/platform/glfw/window.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/utils/src/obj.cpp
-
 	${GLAD_SOURCES}
 )
 target_include_directories(vermilion_core PUBLIC
