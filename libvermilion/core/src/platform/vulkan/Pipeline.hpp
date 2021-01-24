@@ -65,6 +65,8 @@ class Pipeline : public Vermilion::Core::Pipeline{
 		std::shared_ptr<Vermilion::Core::ShaderProgram> shaderProgram;
 
 		std::vector<VkDescriptorPool> vk_descriptorPool;
+		unsigned int lastPool = 0;
+		unsigned int lastDescriptor = 0;
 
 		unsigned int stride = 0;
 

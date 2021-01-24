@@ -136,6 +136,17 @@ void Vermilion::Core::Instance::createBinding(VmBinding& b, std::initializer_lis
 	b.instance = this;
 }
 
+void Vermilion::Core::Instance::createBinding(VmBinding& b, std::vector<VmBuffer*>& buffers, std::vector<VmSampler*>& samplers){
+	std::vector<std::shared_ptr<Buffer>> bfrs;
+	std::vector<std::shared_ptr<Sampler>> smps;
+	for(auto& b : buffers) bfrs.push_back(this->buffers[b->ID]);
+	for(auto& s : samplers) smps.push_back(this->samplers[s->ID]);
+	auto bind = this->api->createBinding(bfrs, smps);
+	this->bindings.insert(std::pair<unsigned int, std::shared_ptr<Binding>>(IDcounter, bind));
+	b.ID = IDcounter++;
+	b.instance = this;
+}
+
 void Vermilion::Core::Instance::createBuffer(VmBuffer& b, size_t size, Vermilion::Core::BufferType type, Vermilion::Core::BufferUsage usage, Vermilion::Core::BufferDataUsage dataUsage){
 	auto buf = this->api->createBuffer(size, type, usage, dataUsage);
 	this->buffers.insert(std::pair<unsigned int, std::shared_ptr<Buffer>>(IDcounter, buf));

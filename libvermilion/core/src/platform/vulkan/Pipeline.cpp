@@ -40,19 +40,17 @@ Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan:
 		this->vertexLayout.push_back(e);
 	}	
 
-	std::vector<VkPushConstantRange> push_constants;
+	VkPushConstantRange push_constants = {};
+	push_constants.offset = 0;
+	push_constants.stageFlags = VK_SHADER_STAGE_VERTEX_BIT|VK_SHADER_STAGE_FRAGMENT_BIT;
 	unsigned int push_offset = 0;
 	for(auto& u : uniforms){
-		VkPushConstantRange p = {};
-		p.offset = push_offset;
-		p.size = u.size;
-		p.stageFlags = VK_SHADER_STAGE_VERTEX_BIT|VK_SHADER_STAGE_FRAGMENT_BIT;
-		push_constants.push_back(p);
 		this->uniforms.insert(std::pair<std::string, std::shared_ptr<Vermilion::Core::PipelineLayoutUniform>>(u.name, std::make_shared<Vermilion::Core::PipelineLayoutUniform>(u.name, u.size)));
 		this->uniforms[u.name]->offset = push_offset;
 		this->uniforms[u.name]->type = u.type;
 		push_offset += u.size;
 	}
+	push_constants.size = push_offset;
 
 	// Create pipeline descriptor layout
 	std::vector<VkDescriptorSetLayoutBinding> layoutBindingsVector;
@@ -108,8 +106,8 @@ Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout(Vermilion::Core::Vulkan:
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 1;
 	pipelineLayoutInfo.pSetLayouts = &vk_descriptorSetLayout;
-	pipelineLayoutInfo.pushConstantRangeCount = push_constants.size(); // Optional
-	pipelineLayoutInfo.pPushConstantRanges = push_constants.data(); // Optional
+	pipelineLayoutInfo.pushConstantRangeCount = 1; // Optional
+	pipelineLayoutInfo.pPushConstantRanges = &push_constants; // Optional
 	if(vkCreatePipelineLayout(api->vk_device->vk_device, &pipelineLayoutInfo, nullptr, &this->vk_pipelineLayout)!=VK_SUCCESS){
 		this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not create pipeline layout");
 		throw std::runtime_error("Vermilion::Core::Vulkan::PipelineLayout::PipelineLayout() - Could not create pipeline layout");
@@ -357,11 +355,20 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 	std::shared_ptr<Vermilion::Core::Vulkan::Binding> vkBinding = std::static_pointer_cast<Vermilion::Core::Vulkan::Binding>(binding);
 	if(this->descriptorSets.find(vkBinding)==this->descriptorSets.end()){
 		// Descriptor set not yet created
+
+		// Get pool and
+		if(lastDescriptor+api->vk_swapchain->swapChainImages.size() >=16){
+			// New pool must be created
+			lastDescriptor=0;
+			lastPool++;
+			createDescriptorPool();
+		}
+
 		this->descriptorSets[vkBinding] = std::vector<VkDescriptorSet>();
 		std::vector<VkDescriptorSetLayout> layouts(api->vk_swapchain->swapChainImages.size(), this->pipelineLayout->vk_descriptorSetLayout);
 		VkDescriptorSetAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		allocInfo.descriptorPool = this->vk_descriptorPool[0];
+		allocInfo.descriptorPool = this->vk_descriptorPool[lastPool];
 		allocInfo.descriptorSetCount = static_cast<uint32_t>(api->vk_swapchain->swapChainImages.size());
 		allocInfo.pSetLayouts = layouts.data();
 		this->descriptorSets[vkBinding].resize(api->vk_swapchain->swapChainImages.size());
@@ -370,6 +377,8 @@ void Vermilion::Core::Vulkan::Pipeline::bind(std::shared_ptr<Vermilion::Core::Bi
 			this->instance->logger.log(VMCORE_LOGLEVEL_FATAL, "Could not allocate descriptor sets: %d", res);
 			throw std::runtime_error("Vermilion::Core::Vulkan::Binding::Binding() - Could not allocate descriptor sets");
 		}
+
+		lastDescriptor+=api->vk_swapchain->swapChainImages.size();
 
 		for(int i = 0; i<api->vk_swapchain->swapChainImages.size(); i++){
 			int bo_i = 0;
