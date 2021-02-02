@@ -297,7 +297,6 @@ class VmObject{
 
 class VmRenderTarget : public VmObject{
     public:
-        ~VmRenderTarget();
         void start(float r=0.0, float g=0.0, float b=0.0, float a=1.0);
         void end();
         void draw(VmPipeline& pipeline, VmBinding& binding, VmRenderable& renderable, unsigned int instanceCount=1, unsigned int firstInstance=0);
@@ -306,24 +305,20 @@ class VmRenderTarget : public VmObject{
 
 class VmShader : public VmObject{
     public:
-        ~VmShader();
         Vermilion::Core::ShaderType type();
 };
 
 class VmShaderProgram : public VmObject{
     public:
-        ~VmShaderProgram();
 };
 
 class VmPipelineLayout : public VmObject{
     public:
-        ~VmPipelineLayout();
 };
 
 class VmPipeline : public VmObject{
 	friend class VmRenderTarget;
     public:
-        ~VmPipeline();
         void setViewport(int width, int height, int x, int y);
         void setScissor(int width, int height, int x, int y);
 };
@@ -331,12 +326,10 @@ class VmPipeline : public VmObject{
 class VmBinding : public VmObject{
 	friend class VmRenderTarget;
     public:
-        ~VmBinding();
 };
 
 class VmBuffer : public VmObject{
     public:
-        ~VmBuffer();
         Vermilion::Core::BufferType type();
         size_t size();
         void setData(void * data, size_t size=0);
@@ -346,7 +339,6 @@ class VmBuffer : public VmObject{
 class VmRenderable : public VmObject{
 	friend class VmRenderTarget;
     public:
-        ~VmRenderable();
         unsigned int vertexOffset();
         unsigned int indexOffset();
         unsigned int length();
@@ -357,7 +349,6 @@ class VmRenderable : public VmObject{
 
 class VmTexture : public VmObject{
     public:
-        ~VmTexture();
         size_t width();
         size_t height();
         size_t channels();
@@ -366,7 +357,6 @@ class VmTexture : public VmObject{
 
 class VmSampler : public VmObject{
     public:
-        ~VmSampler();
 };
 
 namespace Vermilion{

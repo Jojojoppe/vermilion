@@ -8,12 +8,6 @@
 #include "Shader.hpp"
 #include "Texture.hpp"
 
-VmRenderTarget::~VmRenderTarget(){
-    if(ID){
-        instance->rendertargets[ID].reset();
-        instance->rendertargets.erase(ID);
-    }
-}
 void VmRenderTarget::start(float r, float g, float b, float a){
     instance->rendertargets[ID]->start(r, g, b, a);
 }
@@ -31,29 +25,11 @@ void VmRenderTarget::setUniform(VmPipeline& pipeline, const std::string& name, v
     instance->rendertargets[ID]->setUniform(pl, name, data);
 }
 
-VmShader::~VmShader(){
-    instance->shaders[ID].reset();
-    instance->shaders.erase(ID);
-}
 Vermilion::Core::ShaderType VmShader::type(){
     auto shd = instance->shaders[ID];
     return (Vermilion::Core::ShaderType)shd->type;
 }
 
-VmShaderProgram::~VmShaderProgram(){
-    instance->shaderprograms[ID].reset();
-    instance->shaderprograms.erase(ID);
-}
-
-VmPipelineLayout::~VmPipelineLayout(){
-    instance->pipelinelayouts[ID].reset();
-    instance->pipelinelayouts.erase(ID);
-}
-
-VmPipeline::~VmPipeline(){
-    instance->pipelines[ID].reset();
-    instance->pipelines.erase(ID);
-}
 void VmPipeline::setViewport(int width, int height, int x, int y){
     instance->pipelines[ID]->setViewPort(width, height, x, y);
 }
@@ -61,15 +37,6 @@ void VmPipeline::setScissor(int width, int height, int x, int y){
     instance->pipelines[ID]->setScissor(width, height, x, y);
 }
 
-VmBinding::~VmBinding(){
-    instance->bindings[ID].reset();
-    instance->bindings.erase(ID);
-}
-
-VmBuffer::~VmBuffer(){
-    instance->buffers[ID].reset();
-    instance->buffers.erase(ID);
-}
 Vermilion::Core::BufferType VmBuffer::type(){
     auto buf = instance->buffers[ID];
     return buf->type;
@@ -87,10 +54,6 @@ void VmBuffer::getData(void * data, size_t size){
     buf->getData(data, size);
 }
 
-VmRenderable::~VmRenderable(){
-    instance->renderables[ID].reset();
-    instance->renderables.erase(ID);
-}
 unsigned int VmRenderable::vertexOffset(){
     auto ren = instance->renderables[ID];
     return ren->vertexOffset;
@@ -116,10 +79,6 @@ void VmRenderable::length(unsigned int length){
     ren->length = length;
 }
 
-VmTexture::~VmTexture(){
-    instance->textures[ID].reset();
-    instance->textures.erase(ID);
-}
 size_t VmTexture::width(){
     auto tex = instance->textures[ID];
     return tex->width;
@@ -135,9 +94,4 @@ size_t VmTexture::channels(){
 void VmTexture::setData(void * data, size_t size){
     auto tex = instance->textures[ID];
     tex->setData(data, size);
-}
-
-VmSampler::~VmSampler(){
-    instance->samplers[ID].reset();
-    instance->samplers.erase(ID);
 }
